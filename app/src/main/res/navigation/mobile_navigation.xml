@@ -22,4 +22,10 @@
         android:name="com.example.healthtracker.ui.notifications.AccountFragment"
 
         tools:layout="@layout/fragment_notifications" />
+    <activity
+        android:id="@+id/registerActivity"
+        android:name="com.example.healthtracker.ui.RegisterActivity"
+        android:label="RegisterActivity" />
+
+
 </navigation>

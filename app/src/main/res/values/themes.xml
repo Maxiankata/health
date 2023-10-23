@@ -12,5 +12,11 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+<!--        <style name="ScreenBackground"><item name="android:background">@color/yellow_mellow</item></style>-->
+<!--        <style name="StrongColor"><item name="android:background">@color/orange_strong</item> </style>-->
+<!--        <style name="TextAppearance"><item name="android:textColor">@color/white</item></style>-->
+<!--        <style name="SubBackground"><item name="android:background">@color/red_aggressive</item></style>-->
+<!--        <style name="SideBarColor"><item name="android:background">@color/side_bar_light</item></style>-->
+<!--        <style name="SearchMenuBackground"><item name="android:background">@color/search_bar_light</item></style>-->
     </style>
 </resources>
