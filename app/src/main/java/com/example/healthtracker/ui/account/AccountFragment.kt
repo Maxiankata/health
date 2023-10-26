@@ -39,10 +39,16 @@ class AccountFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
             signOutButton.apply {
-                setRoundedCorners(10F)
+                setRoundedCorners(20F)
                 setOnClickListener {
-                    navigateToActivity(requireContext(), LoginActivity::class.java)
+                    navigateToActivity(requireActivity(), LoginActivity::class.java)
                 }
+            }
+            achievements.apply {
+                setRoundedCorners(20F)
+            }
+            friends.apply {
+                setRoundedCorners(20F)
             }
         }
     }
@@ -51,10 +57,10 @@ class AccountFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-    private fun navigateToActivity(context: Context, destinationActivity: Class<out Activity>) {
-
-        val intent = Intent(context, destinationActivity)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        context.startActivity(intent)
+    fun navigateToActivity(currentActivity: Activity, targetActivityClass: Class<*>) {
+        val intent = Intent(currentActivity, targetActivityClass)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        currentActivity.startActivity(intent)
+        currentActivity.finish()
     }
 }

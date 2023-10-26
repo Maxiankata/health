@@ -7,7 +7,6 @@ import android.os.Bundle
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.ActivityLoginBinding
-import com.example.healthtracker.databinding.ActivityRegisterBinding
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding : ActivityLoginBinding
@@ -18,10 +17,10 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding.apply {
             registerButton.setOnClickListener{
-                navigateToActivity(RegisterActivity::class.java)
+                navigateToActivity(this@LoginActivity,RegisterActivity::class.java)
             }
             signInButton.setOnClickListener {
-                navigateToActivity(MainActivity::class.java)
+                navigateToActivity(this@LoginActivity,MainActivity::class.java)
             }
         }
 
@@ -30,9 +29,10 @@ class LoginActivity : AppCompatActivity() {
         super.onBackPressed()
         finish() // Finish the activity (close the app)
     }
-    private fun navigateToActivity(destinationActivity: Class<out Activity>) {
-        val intent = Intent(this, destinationActivity)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        startActivity(intent)
+    fun navigateToActivity(currentActivity: Activity, targetActivityClass: Class<*>) {
+        val intent = Intent(currentActivity, targetActivityClass)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        currentActivity.startActivity(intent)
+        currentActivity.finish()
     }
 }

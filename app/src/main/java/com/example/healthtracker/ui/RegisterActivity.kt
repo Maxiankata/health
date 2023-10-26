@@ -20,22 +20,22 @@ class RegisterActivity : AppCompatActivity() {
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.apply {
-            signInButton.setOnClickListener{
-                navigateToActivity(LoginActivity::class.java)
-
+            signInButton.setOnClickListener {
+                navigateToActivity(this@RegisterActivity, LoginActivity::class.java)
             }
-            registerButton.setOnClickListener{
-                navigateToActivity(MainActivity::class.java)
-
+            registerButton.setOnClickListener {
+                navigateToActivity(this@RegisterActivity, MainActivity::class.java)
             }
         }
+
     }
 
 
-    private fun navigateToActivity(destinationActivity: Class<out Activity>) {
-        val intent = Intent(this, destinationActivity)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        startActivity(intent)
+    fun navigateToActivity(currentActivity: Activity, targetActivityClass: Class<*>) {
+        val intent = Intent(currentActivity, targetActivityClass)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        currentActivity.startActivity(intent)
+        currentActivity.finish()
     }
 
 }
