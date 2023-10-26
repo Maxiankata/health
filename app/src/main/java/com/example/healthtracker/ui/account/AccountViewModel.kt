@@ -1,4 +1,4 @@
-package com.example.healthtracker.ui.notifications
+package com.example.healthtracker.ui.account
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

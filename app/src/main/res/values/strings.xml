@@ -21,5 +21,10 @@
     <string name="confirm_password">Confirm password</string>
     <string name="old_user">Click to Sign in.</string>
     <string name="register">Register</string>
+    <string name="name_placeholder">Name Placeholder</string>
+    <string name="action_sign_out">Sign Out</string>
+    <string name="friends">Friends</string>
+    <string name="total_steps">"Total Steps: "</string>
+    <string name="achievements">Achievements</string>
 
 </resources>
