@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.healthtracker.databinding.FragmentAccountBinding
 import com.example.healthtracker.ui.LoginActivity
+import com.example.healthtracker.ui.navigateToActivity
 import com.example.healthtracker.ui.setRoundedCorners
 
 class AccountFragment : Fragment() {
@@ -39,16 +40,19 @@ class AccountFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
             signOutButton.apply {
-                setRoundedCorners(20F)
+                setRoundedCorners(25F)
                 setOnClickListener {
                     navigateToActivity(requireActivity(), LoginActivity::class.java)
                 }
             }
             achievements.apply {
-                setRoundedCorners(20F)
+                setRoundedCorners(25F)
             }
             friends.apply {
-                setRoundedCorners(20F)
+                setRoundedCorners(25F)
+            }
+            profilePhoto.apply {
+                setRoundedCorners(360F)
             }
         }
     }
@@ -56,11 +60,5 @@ class AccountFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-    fun navigateToActivity(currentActivity: Activity, targetActivityClass: Class<*>) {
-        val intent = Intent(currentActivity, targetActivityClass)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-        currentActivity.startActivity(intent)
-        currentActivity.finish()
     }
 }

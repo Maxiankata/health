@@ -23,16 +23,12 @@ class LoginActivity : AppCompatActivity() {
                 navigateToActivity(this@LoginActivity,MainActivity::class.java)
             }
         }
+        supportActionBar?.hide()
 
     }
     override fun onBackPressed() {
         super.onBackPressed()
         finish() // Finish the activity (close the app)
     }
-    fun navigateToActivity(currentActivity: Activity, targetActivityClass: Class<*>) {
-        val intent = Intent(currentActivity, targetActivityClass)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-        currentActivity.startActivity(intent)
-        currentActivity.finish()
-    }
+
 }

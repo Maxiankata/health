@@ -1,4 +1,6 @@
 package com.example.healthtracker.ui
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Outline
 import android.graphics.Path
 import android.graphics.Rect

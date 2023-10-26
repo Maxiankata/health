@@ -27,15 +27,11 @@ class RegisterActivity : AppCompatActivity() {
                 navigateToActivity(this@RegisterActivity, MainActivity::class.java)
             }
         }
+        supportActionBar?.hide()
 
     }
 
 
-    fun navigateToActivity(currentActivity: Activity, targetActivityClass: Class<*>) {
-        val intent = Intent(currentActivity, targetActivityClass)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-        currentActivity.startActivity(intent)
-        currentActivity.finish()
-    }
+
 
 }
