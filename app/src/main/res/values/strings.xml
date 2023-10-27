@@ -26,5 +26,7 @@
     <string name="friends">Friends</string>
     <string name="total_steps">"Total Steps: "</string>
     <string name="achievements">Achievements</string>
+    <string name="enter_your_email">Enter your e-mail</string>
+    <string name="send_renewal_code">Send renewal code</string>
 
 </resources>
