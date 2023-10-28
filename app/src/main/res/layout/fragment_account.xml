@@ -6,15 +6,15 @@
     android:layout_height="match_parent"
     android:gravity="top|center"
     android:orientation="vertical"
-    android:paddingTop="20pt"
+    android:paddingTop="60dp"
     tools:context=".ui.account.AccountFragment"
     >
 <ImageView
     android:id="@+id/profile_photo"
-    android:layout_width="80pt"
-    android:layout_height="80pt"
+    android:layout_width="180dp"
+    android:layout_height="180dp"
     android:src="@drawable/profile_photo_placeholder"
-    android:layout_marginBottom="5pt"
+    android:layout_marginBottom="10dp"
     style="@style/LightDarkIcon"
     />
     <TextView
@@ -34,25 +34,51 @@
         android:fontFamily="sans-serif-black"
         android:textColor="@color/nav_bar_dark_background"
         android:gravity="center"
-        android:layout_marginHorizontal="20pt"
-        android:layout_marginVertical="5pt"
+        android:layout_marginHorizontal="40dp"
+        android:layout_marginVertical="10dp"
         />
 
+    <LinearLayout
+        android:id="@+id/statistics"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginHorizontal="45dp"
+        android:layout_marginBottom="10dp"
+        android:background="@color/light_green"
+        android:padding="5dp"
+        >
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/statistics"
+            android:layout_marginEnd="5dp"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:gravity="center"
+            android:fontFamily="sans-serif-black"
+            android:textColor="@color/nav_bar_dark_background"
+            android:textSize="16sp"
+            android:layout_height="match_parent"
+            android:text="@string/statistics"
+            />
+    </LinearLayout>
     <LinearLayout
         android:id="@+id/friends"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginHorizontal="20pt"
-        android:layout_marginBottom="5pt"
+        android:layout_marginHorizontal="45dp"
+        android:layout_marginBottom="10dp"
         android:background="@color/light_green"
-        android:padding="2pt"
+        android:padding="5dp"
         >
         <ImageView
-            android:layout_width="20pt"
-            android:layout_height="20pt"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/friends"
-            android:layout_marginEnd="2pt"
+            android:layout_marginEnd="5dp"
             />
         <TextView
             android:layout_width="wrap_content"
@@ -69,16 +95,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginHorizontal="20pt"
-        android:layout_marginBottom="5pt"
+        android:layout_marginHorizontal="45dp"
+        android:layout_marginBottom="10dp"
         android:background="@color/light_green"
-        android:padding="2pt"
+        android:padding="5dp"
         >
         <ImageView
-            android:layout_width="20pt"
-            android:layout_height="20pt"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/medal"
-            android:layout_marginEnd="2pt"
+            android:layout_marginEnd="5dp"
             />
         <TextView
             android:layout_width="wrap_content"
@@ -95,16 +121,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginHorizontal="20pt"
-        android:layout_marginBottom="5pt"
+        android:layout_marginHorizontal="45dp"
+        android:layout_marginBottom="10dp"
         android:background="@color/light_green"
-        android:padding="2pt"
+        android:padding="5dp"
         >
         <ImageView
-            android:layout_width="20pt"
-            android:layout_height="20pt"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/exit_account"
-            android:layout_marginRight="2pt"
+            android:layout_marginEnd="5dp"
             />
         <TextView
             android:layout_width="wrap_content"

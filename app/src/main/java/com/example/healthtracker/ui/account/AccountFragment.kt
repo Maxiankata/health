@@ -54,6 +54,9 @@ class AccountFragment : Fragment() {
             profilePhoto.apply {
                 setRoundedCorners(360F)
             }
+            statistics.apply{
+                setRoundedCorners(25F)
+            }
         }
     }
 

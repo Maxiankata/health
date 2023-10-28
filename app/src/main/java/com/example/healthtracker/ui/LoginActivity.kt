@@ -1,34 +1,29 @@
 package com.example.healthtracker.ui
 
-import android.app.Activity
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.example.healthtracker.MainActivity
-import com.example.healthtracker.R
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
 import com.example.healthtracker.databinding.ActivityLoginBinding
+import androidx.navigation.ui.AppBarConfiguration.Builder;
+import com.example.healthtracker.R
 
 class LoginActivity : AppCompatActivity() {
-    private lateinit var binding : ActivityLoginBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-        binding = ActivityLoginBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        binding.apply {
-            registerButton.setOnClickListener{
-                navigateToActivity(this@LoginActivity,RegisterActivity::class.java)
-            }
-            signInButton.setOnClickListener {
-                navigateToActivity(this@LoginActivity,MainActivity::class.java)
-            }
-        }
-        supportActionBar?.hide()
-
     }
     override fun onBackPressed() {
         super.onBackPressed()
         finish() // Finish the activity (close the app)
     }
+//    override fun onBackPressed() {
+//        val fragmentManager = supportFragmentManager
+//        if (fragmentManager.backStackEntryCount > 0) {
+//            fragmentManager.popBackStack()
+//        } else {
+//            super.onBackPressed()
+//        }
+//    }
 
 }

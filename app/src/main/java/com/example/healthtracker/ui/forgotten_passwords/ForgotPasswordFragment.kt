@@ -31,10 +31,13 @@ class ForgotPasswordFragment : Fragment() {
                 var renewalCode :Int = Random.nextInt(minrandom, maxrandom)
 
                 sendEmail(renewalCode)
-                findNavController().navigate(
+                setOnClickListener {
+                    findNavController().navigate(
                     R.id.action_forgotPasswordFragment_to_codeInputFragment,
                     bundleOf("renewalCode" to renewalCode)
                 )
+                }
+
             }
         }
     }

@@ -21,29 +21,6 @@
         android:id="@+id/navigation_notifications"
         android:name="com.example.healthtracker.ui.account.AccountFragment"
 
-        tools:layout="@layout/fragment_account" >
-        <action
-            android:id="@+id/action_navigation_notifications_to_registerActivity"
-            app:destination="@id/registerActivity" />
-    </fragment>
-    <activity
-        android:id="@+id/registerActivity"
-        android:name="com.example.healthtracker.ui.RegisterActivity"
-        android:label="RegisterActivity" />
-    <fragment
-        android:id="@+id/codeInputFragment"
-        android:name="com.example.healthtracker.ui.forgotten_passwords.CodeInputFragment"
-        android:label="fragment_code_input"
-        tools:layout="@layout/fragment_code_input" />
-    <fragment
-        android:id="@+id/forgotPasswordFragment"
-        android:name="com.example.healthtracker.ui.forgotten_passwords.ForgotPasswordFragment"
-        android:label="fragment_forgot_password"
-        tools:layout="@layout/fragment_forgot_password" >
-        <action
-            android:id="@+id/action_forgotPasswordFragment_to_codeInputFragment"
-            app:destination="@id/codeInputFragment" />
-    </fragment>
-
+        tools:layout="@layout/fragment_account" />
 
 </navigation>

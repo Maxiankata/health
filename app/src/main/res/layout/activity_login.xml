@@ -1,76 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fragment_container"
     tools:context=".ui.LoginActivity"
-    android:orientation="vertical"
-    android:gravity="center"
-    >
-<TextView
-    android:gravity="center"
-    android:text="@string/welcome_back"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:textSize="30sp"
-    />
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_marginTop="5pt"
-        android:layout_marginBottom="2pt"
-        android:layout_marginHorizontal="20pt"
+    android:layout_height="match_parent">
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
+        android:layout_height="match_parent"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/login_navigation"/>
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/prompt_email"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
-    <com.google.android.material.textfield.TextInputLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20pt"
-        android:layout_marginBottom="2pt"
-    >
-
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/prompt_password"
-        />
-</com.google.android.material.textfield.TextInputLayout>
-    <GridLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20pt"
-        android:orientation="horizontal"
-        android:layout_gravity="fill_horizontal"
-        >
-        <TextView
-            android:id="@+id/register_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/new_user"
-            android:layout_column="0"
-            />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="2"
-            android:text="@string/forgot_password" />
-    </GridLayout>
-    <Button
-        android:id="@+id/sign_in_button"
-        android:layout_marginTop="30pt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/action_sign_in_short"
-        />
-
-</androidx.appcompat.widget.LinearLayoutCompat>
+</FrameLayout>
