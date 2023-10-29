@@ -13,17 +13,12 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
     }
-    override fun onBackPressed() {
-        super.onBackPressed()
-        finish() // Finish the activity (close the app)
-    }
 //    override fun onBackPressed() {
-//        val fragmentManager = supportFragmentManager
-//        if (fragmentManager.backStackEntryCount > 0) {
-//            fragmentManager.popBackStack()
+//        val fragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+//        if (fragment is RegisterFragment) {
+//            finish()
 //        } else {
 //            super.onBackPressed()
 //        }
 //    }
-
 }

@@ -33,5 +33,7 @@
     <string name="input_code">Input the code sent to your e-mail</string>
     <string name="code_sent">Code sent!</string>
     <string name="reset_password">Reset Password</string>
+    <string name="change_password_for">"Change password for "</string>
+    <string name="code">00000</string>
 
 </resources>

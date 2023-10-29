@@ -12,6 +12,7 @@ import com.example.healthtracker.databinding.FragmentLoginBinding
 import com.example.healthtracker.databinding.FragmentRegisterBinding
 
 
+
 class LoginFragment : Fragment() {
     private var _binding: FragmentLoginBinding? = null
 
@@ -31,6 +32,7 @@ class LoginFragment : Fragment() {
             registerButton.apply {
                 setOnClickListener {
                     findNavController().navigate(R.id.action_login_to_register)
+
                 }
             }
             signInButton.apply {
