@@ -34,10 +34,7 @@ class RegisterFragment : Fragment() {
     ): View? {
         super.onCreate(savedInstanceState)
         _binding = FragmentRegisterBinding.inflate(inflater, container, false)
-
         return binding.root
-
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -48,11 +45,7 @@ class RegisterFragment : Fragment() {
             }
             registerButton.setOnClickListener {
                 if (passwordInput.text.toString().isNotEmpty() && confirmPasswordInput.text.toString() == passwordInput.text.toString() && emailInput.text.toString().isNotEmpty()) {
-                    firebaseViewModel.createAcc(
-                        emailInput.text.toString(),
-                        passwordInput.text.toString(),
-                        view
-                    )
+                    firebaseViewModel.createAcc(emailInput.text.toString(), passwordInput.text.toString())
                 }
             }
         }

@@ -15,7 +15,7 @@ class FirebaseViewModel : ViewModel() {
     fun signout() {
         Firebase.auth.signOut()
     }
-    fun createAcc(email: String , password: String, view : View){
+    fun createAcc(email: String , password: String){
         Firebase.auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {

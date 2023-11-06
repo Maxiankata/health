@@ -36,7 +36,6 @@ class LoginFragment : Fragment() {
             registerButton.apply {
                 setOnClickListener {
                     findNavController().navigate(R.id.action_login_to_register)
-
                 }
             }
             signInButton.apply {
@@ -44,27 +43,19 @@ class LoginFragment : Fragment() {
                     auth.signInWithEmailAndPassword(usernameInput.text.toString(), passwordInput.text.toString())
                         .addOnCompleteListener(requireActivity()) { task ->
                             if (task.isSuccessful) {
-                                // Sign in success, update UI with the signed-in user's information
                                 Log.d(TAG, "signInWithEmail:success")
                                 val user = auth.currentUser
-//                                updateUI(user)
+                                var intent = Intent(context,MainActivity::class.java)
+                                startActivity(intent)
                             } else {
-                                // If sign in fails, display a message to the user.
                                 Log.w(TAG, "signInWithEmail:failure", task.exception)
                                 Toast.makeText(
                                     context,
                                     "Authentication failed.",
                                     Toast.LENGTH_SHORT,
                                 ).show()
-//                                updateUI(null)
                             }
                         }
-                    val currentUser = auth.currentUser
-                     var intent = Intent(context,MainActivity::class.java)
-
-                    if (currentUser != null) {
-                        startActivity(intent)
-                    }
                 }
             }
             forgotPassword.apply {

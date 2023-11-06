@@ -35,5 +35,7 @@
     <string name="reset_password">Reset Password</string>
     <string name="change_password_for">"Change password for "</string>
     <string name="code">00000</string>
+    <string name="account">Account</string>
+    <string name="steps">Steps:</string>
 
 </resources>
