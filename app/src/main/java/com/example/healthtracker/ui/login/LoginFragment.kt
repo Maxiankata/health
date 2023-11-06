@@ -1,0 +1,78 @@
+package com.example.healthtracker.ui.login
+
+import android.content.ContentValues.TAG
+import android.content.Intent
+import android.os.Bundle
+import android.util.Log
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.navigation.findNavController
+import com.example.healthtracker.MainActivity
+import com.example.healthtracker.R
+import com.example.healthtracker.databinding.FragmentLoginBinding
+import com.example.healthtracker.ui.login.LoginActivity.Companion.auth
+import com.example.healthtracker.ui.navigateToActivity
+
+
+class LoginFragment : Fragment() {
+    private var _binding: FragmentLoginBinding? = null
+
+    private val binding get() = _binding!!
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentLoginBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.apply {
+            registerButton.apply {
+                setOnClickListener {
+                    findNavController().navigate(R.id.action_login_to_register)
+
+                }
+            }
+            signInButton.apply {
+                setOnClickListener {
+                    auth.signInWithEmailAndPassword(usernameInput.text.toString(), passwordInput.text.toString())
+                        .addOnCompleteListener(requireActivity()) { task ->
+                            if (task.isSuccessful) {
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d(TAG, "signInWithEmail:success")
+                                val user = auth.currentUser
+//                                updateUI(user)
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Log.w(TAG, "signInWithEmail:failure", task.exception)
+                                Toast.makeText(
+                                    context,
+                                    "Authentication failed.",
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+//                                updateUI(null)
+                            }
+                        }
+                    val currentUser = auth.currentUser
+                     var intent = Intent(context,MainActivity::class.java)
+
+                    if (currentUser != null) {
+                        startActivity(intent)
+                    }
+                }
+            }
+            forgotPassword.apply {
+                setOnClickListener {
+                    findNavController().navigate(R.id.action_login_to_forgotPassword)
+
+                }
+            }
+        }
+    }
+}

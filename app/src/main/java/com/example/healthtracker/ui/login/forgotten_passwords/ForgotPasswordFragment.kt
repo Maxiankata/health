@@ -1,4 +1,4 @@
-package com.example.healthtracker.ui.forgotten_passwords
+package com.example.healthtracker.ui.login.forgotten_passwords
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

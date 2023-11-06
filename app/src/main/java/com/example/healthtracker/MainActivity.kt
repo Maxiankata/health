@@ -9,6 +9,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.healthtracker.databinding.ActivityMainBinding
+import com.example.healthtracker.ui.login.LoginActivity.Companion.auth
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,6 +36,10 @@ class MainActivity : AppCompatActivity() {
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        auth = FirebaseAuth.getInstance()
+        val user = auth.currentUser
+
     }
 
 }
