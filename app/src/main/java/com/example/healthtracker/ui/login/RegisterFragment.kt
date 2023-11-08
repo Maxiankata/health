@@ -45,7 +45,7 @@ class RegisterFragment : Fragment() {
             }
             registerButton.setOnClickListener {
                 if (passwordInput.text.toString().isNotEmpty() && confirmPasswordInput.text.toString() == passwordInput.text.toString() && emailInput.text.toString().isNotEmpty()) {
-                    firebaseViewModel.createAcc(emailInput.text.toString(), passwordInput.text.toString())
+                    firebaseViewModel.createAcc(emailInput.text.toString(), passwordInput.text.toString(), usernameInput.text.toString())
                 }
             }
         }

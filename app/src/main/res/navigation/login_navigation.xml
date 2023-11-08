@@ -15,10 +15,11 @@
             android:id="@+id/action_login_to_register"
             app:destination="@id/registerFragment"
 
-            />
+            app:enterAnim="@anim/nav_default_enter_anim" />
         <action
             android:id="@+id/action_login_to_forgotPassword"
-            app:destination="@id/forgotPasswordFragment" />
+            app:destination="@id/forgotPasswordFragment"
+            app:enterAnim="@anim/nav_default_pop_enter_anim" />
         <!-- Add other actions as needed -->
     </fragment>
 
@@ -41,7 +42,8 @@
         tools:layout="@layout/fragment_forgot_password" >
         <action
             android:id="@+id/action_forgotPasswordFragment_to_codeInputFragment"
-            app:destination="@id/codeInputFragment" />
+            app:destination="@id/codeInputFragment"
+            app:enterAnim="@anim/nav_default_enter_anim" />
     </fragment>
     <fragment
         android:id="@+id/codeInputFragment"
@@ -50,7 +52,8 @@
         tools:layout="@layout/fragment_code_input" >
         <action
             android:id="@+id/action_codeInputFragment_to_resetPasswordFragment"
-            app:destination="@id/resetPasswordFragment" />
+            app:destination="@id/resetPasswordFragment"
+            app:enterAnim="@anim/nav_default_enter_anim" />
     </fragment>
     <fragment
         android:id="@+id/resetPasswordFragment"
@@ -60,8 +63,8 @@
         <action
             android:id="@+id/action_resetPasswordFragment_to_loginFragment"
             app:destination="@id/loginFragment"
+            app:enterAnim="@anim/nav_default_exit_anim"
             app:popUpTo="@+id/loginFragment"
-            app:popUpToInclusive="true"
-            />
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

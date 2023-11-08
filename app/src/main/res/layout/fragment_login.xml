@@ -19,31 +19,53 @@
 
 
     <com.google.android.material.textfield.TextInputLayout
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="5dp"
-        android:layout_marginHorizontal="50dp"
         android:layout_width="match_parent"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         android:layout_height="wrap_content"
+        android:hint="@string/prompt_email"
+        app:errorEnabled="true"
+        app:boxCornerRadiusBottomEnd="30dp"
+        app:boxCornerRadiusBottomStart="30dp"
+        app:boxCornerRadiusTopEnd="30dp"
+        app:boxCornerRadiusTopStart="30dp"
+        app:startIconDrawable="@drawable/baseline_mail_24"
+        android:layout_marginHorizontal="40dp"
+
+
         >
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/username_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/username"
+            android:imeOptions="actionNext"
+            android:nextFocusForward="@+id/next_edit_text"
+            android:maxLines="1"
+            android:inputType="text"
             />
     </com.google.android.material.textfield.TextInputLayout>
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:layout_marginHorizontal="50dp"
+        android:hint="@string/prompt_password"
+        app:errorEnabled="true"
+        app:boxCornerRadiusBottomEnd="30dp"
+        app:boxCornerRadiusBottomStart="30dp"
+        app:boxCornerRadiusTopEnd="30dp"
+        app:boxCornerRadiusTopStart="30dp"
+        app:startIconDrawable="@drawable/baseline_lock_24"
+        app:endIconMode="password_toggle"
+        android:layout_marginHorizontal="40dp"
+        android:singleLine="true"
         >
-
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/password_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/prompt_password"
+            android:gravity="center_vertical"
+            android:imeOptions="actionDone"
+            android:maxLines="1"
+            android:inputType="textPassword"
             />
     </com.google.android.material.textfield.TextInputLayout>
     <GridLayout
@@ -77,6 +99,7 @@
 
     </GridLayout>
     <Button
+        style=""
         android:id="@+id/sign_in_button"
         android:layout_marginTop="30dp"
         android:layout_width="wrap_content"

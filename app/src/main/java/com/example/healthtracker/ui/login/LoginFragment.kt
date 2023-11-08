@@ -40,8 +40,8 @@ class LoginFragment : Fragment() {
             }
             signInButton.apply {
                 setOnClickListener {
-                    auth.signInWithEmailAndPassword(usernameInput.text.toString(), passwordInput.text.toString())
-                        .addOnCompleteListener(requireActivity()) { task ->
+                    auth?.signInWithEmailAndPassword(usernameInput.text.toString(), passwordInput.text.toString())
+                        ?.addOnCompleteListener(requireActivity()) { task ->
                             if (task.isSuccessful) {
                                 Log.d(TAG, "signInWithEmail:success")
                                 val user = auth.currentUser

@@ -13,6 +13,10 @@ import com.example.healthtracker.ui.login.LoginActivity
 import com.example.healthtracker.ui.navigateToActivity
 import com.example.healthtracker.ui.setRoundedCorners
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.database
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 class AccountFragment : Fragment() {
 
@@ -37,11 +41,13 @@ class AccountFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val user = auth.currentUser
+        lateinit var user:String
+            Firebase.database.getReference("user/${auth.currentUser!!.uid}/username").get().addOnCompleteListener {
+            user = it.result.getValue(String::class.java).toString()
+                binding.username.text = user
+        }
         binding.apply {
-            if (user != null) {
-                username.text = user.email
-            }
+
             signOutButton.apply {
                 setRoundedCorners(25F)
                 setOnClickListener {
@@ -60,6 +66,7 @@ class AccountFragment : Fragment() {
             }
             statistics.apply{
                 setRoundedCorners(25F)
+
             }
         }
     }
