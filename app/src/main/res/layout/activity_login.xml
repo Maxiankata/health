@@ -6,6 +6,14 @@
     tools:context=".ui.login.LoginActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/animation"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/very_cool_anim2"
+        app:layout_constraintStart_toStartOf="parent"
+        />
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"

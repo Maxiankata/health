@@ -25,7 +25,7 @@ class LoginFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -40,12 +40,12 @@ class LoginFragment : Fragment() {
             }
             signInButton.apply {
                 setOnClickListener {
-                    auth?.signInWithEmailAndPassword(usernameInput.text.toString(), passwordInput.text.toString())
-                        ?.addOnCompleteListener(requireActivity()) { task ->
+                    auth.signInWithEmailAndPassword(usernameInput.text.toString(), passwordInput.text.toString())
+                        .addOnCompleteListener(requireActivity()) { task ->
                             if (task.isSuccessful) {
                                 Log.d(TAG, "signInWithEmail:success")
                                 val user = auth.currentUser
-                                var intent = Intent(context,MainActivity::class.java)
+                                val intent = Intent(context,MainActivity::class.java)
                                 startActivity(intent)
                             } else {
                                 Log.w(TAG, "signInWithEmail:failure", task.exception)
