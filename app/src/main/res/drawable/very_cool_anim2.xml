@@ -3,39 +3,41 @@
     xmlns:aapt="http://schemas.android.com/aapt">
     <aapt:attr name="android:drawable">
         <vector
+
             android:name="vector"
             android:width="3dp"
             android:height="6dp"
             android:viewportWidth="2532"
             android:viewportHeight="5064">
-            <group android:name="group">
+            <group android:name="group" android:translateY="-100">
                 <path
                     android:name="path"
                     android:pathData="M 1266 2599.085 C 1343.649 2599.085 1406.668 2662.105 1406.668 2739.754 C 1406.668 2817.403 1343.649 2880.422 1266 2880.422 C 1188.351 2880.422 1125.332 2817.403 1125.332 2739.754 C 1125.332 2662.105 1188.351 2599.085 1266 2599.085 Z"
                     android:fillColor="#ab87ff"/>
             </group>
-            <group android:name="group_1">
+            <group android:name="group_1" android:translateY="-100">
                 <path
+
                     android:name="path_1"
                     android:pathData="M 1266 2599.085 C 1343.649 2599.085 1406.668 2662.105 1406.668 2739.754 C 1406.668 2817.403 1343.649 2880.422 1266 2880.422 C 1188.351 2880.422 1125.332 2817.403 1125.332 2739.754 C 1125.332 2662.105 1188.351 2599.085 1266 2599.085 Z"
                     android:fillColor="#faa613"
                     android:strokeWidth="1"/>
             </group>
-            <group android:name="group_2">
+            <group android:name="group_2" android:translateY="-100">
                 <path
                     android:name="path_2"
                     android:pathData="M 1266 2599.085 C 1343.649 2599.085 1406.668 2662.105 1406.668 2739.754 C 1406.668 2817.403 1343.649 2880.422 1266 2880.422 C 1188.351 2880.422 1125.332 2817.403 1125.332 2739.754 C 1125.332 2662.105 1188.351 2599.085 1266 2599.085 Z"
                     android:fillColor="#53c840"
                     android:strokeWidth="1"/>
             </group>
-            <group android:name="group_3">
+            <group android:name="group_3" android:translateY="-100">
                 <path
                     android:name="path_3"
                     android:pathData="M 1266 2599.085 C 1343.649 2599.085 1406.668 2662.105 1406.668 2739.754 C 1406.668 2817.403 1343.649 2880.422 1266 2880.422 C 1188.351 2880.422 1125.332 2817.403 1125.332 2739.754 C 1125.332 2662.105 1188.351 2599.085 1266 2599.085 Z"
                     android:fillColor="#121212"
                     android:strokeWidth="1"/>
             </group>
-            <group android:name="group_4">
+            <group android:name="group_4" android:translateY="-100">
                 <path
                     android:name="path_4"
                     android:pathData="M 1266 2599.085 C 1343.649 2599.085 1406.668 2662.105 1406.668 2739.754 C 1406.668 2817.403 1343.649 2880.422 1266 2880.422 C 1188.351 2880.422 1125.332 2817.403 1125.332 2739.754 C 1125.332 2662.105 1188.351 2599.085 1266 2599.085 Z"
@@ -61,6 +63,7 @@
                     </group>
                 </vector>
             </group>
+
         </vector>
     </aapt:attr>
     <target android:name="group">
@@ -216,11 +219,12 @@
             <set>
                 <objectAnimator
                     android:propertyName="alpha"
-                    android:startOffset="1607"
                     android:duration="1"
-                    android:valueFrom="0"
-                    android:valueTo="1"
-                    android:valueType="floatType"/>
+                    android:valueFrom="1f"
+                    android:valueTo="0.1f"
+                    android:startOffset="0"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
+                    />
                 <objectAnimator
                     android:propertyName="pivotX"
                     android:startOffset="1607"
