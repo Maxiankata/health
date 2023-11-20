@@ -10,4 +10,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="black">#000000</color>
     <color name="input_grey">#E0E0E0</color>
+    <color name="orange">#FF9237</color>
+    <color name="red">#FF0000</color>
+
 </resources>

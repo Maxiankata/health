@@ -10,6 +10,7 @@
     tools:context=".ui.account.AccountFragment"
     >
 <ImageView
+
     android:id="@+id/profile_photo"
     android:layout_width="180dp"
     android:layout_height="180dp"
@@ -48,11 +49,13 @@
         android:layout_marginBottom="10dp"
         android:background="@color/light_green"
         android:padding="5dp"
+
         >
         <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/statistics"
+
             android:layout_marginEnd="5dp"
             />
         <TextView

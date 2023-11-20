@@ -37,5 +37,8 @@
     <string name="code">00000</string>
     <string name="account">Account</string>
     <string name="steps">Steps:</string>
+    <string name="calories">Calories:</string>
+    <string name="daily_weight">Daily Weight</string>
+    <string name="sleep">Daily Sleep</string>
 
 </resources>

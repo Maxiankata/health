@@ -1,7 +1,14 @@
 package com.example.healthtracker
 
+import android.content.Context
 import android.content.Intent
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.Bundle
+import android.widget.TextView
+import android.widget.Toast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -13,10 +20,12 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.healthtracker.databinding.ActivityMainBinding
 import com.example.healthtracker.ui.login.LoginActivity.Companion.auth
 import com.google.firebase.auth.FirebaseAuth
+import com.mikhaellopez.circularprogressbar.CircularProgressBar
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -34,5 +43,6 @@ class MainActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         val user = auth.currentUser
     }
+
 
 }

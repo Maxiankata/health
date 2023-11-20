@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,17 +8,159 @@
     android:orientation="vertical"
     android:paddingTop="60dp"
     tools:context=".ui.home.HomeFragment"
+    android:fadingEdgeLength="20dp"
+
     >
 
-    <TextView
-        android:id="@+id/stepcount"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@+id/stepsCircularProgressBar"
+        app:layout_constraintEnd_toEndOf="@+id/stepsCircularProgressBar"
+        app:layout_constraintStart_toStartOf="@+id/stepsCircularProgressBar"
+        app:layout_constraintTop_toTopOf="@+id/stepsCircularProgressBar">
+        <com.mikhaellopez.circularprogressbar.CircularProgressBar
+            android:id="@+id/stepsCircularProgressBar"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            app:cpb_background_progressbar_color="@color/input_grey"
+            app:cpb_background_progressbar_width="5dp"
+            app:cpb_progress_direction="to_right"
+            app:cpb_progressbar_color="@color/light_green"
+            app:cpb_progressbar_width="20dp"
+            app:cpb_round_border="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.mikhaellopez.circularprogressbar.CircularProgressBar
+            android:id="@+id/caloriesProgressBar"
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            app:cpb_background_progressbar_color="@color/input_grey"
+            app:cpb_background_progressbar_width="5dp"
+            app:cpb_progress_direction="to_right"
+            app:cpb_progressbar_color="@color/orange"
+            app:cpb_progressbar_width="20dp"
+            app:cpb_round_border="true"
+            app:layout_constraintBottom_toBottomOf="@+id/stepsCircularProgressBar"
+            app:layout_constraintEnd_toEndOf="@+id/stepsCircularProgressBar"
+            app:layout_constraintStart_toStartOf="@+id/stepsCircularProgressBar"
+            app:layout_constraintTop_toTopOf="@+id/stepsCircularProgressBar" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@+id/stepsCircularProgressBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/stepcount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/steps"
+                android:textColor="@color/light_green"
+                android:textSize="30sp"
+                />
+
+            <TextView
+                android:id="@+id/calorieCount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/calories"
+                android:textColor="@color/orange"
+                android:textSize="30sp"
+                />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:id="@+id/water"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/steps"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:orientation="horizontal"
+        android:layout_marginHorizontal="25dp"
+        android:layout_marginBottom="10dp"
+        android:background="#5EABC6"
+        android:padding="5dp"
 
+        >
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/statistics"
+            android:layout_marginEnd="5dp"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:gravity="center"
+            android:fontFamily="sans-serif-black"
+            android:textColor="@color/nav_bar_dark_background"
+            android:textSize="16sp"
+            android:layout_height="match_parent"
+            android:text="@string/statistics"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/sleep"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginHorizontal="25dp"
+        android:layout_marginBottom="10dp"
+        android:background="#84419C"
+        android:padding="5dp"
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        >
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/moon_icon2"
+            android:layout_marginEnd="5dp"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:gravity="center"
+            android:fontFamily="sans-serif-black"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:layout_height="match_parent"
+            android:text="@string/sleep"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/weight"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginHorizontal="25dp"
+        android:layout_marginBottom="10dp"
+        android:background="@color/orange"
+        android:padding="5dp"
+        >
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/weight_scale"
+            android:layout_marginEnd="5dp"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:gravity="center"
+            android:fontFamily="sans-serif-black"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:layout_height="match_parent"
+            android:text="@string/daily_weight"
+            />
+
+    </LinearLayout>
+</LinearLayout>
