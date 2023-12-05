@@ -20,10 +20,7 @@ class WalkService(context: Context) : SensorEventListener {
     var caloriesBurned = MutableLiveData<Int>()
     init {
         sensorManager = context.getSystemService(SENSOR_SERVICE) as SensorManager
-
-
         Log.d("SENSORS", "${sensorManager}")
-
         currentSteps.value=0
         caloriesBurned.value=0
         val stepSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)

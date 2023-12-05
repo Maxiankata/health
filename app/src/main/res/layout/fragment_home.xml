@@ -82,7 +82,9 @@
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+
+        android:layout_marginTop="20dp"
         android:id="@+id/water"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -90,26 +92,62 @@
         android:layout_marginHorizontal="25dp"
         android:layout_marginBottom="10dp"
         android:background="#5EABC6"
-        android:padding="5dp"
+
 
         >
+
         <ImageView
+            android:id="@+id/imageView"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:src="@drawable/statistics"
-            android:layout_marginEnd="5dp"
-            />
+            android:src="@drawable/glass_cup"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
+            android:id="@+id/textView3"
             android:layout_width="wrap_content"
-            android:gravity="center"
-            android:fontFamily="sans-serif-black"
-            android:textColor="@color/nav_bar_dark_background"
-            android:textSize="16sp"
             android:layout_height="match_parent"
-            android:text="@string/statistics"
-            />
-    </LinearLayout>
-    <LinearLayout
+            android:fontFamily="sans-serif-black"
+            android:gravity="center"
+
+            android:text="@string/water"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageView"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/minus"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/minus"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textView3"
+            app:layout_constraintEnd_toStartOf="@id/textView2"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/minus"
+            app:layout_constraintEnd_toStartOf="@id/plus"
+            app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+            android:id="@+id/plus"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/plus"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textView2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/sleep"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -117,26 +155,31 @@
         android:layout_marginHorizontal="25dp"
         android:layout_marginBottom="10dp"
         android:background="#84419C"
-        android:padding="5dp"
-
         >
+
         <ImageView
+            android:id="@+id/imageView2"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:src="@drawable/moon_icon2"
-            android:layout_marginEnd="5dp"
-            />
+            android:src="@drawable/moon_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
+
             android:layout_width="wrap_content"
-            android:gravity="center"
+            android:layout_height="match_parent"
             android:fontFamily="sans-serif-black"
+            android:gravity="center"
+            android:text="@string/sleep"
             android:textColor="@color/white"
             android:textSize="16sp"
-            android:layout_height="match_parent"
-            android:text="@string/sleep"
-            />
-    </LinearLayout>
-    <LinearLayout
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageView2"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/weight"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -144,23 +187,52 @@
         android:layout_marginHorizontal="25dp"
         android:layout_marginBottom="10dp"
         android:background="@color/orange"
-        android:padding="5dp"
         >
         <ImageView
+            android:id="@+id/scaleImage"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:src="@drawable/weight_scale"
-            android:layout_marginEnd="5dp"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:gravity="center"
-            android:fontFamily="sans-serif-black"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:layout_height="match_parent"
-            android:text="@string/daily_weight"
             />
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:fontFamily="sans-serif-black"
+            android:gravity="center"
+            android:text="@string/daily_weight"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/scaleImage"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/weight_recycler"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textView"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:itemCount="1">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/second_weight_recycler"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/weight_recycler"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:itemCount="1">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

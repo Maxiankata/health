@@ -9,6 +9,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.icu.lang.UCharacter.VerticalOrientation
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
@@ -22,8 +23,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.healthtracker.databinding.FragmentHomeBinding
+import com.example.healthtracker.ui.setRoundedCorners
 import com.mikhaellopez.circularprogressbar.CircularProgressBar
+import kotlinx.coroutines.delay
 
 class HomeFragment : Fragment() {
 
@@ -48,8 +54,13 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val weightRecyclerVal = WeightRecyclerAdapter()
+
+        binding.apply {
         homeViewModel.walkService.currentSteps.observe(viewLifecycleOwner) {
-            binding.apply {
+                weight.setRoundedCorners(30F)
+                water.setRoundedCorners(30F)
+                sleep.setRoundedCorners(30F)
                 stepcount.apply {
                     text = "Steps: $it"
                     setOnLongClickListener {
@@ -57,11 +68,13 @@ class HomeFragment : Fragment() {
                         true
                     }
                 }
-                stepsCircularProgressBar.apply{
+                stepsCircularProgressBar.apply {
                     setProgressWithAnimation(it.toFloat())
                     progressMax = 6000f
                 }
-            }
+
+
+
             homeViewModel.walkService.caloriesBurned.observe(viewLifecycleOwner) {
                 binding.apply {
                     calorieCount.text = "Calories: $it"
@@ -73,7 +86,32 @@ class HomeFragment : Fragment() {
 
                 }
             }
+        }
+            weightRecycler.apply {
+                adapter = weightRecyclerVal
 
+                layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL,false)
+                val fakelayoutmanager = this.layoutManager as LinearLayoutManager
+                val fakeadapter = adapter
+
+                if (fakeadapter is WeightRecyclerAdapter) {
+                    scaleImage.setOnClickListener { var middleItem =
+                        fakeadapter.getItem((fakelayoutmanager.findFirstVisibleItemPosition() + fakelayoutmanager.findLastVisibleItemPosition()))
+                    }
+                    }
+            }
+//            secondWeightRecycler.apply{
+//                adapter = weightRecyclerVal
+//                layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL,false)
+////                    addItemDecoration(DividerItemDecoration(context, (layoutManager as LinearLayoutManager).orientation ))
+//                val fakelayoutmanager = this.layoutManager as LinearLayoutManager
+//                val fakeadapter = adapter
+//
+//                if (fakeadapter is WeightRecyclerAdapter) {
+//                    var middleItem =
+//                        fakeadapter.getItem((fakelayoutmanager.findFirstVisibleItemPosition() + fakelayoutmanager.findLastVisibleItemPosition()))
+//                }
+//            }
         }
     }
 
@@ -82,5 +120,8 @@ class HomeFragment : Fragment() {
         _binding = null
     }
 
+    fun findMid(){
+
+    }
 
 }

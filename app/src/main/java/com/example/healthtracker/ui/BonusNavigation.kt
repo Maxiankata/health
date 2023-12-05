@@ -9,3 +9,4 @@ fun navigateToActivity(currentActivity: Activity, targetActivityClass: Class<*>)
     currentActivity.startActivity(intent)
     currentActivity.finish()
 }
+

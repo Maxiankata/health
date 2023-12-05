@@ -6,9 +6,18 @@
     android:layout_height="match_parent"
     android:gravity="top|center"
     android:orientation="vertical"
-    android:paddingTop="60dp"
     tools:context=".ui.account.AccountFragment"
     >
+    <ImageView
+        android:layout_marginVertical="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/settings"
+        android:layout_gravity="end"
+        app:tint="@color/light_green"
+        android:outlineProvider="bounds"
+
+        />
 <ImageView
 
     android:id="@+id/profile_photo"

@@ -7,8 +7,10 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -42,6 +44,8 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
         auth = FirebaseAuth.getInstance()
         val user = auth.currentUser
+
+
     }
 
 

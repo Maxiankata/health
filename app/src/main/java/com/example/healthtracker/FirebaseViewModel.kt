@@ -2,13 +2,10 @@ package com.example.healthtracker
 
 import android.content.ContentValues
 import android.util.Log
-import android.view.View
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.example.healthtracker.ui.login.LoginActivity
 import com.example.healthtracker.user.UserInfo
-import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.auth.FirebaseAuth
+import com.example.healthtracker.user.UserMegaInfo
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -16,8 +13,8 @@ import com.google.firebase.ktx.Firebase
 class FirebaseViewModel : ViewModel() {
 
     fun SetUser(email: String,username: String,uid:String){
-        Firebase.database.getReference("user/${Firebase.auth.uid}").setValue(UserInfo(username,
-            uid,"",email))
+        Firebase.database.getReference("user/${Firebase.auth.uid}").setValue(UserMegaInfo(UserInfo(username,
+            uid,"",email)))
             .addOnCompleteListener{
                 Log.d("BINDED TO BASE", "BASE BINDED BINGO BINGO")
             }
