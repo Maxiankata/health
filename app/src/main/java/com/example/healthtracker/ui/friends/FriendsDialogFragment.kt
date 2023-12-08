@@ -7,11 +7,14 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.PopupFriendsBinding
@@ -21,7 +24,7 @@ class FriendsDialogFragment : DialogFragment() {
     private val binding get() = _binding!!
 
     val friendListAdapter = FriendListAdapter()
-
+    val friendListViewModel:FriendListViewModel by viewModels()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -41,8 +44,8 @@ class FriendsDialogFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         binding.apply {
+
             textInputLayout.helperText= "current friend mode on"
             usernameInput.setOnFocusChangeListener { _, hasFocus ->
                 val color = if (hasFocus) (ContextCompat.getColor(
@@ -56,23 +59,35 @@ class FriendsDialogFragment : DialogFragment() {
             friendRecycler.apply {
                 layoutManager = LinearLayoutManager(requireContext())
                 adapter = friendListAdapter
+
             }
             var newFriend = false
+//            val challenge:ImageView=view.findViewById(R.id.challenge)
+//            val message:ImageView=view.findViewById(R.id.chat)
             searchSwitch.apply {
+
                 setOnClickListener {
                     if (!newFriend) {
                         newFriend = true
                         rotateView(searchSwitch, 45F)
                         textInputLayout.helperText= "new friend mode on"
+//                        challenge.visibility=GONE
+//                        message.setImageResource(R.drawable.friendadd)
                     } else {
                         newFriend = false
                         rotateView(searchSwitch, 0F)
                         textInputLayout.helperText= "current friend mode on"
+//                        challenge.visibility= VISIBLE
+//                        message.setImageResource(R.drawable.message)
                     }
                 }
                 close.setOnClickListener {
                     dismiss()
                 }
+
+            }
+            friendListViewModel.user.observe(viewLifecycleOwner){
+                friendListAdapter.updateItems(it)
             }
         }
 

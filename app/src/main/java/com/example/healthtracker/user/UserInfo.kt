@@ -1,3 +1,8 @@
 package com.example.healthtracker.user
 
-data class UserInfo(val username:String, val uid:String,val image:String, val mail:String)
+data class UserInfo(
+    val username: String?=null,
+    val uid: String?=null,
+    val image: String?=null,
+    val mail: String?=null
+)
