@@ -41,5 +41,9 @@
     <string name="daily_weight">Daily Weight</string>
     <string name="sleep">Daily Sleep</string>
     <string name="water">Cups of Water Drank</string>
+    <string name="searchFriend">Search friend</string>
+    <string name="password_help">Password should be 6 or more symbols long</string>
+    <string name="email_help">Input a real e-mail, so you can recover your password</string>
+    <string name="close">CLOSE</string>
 
 </resources>

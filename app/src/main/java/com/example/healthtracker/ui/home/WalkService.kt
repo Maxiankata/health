@@ -13,38 +13,27 @@ import androidx.lifecycle.MutableLiveData
 
 class WalkService(context: Context) : SensorEventListener {
 
-    private var totalSteps = 0f
-    private var previousTotalSteps = 0f
+//    private var totalSteps = 0f
+//    private var previousTotalSteps = 0f
     private var sensorManager: SensorManager?=null
     var currentSteps = MutableLiveData<Int>()
     var caloriesBurned = MutableLiveData<Int>()
     init {
         sensorManager = context.getSystemService(SENSOR_SERVICE) as SensorManager
-        Log.d("SENSORS", "${sensorManager}")
-        currentSteps.value=0
-        caloriesBurned.value=0
         val stepSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
     if (stepSensor==null){
-        Log.d("SENSOR ISSUE", "NO SENSOR FOUND")
-
         Toast.makeText(context,"No sensor",Toast.LENGTH_SHORT).show()
     }else{
         sensorManager?.registerListener(this, stepSensor,SensorManager.SENSOR_DELAY_UI)
-        Log.d("SENSOR ISSUE", "NO SENSOR ISSUE")
-        Toast.makeText(context,"Sensor Found",Toast.LENGTH_SHORT).show()
-
     }
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
-            totalSteps = event!!.values[0]
-        currentSteps.value = totalSteps.toInt() - previousTotalSteps.toInt()
-        Log.d("STEP CHANGED MAYBE", "WE HAVE STEPPED $currentSteps")
+        currentSteps.value = (currentSteps.value ?: -1 )+ 1
         caloriesBurned.value = currentSteps.value!! /25
     }
     fun resetSteps(){
         currentSteps.value = 0
-        previousTotalSteps = totalSteps
         caloriesBurned.value = 0
     }
 

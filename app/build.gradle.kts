@@ -37,6 +37,7 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
 }
 
 dependencies {
@@ -57,4 +58,6 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     implementation ("com.mikhaellopez:circularprogressbar:3.1.0")
     implementation ("io.coil-kt:coil-compose:2.1.0")
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
+
 }

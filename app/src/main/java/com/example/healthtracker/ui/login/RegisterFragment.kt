@@ -1,6 +1,7 @@
 package com.example.healthtracker.ui.login
 
 import android.content.ContentValues.TAG
+import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -24,14 +25,14 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 
 class RegisterFragment : Fragment() {
-    private val firebaseViewModel : FirebaseViewModel by activityViewModels()
+    private val firebaseViewModel: FirebaseViewModel by activityViewModels()
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         super.onCreate(savedInstanceState)
         _binding = FragmentRegisterBinding.inflate(inflater, container, false)
         return binding.root
@@ -44,8 +45,22 @@ class RegisterFragment : Fragment() {
                 findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
             }
             registerButton.setOnClickListener {
-                if (passwordInput.text.toString().isNotEmpty() && confirmPasswordInput.text.toString() == passwordInput.text.toString() && emailInput.text.toString().isNotEmpty()) {
-                    firebaseViewModel.createAcc(emailInput.text.toString(), passwordInput.text.toString(), usernameInput.text.toString())
+                if (passwordInput.text.toString()
+                        .isNotEmpty() && confirmPasswordInput.text.toString() == passwordInput.text.toString() && emailInput.text.toString()
+                        .isNotEmpty()
+                ) {
+                    firebaseViewModel.createAcc(
+                        emailInput.text.toString(),
+                        passwordInput.text.toString(),
+                        usernameInput.text.toString()
+                    )
+                    auth.signInWithEmailAndPassword(
+                        usernameInput.text.toString(),
+                        passwordInput.text.toString()
+                    )
+                    val user = auth.currentUser
+                    val intent = Intent(context, MainActivity::class.java)
+                    startActivity(intent)
                 }
             }
         }

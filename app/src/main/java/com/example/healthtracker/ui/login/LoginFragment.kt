@@ -40,22 +40,31 @@ class LoginFragment : Fragment() {
             }
             signInButton.apply {
                 setOnClickListener {
-                    auth.signInWithEmailAndPassword(usernameInput.text.toString(), passwordInput.text.toString())
-                        .addOnCompleteListener(requireActivity()) { task ->
-                            if (task.isSuccessful) {
-                                Log.d(TAG, "signInWithEmail:success")
-                                val user = auth.currentUser
-                                val intent = Intent(context,MainActivity::class.java)
-                                startActivity(intent)
-                            } else {
-                                Log.w(TAG, "signInWithEmail:failure", task.exception)
-                                Toast.makeText(
-                                    context,
-                                    "Authentication failed.",
-                                    Toast.LENGTH_SHORT,
-                                ).show()
+                    try {
+                        auth.signInWithEmailAndPassword(usernameInput.text.toString(), passwordInput.text.toString())
+                            .addOnCompleteListener(requireActivity()) { task ->
+                                if (task.isSuccessful) {
+                                    Log.d(TAG, "signInWithEmail:success")
+                                    val user = auth.currentUser
+                                    val intent = Intent(context,MainActivity::class.java)
+                                    startActivity(intent)
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Incorrect e-mail or password",
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                                }
                             }
-                        }
+                    }catch (e:Exception){
+                        Log.d("empty", "$e")
+                        Toast.makeText(
+                            context,
+                            "Empty field",
+                            Toast.LENGTH_SHORT,
+                        ).show()
+                    }
+
                 }
             }
             forgotPassword.apply {

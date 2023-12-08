@@ -24,6 +24,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.healthtracker.databinding.FragmentHomeBinding
@@ -90,13 +91,14 @@ class HomeFragment : Fragment() {
             weightRecycler.apply {
                 adapter = weightRecyclerVal
 
-                layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL,false)
-                val fakelayoutmanager = this.layoutManager as LinearLayoutManager
+                layoutManager = GridLayoutManager(context,  1, GridLayoutManager.VERTICAL, false)
+                val fakelayoutmanager = this.layoutManager as GridLayoutManager
                 val fakeadapter = adapter
 
                 if (fakeadapter is WeightRecyclerAdapter) {
                     scaleImage.setOnClickListener { var middleItem =
-                        fakeadapter.getItem((fakelayoutmanager.findFirstVisibleItemPosition() + fakelayoutmanager.findLastVisibleItemPosition()))
+                        fakeadapter.getItem((fakelayoutmanager.findFirstVisibleItemPosition() + fakelayoutmanager.findLastVisibleItemPosition())/2)
+                        Log.d("Middle Item", middleItem)
                     }
                     }
             }

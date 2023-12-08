@@ -47,16 +47,7 @@ class ForgotPasswordFragment : Fragment() {
         }
     }
 
-//    private fun sendEmail(emailLink:String){
-//        Firebase.auth.checkActionCode(emailLink)
-//            .addOnCompleteListener { task ->
-//                if (task.isSuccessful) {
-//                    val email = task.result?.data?.get("email")
-//                } else {
-//                    Log.e("LINK_HANDLING_FAIL", "Failed to handle email link: ${task.exception?.message}")
-//                }
-//            }
-//    }
+
     private fun resetPassword(email:String){
         Firebase.auth.sendPasswordResetEmail(email)
             .addOnCompleteListener { task ->

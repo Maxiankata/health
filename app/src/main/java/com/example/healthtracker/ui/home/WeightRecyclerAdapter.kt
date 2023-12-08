@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.healthtracker.R
 
 class WeightRecyclerAdapter:RecyclerView.Adapter<WeightRecyclerAdapter.WeightViewHolder>() {
-    private val weight = arrayOf("",0,1,2,3,4,5,6,7,8,9,"")
+    private val weight = Weight.weight
 
 
     inner class WeightViewHolder(view: View):RecyclerView.ViewHolder(view){
