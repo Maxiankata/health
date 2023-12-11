@@ -15,9 +15,12 @@ class FriendListViewModel : ViewModel() {
     private val _user = MutableLiveData<MutableList<UserInfo>>()
     val user: LiveData<MutableList<UserInfo>> get() = _user
     private val database = FirebaseDatabase.getInstance()
-
+    private var _searchState = MutableLiveData<Boolean>()
+    val searchState: LiveData<Boolean> get() = _searchState
     init {
+        _searchState.value=true
         fetchAllUsersInfo()
+        switchSearchState()
     }
 
     fun fetchAllUsersInfo() {
@@ -41,6 +44,13 @@ class FriendListViewModel : ViewModel() {
                 Log.e("FirebaseError", "Error fetching data", databaseError.toException())
             }
         })
+    }
+    fun switchSearchState(){
+        if(_searchState.value==true){
+            _searchState.value=false
+        }else if (_searchState.value==false){
+            _searchState.value=true
+        }
     }
 }
 

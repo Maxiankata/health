@@ -44,11 +44,12 @@ class FriendListAdapter : RecyclerView.Adapter<FriendListAdapter.FriendListViewH
             name.text=friendFront.username
             email.text=friendFront.mail
             challenge.setOnClickListener{
-                //todo put this in a fragment maybe, navigate with bundle
+                Log.d("I WORK", "ITS OKAY")
             }
             message.setOnClickListener {
                 //todo put this in a fragment maybe, navigate with bundle
             }
+
         }
 
     }

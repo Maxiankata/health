@@ -13,11 +13,14 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.PopupFriendsBinding
+import com.example.healthtracker.user.FriendFront
 
 class FriendsDialogFragment : DialogFragment() {
     private var _binding: PopupFriendsBinding? = null
@@ -45,7 +48,6 @@ class FriendsDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
-
             textInputLayout.helperText= "current friend mode on"
             usernameInput.setOnFocusChangeListener { _, hasFocus ->
                 val color = if (hasFocus) (ContextCompat.getColor(
@@ -61,36 +63,36 @@ class FriendsDialogFragment : DialogFragment() {
                 adapter = friendListAdapter
 
             }
-            var newFriend = false
-//            val challenge:ImageView=view.findViewById(R.id.challenge)
-//            val message:ImageView=view.findViewById(R.id.chat)
             searchSwitch.apply {
-
                 setOnClickListener {
-                    if (!newFriend) {
-                        newFriend = true
-                        rotateView(searchSwitch, 45F)
-                        textInputLayout.helperText= "new friend mode on"
-//                        challenge.visibility=GONE
-//                        message.setImageResource(R.drawable.friendadd)
-                    } else {
-                        newFriend = false
-                        rotateView(searchSwitch, 0F)
-                        textInputLayout.helperText= "current friend mode on"
-//                        challenge.visibility= VISIBLE
-//                        message.setImageResource(R.drawable.message)
+                    friendListViewModel.switchSearchState()
+                    friendListViewModel.searchState.observe(viewLifecycleOwner) {
+                        if (it==true) {
+                            rotateView(searchSwitch, 45F)
+                            textInputLayout.helperText = "new friend mode on"
+
+                        } else {
+                            rotateView(searchSwitch, 0F)
+                            textInputLayout.helperText = "current friend mode on"
+
+                        }
                     }
                 }
-                close.setOnClickListener {
-                    dismiss()
-                }
-
+            }
+            close.setOnClickListener {
+                dismiss()
             }
             friendListViewModel.user.observe(viewLifecycleOwner){
                 friendListAdapter.updateItems(it)
             }
         }
-
+        val itemAdapter = FriendListAdapter().apply {
+            itemClickListener = object : FriendListAdapter.ItemClickListener<FriendFront> {
+                override fun onItemClicked(item: FriendFront, itemPosition: Int) {
+//                    findNavController().navigate(R.id.blahblah, bundleOf("id" to id))
+                }
+            }
+        }
     }
 
     fun rotateView(imageView: View, angle: Float) {
