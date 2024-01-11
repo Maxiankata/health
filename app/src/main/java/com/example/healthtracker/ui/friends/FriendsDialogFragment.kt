@@ -7,34 +7,36 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
-import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.PopupFriendsBinding
-import com.example.healthtracker.user.FriendFront
+import com.example.healthtracker.user.UserInfo
 
 class FriendsDialogFragment : DialogFragment() {
     private var _binding: PopupFriendsBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding
 
-    val friendListAdapter = FriendListAdapter()
-    val friendListViewModel:FriendListViewModel by viewModels()
+
+//    val friendListViewModel:FriendListViewModel by viewModels()
+//    val friendListAdapter = FriendListAdapter(friendListViewModel)
+
+    private val friendListViewModel: FriendListViewModel by activityViewModels()
+    private lateinit var friendListAdapter: FriendListAdapter
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        friendListAdapter = FriendListAdapter(friendListViewModel)
         _binding = PopupFriendsBinding.inflate(inflater, container, false)
-        return binding.root
+        return binding?.root
     }
 
     override fun onStart() {
@@ -47,7 +49,7 @@ class FriendsDialogFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.apply {
+        binding?.apply {
             textInputLayout.helperText= "current friend mode on"
             usernameInput.setOnFocusChangeListener { _, hasFocus ->
                 val color = if (hasFocus) (ContextCompat.getColor(
@@ -83,13 +85,18 @@ class FriendsDialogFragment : DialogFragment() {
                 dismiss()
             }
             friendListViewModel.user.observe(viewLifecycleOwner){
-                friendListAdapter.updateItems(it)
+                if (it != null) {
+                    friendListAdapter.updateItems(it)
+                }
             }
         }
-        val itemAdapter = FriendListAdapter().apply {
-            itemClickListener = object : FriendListAdapter.ItemClickListener<FriendFront> {
-                override fun onItemClicked(item: FriendFront, itemPosition: Int) {
-//                    findNavController().navigate(R.id.blahblah, bundleOf("id" to id))
+        friendListAdapter.apply {
+            itemClickListener = object : FriendListAdapter.ItemClickListener<UserInfo> {
+                override fun onItemClicked(item: UserInfo, itemPosition: Int) {
+                        Log.d("uid", item.uid!!)
+                    findNavController().navigate(R.id.action_navigation_notifications_to_friendAccountFragment,
+                        bundleOf("uid" to item.uid))
+                    dismiss()
                 }
             }
         }

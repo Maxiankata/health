@@ -17,7 +17,7 @@
         app:tint="@color/input_grey"
 
         />
-    
+<!--    TODO() ADD BACKGROUND IMAGE PICKING MAYBE :)-->
     <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

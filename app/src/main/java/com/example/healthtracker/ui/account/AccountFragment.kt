@@ -1,36 +1,26 @@
 package com.example.healthtracker.ui.account
-
-import android.app.Dialog
-import android.content.res.ColorStateList
-import android.graphics.PorterDuff
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
-import androidx.core.content.ContextCompat
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.example.healthtracker.CropActivity
 import com.example.healthtracker.FirebaseViewModel
-import com.example.healthtracker.R
 import com.example.healthtracker.databinding.FragmentAccountBinding
 import com.example.healthtracker.ui.base64ToBitmap
-import com.example.healthtracker.ui.bitmapToBase64
-import com.example.healthtracker.ui.friends.FriendListAdapter
 import com.example.healthtracker.ui.friends.FriendsDialogFragment
 import com.example.healthtracker.ui.login.LoginActivity
 import com.example.healthtracker.ui.navigateToActivity
 import com.example.healthtracker.ui.saveBitmapToDatabase
 import com.example.healthtracker.ui.uriToBitmap
 import com.example.healthtracker.ui.setRoundedCorners
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
+import com.example.healthtracker.ui.showBottomNav
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -50,18 +40,16 @@ class AccountFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        requireActivity().showBottomNav()
         accountViewModel = ViewModelProvider(this)[AccountViewModel::class.java]
         _binding = FragmentAccountBinding.inflate(inflater, container, false)
-        val root: View = binding.root
         auth = FirebaseAuth.getInstance()
-
-        return root
+        return binding.root
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val contentResolver = requireContext().contentResolver
         var userPhoto: String?
         val dialog = FriendsDialogFragment()
         Firebase.database.getReference("user/${auth.currentUser!!.uid}/userInfo/image").get()
@@ -71,17 +59,16 @@ class AccountFragment : Fragment() {
                     binding.profilePhoto.setImageBitmap(userPhoto?.let { it1 -> base64ToBitmap(it1) })
                 }
             }
-        val pickMedia = registerForActivityResult(PickVisualMedia()) { uri ->
-            binding.profilePhoto.setImageURI(uri)
-            lifecycleScope.launch {
-                val bitmap = uri?.let { uriToBitmap(contentResolver, it) }
-                if (bitmap != null) {
-                    bitmapToBase64(bitmap)
-                    saveBitmapToDatabase(bitmap)
-                }
-            }
 
+        val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            fun onActivityResult(result: Uri) {
+                val intent = Intent(context, CropActivity::class.java)
+                intent.putExtra("DATA", result.toString())
+                startActivityForResult(intent, 101)
+            }
+            uri?.let { onActivityResult(it) }
         }
+
 
         lateinit var userName: String
         Firebase.database.getReference("user/${auth.currentUser!!.uid}/userInfo/username").get()
@@ -110,13 +97,33 @@ class AccountFragment : Fragment() {
             profilePhoto.apply {
                 setRoundedCorners(360F)
                 setOnClickListener {
-                    pickMedia.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
+                    pickImage.launch("image/*")
+
                 }
             }
             statistics.apply {
                 setRoundedCorners(25F)
             }
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        val contentResolver = requireContext().contentResolver
+
+        if (resultCode == -1 && requestCode == 101) {
+            val result: String? = data?.getStringExtra("RESULT")
+            val resultUri: Uri? = Uri.parse(result)
+            if (resultUri != null && result != "") {
+                binding.profilePhoto.setImageURI(resultUri)
+                lifecycleScope.launch {
+                    uriToBitmap(contentResolver, resultUri)?.let { saveBitmapToDatabase(it) }
+
+                }
+            }
+        }
+
+
     }
 
     override fun onDestroyView() {

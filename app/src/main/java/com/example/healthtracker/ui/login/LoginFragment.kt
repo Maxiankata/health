@@ -23,8 +23,7 @@ class LoginFragment : Fragment() {
     private val binding get() = _binding!!
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
@@ -41,12 +40,13 @@ class LoginFragment : Fragment() {
             signInButton.apply {
                 setOnClickListener {
                     try {
-                        auth.signInWithEmailAndPassword(usernameInput.text.toString(), passwordInput.text.toString())
-                            .addOnCompleteListener(requireActivity()) { task ->
+                        auth.signInWithEmailAndPassword(
+                            usernameInput.text.toString(), passwordInput.text.toString()
+                        ).addOnCompleteListener(requireActivity()) { task ->
                                 if (task.isSuccessful) {
                                     Log.d(TAG, "signInWithEmail:success")
                                     val user = auth.currentUser
-                                    val intent = Intent(context,MainActivity::class.java)
+                                    val intent = Intent(context, MainActivity::class.java)
                                     startActivity(intent)
                                 } else {
                                     Toast.makeText(
@@ -56,7 +56,7 @@ class LoginFragment : Fragment() {
                                     ).show()
                                 }
                             }
-                    }catch (e:Exception){
+                    } catch (e: Exception) {
                         Log.d("empty", "$e")
                         Toast.makeText(
                             context,
