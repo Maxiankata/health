@@ -12,18 +12,19 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
 class WalkService(context: Context) : SensorEventListener {
 
-//        private var totalSteps = 0f
-//    private var previousTotalSteps = 0f
+
     private var sensorManager: SensorManager? = null
     var currentSteps = MutableLiveData<Int>()
     var caloriesBurned = MutableLiveData<Int>()
 
+    val walkViewModel = WalkViewModel()
     init {
         sensorManager = context.getSystemService(SENSOR_SERVICE) as SensorManager
         val stepSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
@@ -42,7 +43,7 @@ class WalkService(context: Context) : SensorEventListener {
         val time = LocalTime.now()
         val resetTime = LocalTime.of(23,59)
         if (time == resetTime){
-            Log.d("reset now", "time is $time, corresponding go $resetTime, RESET STEPS NOW")
+            walkViewModel.nullifySteps()
         }
 //        steps can be reset with currentSteps.value = (currentSteps.value ?: -1) + 1
 //        TODO("the stepcounter can only be refreshed on device restart,

@@ -48,6 +48,7 @@ class LoginFragment : Fragment() {
                                     val user = auth.currentUser
                                     val intent = Intent(context, MainActivity::class.java)
                                     startActivity(intent)
+
                                 } else {
                                     Toast.makeText(
                                         context,

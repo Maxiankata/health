@@ -17,9 +17,10 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val homeViewModel:HomeViewModel by activityViewModels()
+    val walkViewModel:WalkViewModel by activityViewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        homeViewModel.walkingStart(requireContext())
+        walkViewModel.walkingStart(requireContext())
 
     }
     override fun onCreateView(
@@ -37,14 +38,14 @@ class HomeFragment : Fragment() {
         val weightRecyclerVal = WeightRecyclerAdapter()
 
         binding.apply {
-        homeViewModel.walkService.currentSteps.observe(viewLifecycleOwner) {
-                weight.setRoundedCorners(30F)
-                water.setRoundedCorners(30F)
-                sleep.setRoundedCorners(30F)
+            weight.setRoundedCorners(30F)
+            water.setRoundedCorners(30F)
+            sleep.setRoundedCorners(30F)
+            walkViewModel.walkService.currentSteps.observe(viewLifecycleOwner) {
                 stepcount.apply {
                     text = "Steps: $it"
                     setOnLongClickListener {
-                        homeViewModel.walkService.resetSteps()
+                        walkViewModel.walkService.resetSteps()
                         true
                     }
                 }
@@ -52,10 +53,7 @@ class HomeFragment : Fragment() {
                     setProgressWithAnimation(it.toFloat())
                     progressMax = 6000f
                 }
-
-
-
-            homeViewModel.walkService.caloriesBurned.observe(viewLifecycleOwner) {
+            walkViewModel.walkService.caloriesBurned.observe(viewLifecycleOwner) {
                 binding.apply {
                     calorieCount.text = "Calories: $it"
                     caloriesProgressBar.apply {

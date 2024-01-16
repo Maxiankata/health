@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModel
 
 class HomeViewModel : ViewModel(){
 
-    lateinit var walkService:WalkService
 
 //    fun resetSteps(){
 //        stepsTaken.setOnClickListener {
@@ -26,9 +25,7 @@ class HomeViewModel : ViewModel(){
 //    }
 
 
-    fun walkingStart(context: Context){
-        walkService = WalkService(context)
-    }
+
 
 
 

@@ -17,7 +17,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.PopupFriendsBinding
+import com.example.healthtracker.ui.login.LoginActivity.Companion.auth
 import com.example.healthtracker.user.UserInfo
+import com.google.firebase.database.database
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 class FriendsDialogFragment : DialogFragment() {
     private var _binding: PopupFriendsBinding? = null
@@ -36,6 +40,8 @@ class FriendsDialogFragment : DialogFragment() {
     ): View? {
         friendListAdapter = FriendListAdapter(friendListViewModel)
         _binding = PopupFriendsBinding.inflate(inflater, container, false)
+        friendListViewModel.fetchUserFriends()
+
         return binding?.root
     }
 
@@ -45,12 +51,20 @@ class FriendsDialogFragment : DialogFragment() {
         val height = ViewGroup.LayoutParams.WRAP_CONTENT
         dialog?.window?.setLayout(width, height)
         dialog?.window?.setBackgroundDrawableResource(R.drawable.custom_rounded_background)
+        friendListViewModel.fetchAllUsersInfo()
+        friendListViewModel.fetchUserFriends()
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         binding?.apply {
-            textInputLayout.helperText= "current friend mode on"
+            friendListViewModel.user.observe(viewLifecycleOwner) {
+                if (it != null) {
+                    friendListAdapter.updateItems(it)
+                }
+            }
             usernameInput.setOnFocusChangeListener { _, hasFocus ->
                 val color = if (hasFocus) (ContextCompat.getColor(
                     requireContext(),
@@ -65,18 +79,22 @@ class FriendsDialogFragment : DialogFragment() {
                 adapter = friendListAdapter
 
             }
+
             searchSwitch.apply {
-                setOnClickListener {
-                    friendListViewModel.switchSearchState()
-                    friendListViewModel.searchState.observe(viewLifecycleOwner) {
-                        if (it==true) {
-                            rotateView(searchSwitch, 45F)
-                            textInputLayout.helperText = "new friend mode on"
-
-                        } else {
-                            rotateView(searchSwitch, 0F)
-                            textInputLayout.helperText = "current friend mode on"
-
+                friendListViewModel.searchState.observe(viewLifecycleOwner) { it1 ->
+                    if (it1 == true) {
+                        rotateView(searchSwitch, 45F)
+                        textInputLayout.helperText = "new friend mode on"
+                        setOnClickListener {
+                            friendListViewModel.switchSearchState()
+                            friendListViewModel.fetchUserFriends()
+                        }
+                    } else {
+                        rotateView(searchSwitch, 0F)
+                        textInputLayout.helperText = "current friend mode on"
+                        setOnClickListener {
+                            friendListViewModel.switchSearchState()
+                            friendListViewModel.fetchAllUsersInfo()
                         }
                     }
                 }
@@ -84,18 +102,16 @@ class FriendsDialogFragment : DialogFragment() {
             close.setOnClickListener {
                 dismiss()
             }
-            friendListViewModel.user.observe(viewLifecycleOwner){
-                if (it != null) {
-                    friendListAdapter.updateItems(it)
-                }
-            }
+
         }
         friendListAdapter.apply {
             itemClickListener = object : FriendListAdapter.ItemClickListener<UserInfo> {
                 override fun onItemClicked(item: UserInfo, itemPosition: Int) {
-                        Log.d("uid", item.uid!!)
-                    findNavController().navigate(R.id.action_navigation_notifications_to_friendAccountFragment,
-                        bundleOf("uid" to item.uid))
+                    item.uid?.let { Log.d("uid", it) }
+                    findNavController().navigate(
+                        R.id.action_navigation_notifications_to_friendAccountFragment,
+                        bundleOf("uid" to item.uid)
+                    )
                     dismiss()
                 }
             }

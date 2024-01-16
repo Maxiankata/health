@@ -15,10 +15,13 @@ import android.view.View.VISIBLE
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
@@ -26,6 +29,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.healthtracker.databinding.ActivityMainBinding
+import com.example.healthtracker.ui.home.WalkViewModel
 import com.example.healthtracker.ui.login.LoginActivity.Companion.auth
 import com.google.firebase.auth.FirebaseAuth
 import com.mikhaellopez.circularprogressbar.CircularProgressBar
@@ -34,7 +38,7 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-
+    val walkViewModel: WalkViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,5 +59,9 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        walkViewModel.saveLeaveSteps()
+    }
 
 }

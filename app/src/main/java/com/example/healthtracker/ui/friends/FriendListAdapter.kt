@@ -44,23 +44,22 @@ class FriendListAdapter(private val friendListViewModel: FriendListViewModel) :
             image.setRoundedCorners(360F)
             name.text = userInfo.username
             email.text = userInfo.mail
-            image.setOnClickListener {
-                Log.d("clciked itm", "clicked challenge")
+            friendCardContainer.setOnClickListener {
                 itemClickListener?.onItemClicked(
-                    UserInfo(
-                        userInfo.username, userInfo.image, userInfo.mail, userInfo.uid
-                    ), adapterPosition
+                    userInfo, adapterPosition
                 )
 
             }
-            friendListViewModel.searchState.observeForever() {
+            friendListViewModel.searchState.observeForever{
                 if (it) {
                     cardButton.apply {
                         setImageResource(R.drawable.friend_add)
                         setOnClickListener {
-                            friendListViewModel.addFriend()
-                            Log.d("added friend", "added friend")
+                            userInfo.uid?.let { it1 -> friendListViewModel.addFriend(it1) }
                         }
+                    }
+                    image.apply {
+
                     }
                 } else {
                     cardButton.apply {
@@ -77,9 +76,6 @@ class FriendListAdapter(private val friendListViewModel: FriendListViewModel) :
 
     @SuppressLint("NotifyDataSetChanged")
     fun updateItems(newItems: List<UserInfo>) {
-
-        //when image is changed, notifyDataSetChanged() activates and doubles the list, think of fix pls
-
         items.clear()
         items.addAll(newItems)
         notifyDataSetChanged()
