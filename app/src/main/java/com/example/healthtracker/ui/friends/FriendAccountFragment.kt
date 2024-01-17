@@ -23,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuth
 import java.time.Duration
 import kotlin.coroutines.coroutineContext
 
+//FIXME check comment in FirebaseViewModel
 class FriendAccountFragment : Fragment() {
     private var _binding: FragmentFriendAccountBinding? = null
     private lateinit var auth: FirebaseAuth
@@ -50,6 +51,8 @@ class FriendAccountFragment : Fragment() {
             profilePhoto.apply {
                 setRoundedCorners(360F)
                 if (user.image != null && user.image!="") {
+                    //FIXME there is probably a better way to handle images, check out Glide library
+                    // and its local image loading capabilities https://bumptech.github.io/glide/
                     setImageBitmap(user.image?.let { base64ToBitmap(it) })
                 }
             }

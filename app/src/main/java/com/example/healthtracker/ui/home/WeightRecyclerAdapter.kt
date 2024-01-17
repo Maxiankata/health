@@ -13,6 +13,7 @@ class WeightRecyclerAdapter:RecyclerView.Adapter<WeightRecyclerAdapter.WeightVie
 
     inner class WeightViewHolder(view: View):RecyclerView.ViewHolder(view){
         private val text = view.findViewById<TextView>(R.id.weight)
+        //FIXME fix this signature and use proper types
         fun bind(double:Any){
             text.text = double.toString()
         }

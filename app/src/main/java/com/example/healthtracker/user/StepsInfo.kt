@@ -1,5 +1,6 @@
 package com.example.healthtracker.user
 
+
 data class StepsInfo(
     val totalSteps:Int?=null,
     val totalCalories:Int?=null,

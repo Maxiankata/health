@@ -61,8 +61,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
+        //FIXME check comments in WalkService, this will not work for tracking the application lifecycle
         walkViewModel.saveLeaveSteps()
     }
+
     private fun buildNotification(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             val name = getString(R.string.friends)

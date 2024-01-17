@@ -14,6 +14,9 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 
+//FIXME are you sure you want multiple activities? Pay attention to your back stack and make sure
+// your application has a single entry point
+// also see comment in FirebaseViewModel for auth-related logic
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

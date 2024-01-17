@@ -14,6 +14,8 @@ import com.example.healthtracker.R
 import com.example.healthtracker.databinding.FragmentRegisterBinding
 import com.example.healthtracker.ui.login.LoginActivity.Companion.auth
 
+//FIXME _binding should be cleared in onDestroyView()
+// Check comment in FirebaseViewModel
 class RegisterFragment : Fragment() {
     private val firebaseViewModel: FirebaseViewModel by activityViewModels()
     private var _binding: FragmentRegisterBinding? = null

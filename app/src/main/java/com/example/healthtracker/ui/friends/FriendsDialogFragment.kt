@@ -40,6 +40,7 @@ class FriendsDialogFragment : DialogFragment() {
     ): View? {
         friendListAdapter = FriendListAdapter(friendListViewModel)
         _binding = PopupFriendsBinding.inflate(inflater, container, false)
+        //FIXME figure out when you want to fetch the data
         friendListViewModel.fetchUserFriends()
 
         return binding?.root
@@ -85,6 +86,8 @@ class FriendsDialogFragment : DialogFragment() {
                         rotateView(searchSwitch, 45F)
                         textInputLayout.helperText = "new friend mode on"
                         setOnClickListener {
+                            //FIXME have a single VM method that has a suitable name for
+                            // the performed action, e.g. switchToFriendSearch
                             friendListViewModel.switchSearchState()
                         }
                     } else {
@@ -92,6 +95,9 @@ class FriendsDialogFragment : DialogFragment() {
                         rotateView(searchSwitch, 0F)
                         textInputLayout.helperText = "current friend mode on"
                         setOnClickListener {
+                            //FIXME same as above, you can also have just one toggle function
+                            // that tracks operates based on searchState that's already tracked in
+                            // the VM.
                             friendListViewModel.switchSearchState()
                         }
                     }

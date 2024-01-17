@@ -28,10 +28,12 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
+//FIXME See comment in FirebaseViewModel
 class AccountFragment : Fragment() {
 
     private var _binding: FragmentAccountBinding? = null
     private lateinit var auth: FirebaseAuth
+    //FIXME This is getting messy, why do you need all these VMs here?
     val firebaseViewModel: FirebaseViewModel by activityViewModels()
     private val binding get() = _binding!!
     private lateinit var accountViewModel: AccountViewModel
@@ -46,6 +48,7 @@ class AccountFragment : Fragment() {
         accountViewModel = ViewModelProvider(this)[AccountViewModel::class.java]
         _binding = FragmentAccountBinding.inflate(inflater, container, false)
         auth = FirebaseAuth.getInstance()
+        //FIXME why?
         friendListViewModel.fetchAllUsersInfo()
         return binding.root
     }
@@ -55,6 +58,8 @@ class AccountFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         var userPhoto: String?
         val dialog = FriendsDialogFragment()
+        //FIXME do not access the database directly, the VM associated with this fragment should use
+        // the appropriate repository to access/modify the data
         Firebase.database.getReference("user/${auth.currentUser!!.uid}/userInfo/image").get()
             .addOnCompleteListener {
                 userPhoto = it.result.getValue(String::class.java)?.toString()
@@ -67,18 +72,22 @@ class AccountFragment : Fragment() {
             fun onActivityResult(result: Uri) {
                 val intent = Intent(context, CropActivity::class.java)
                 intent.putExtra("DATA", result.toString())
+                //FIXME you should use an ActivityResultContract for this activity result as well,
+                // more info: https://developer.android.com/training/basics/intents/result and
+                // https://developer.android.com/training/basics/intents/result#custom
                 startActivityForResult(intent, 101)
             }
             uri?.let { onActivityResult(it) }
         }
 
-
         lateinit var userName: String
+        //FIXME again, this logic should not be here
         Firebase.database.getReference("user/${auth.currentUser!!.uid}/userInfo/username").get()
             .addOnCompleteListener {
                 userName = it.result.getValue(String::class.java).toString()
                 binding.username.text = userName
             }
+        //FIXME check the comment for setRoundedCorners in HomeFragment
         binding.apply {
             signOutButton.apply {
                 setRoundedCorners(25F)
@@ -110,6 +119,7 @@ class AccountFragment : Fragment() {
         }
     }
 
+    //FIXME check the comment above for the crop result contract
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         val contentResolver = requireContext().contentResolver
