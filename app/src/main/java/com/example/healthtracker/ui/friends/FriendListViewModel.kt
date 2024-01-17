@@ -1,6 +1,7 @@
 package com.example.healthtracker.ui.friends
 
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,6 +15,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import kotlin.coroutines.coroutineContext
 
 class FriendListViewModel : ViewModel() {
     private val _user = MutableLiveData<MutableList<UserInfo>?>()
@@ -44,7 +46,9 @@ class FriendListViewModel : ViewModel() {
                         val userInfoSnapshot = userSnapshot.child("userInfo")
                         val userInfo = userInfoSnapshot.getValue(UserInfo::class.java)
                         userInfo?.let {
-                            allUsersInfoList.add(it)
+                            if (it.uid != auth.currentUser!!.uid){
+                                allUsersInfoList.add(it)
+                            }
                         }
                     }
                     _user.postValue(allUsersInfoList)
@@ -59,7 +63,6 @@ class FriendListViewModel : ViewModel() {
         ref.removeEventListener(eventer)
     }
     fun fetchUserFriends(){
-            Log.d("REF2", ref2.toString())
             val eventer = ref2.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     friendsInfoList.clear()
@@ -67,10 +70,8 @@ class FriendListViewModel : ViewModel() {
                         val userInfo = snapshot.value.toString()
                         userInfo.let {
                             val user = getUserInfoByUid(it)
-                            Log.d("POST ADAPTION USERINFO", user.toString())
                             if (user != null) {
                                 friendsInfoList.add(user)
-                                Log.d("USER INFO LIST", friendsInfoList.toString())
                             }
                         }
                     }
@@ -87,12 +88,18 @@ class FriendListViewModel : ViewModel() {
     }
     fun addFriend(userId: String) {
         val databases = Firebase.database.reference
-//        databases.child("user").child("userFriends").push().setValue(userId)
         databases.child("user").child(auth.currentUser!!.uid).child("userFriends").child(userId).setValue(userId)
     }
+    fun removeFriend(userId:String){
+        val friend = getUserInfoByUid(userId)
+        if (friendsInfoList.contains(friend)) {
+            val databases = Firebase.database.reference
+            databases.child("user").child(auth.currentUser!!.uid).child("userFriends").child(userId)
+                .removeValue()
+            fetchUserFriends()
+        }
+    }
     fun getUserInfoByUid(uid: String): UserInfo? {
-        Log.d("GETTER ID", uid)
-        Log.d("ALL USERS", allUsersInfoList.toString())
 
         return allUsersInfoList.find {  uid==it.uid }
     }

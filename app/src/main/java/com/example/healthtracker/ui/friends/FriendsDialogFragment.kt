@@ -51,8 +51,6 @@ class FriendsDialogFragment : DialogFragment() {
         val height = ViewGroup.LayoutParams.WRAP_CONTENT
         dialog?.window?.setLayout(width, height)
         dialog?.window?.setBackgroundDrawableResource(R.drawable.custom_rounded_background)
-        friendListViewModel.fetchAllUsersInfo()
-        friendListViewModel.fetchUserFriends()
 
     }
 
@@ -83,18 +81,18 @@ class FriendsDialogFragment : DialogFragment() {
             searchSwitch.apply {
                 friendListViewModel.searchState.observe(viewLifecycleOwner) { it1 ->
                     if (it1 == true) {
+                        friendListViewModel.fetchAllUsersInfo()
                         rotateView(searchSwitch, 45F)
                         textInputLayout.helperText = "new friend mode on"
                         setOnClickListener {
                             friendListViewModel.switchSearchState()
-                            friendListViewModel.fetchUserFriends()
                         }
                     } else {
+                        friendListViewModel.fetchUserFriends()
                         rotateView(searchSwitch, 0F)
                         textInputLayout.helperText = "current friend mode on"
                         setOnClickListener {
                             friendListViewModel.switchSearchState()
-                            friendListViewModel.fetchAllUsersInfo()
                         }
                     }
                 }
@@ -121,8 +119,7 @@ class FriendsDialogFragment : DialogFragment() {
     fun rotateView(imageView: View, angle: Float) {
         val rotationAnim = ObjectAnimator.ofFloat(imageView, "rotation", angle)
         rotationAnim.duration = 300
-        rotationAnim.interpolator =
-            AccelerateDecelerateInterpolator()
+        rotationAnim.interpolator = AccelerateDecelerateInterpolator()
         rotationAnim.start()
     }
 }

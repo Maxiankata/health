@@ -8,12 +8,14 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.healthtracker.CropActivity
 import com.example.healthtracker.FirebaseViewModel
 import com.example.healthtracker.databinding.FragmentAccountBinding
 import com.example.healthtracker.ui.base64ToBitmap
+import com.example.healthtracker.ui.friends.FriendListViewModel
 import com.example.healthtracker.ui.friends.FriendsDialogFragment
 import com.example.healthtracker.ui.login.LoginActivity
 import com.example.healthtracker.ui.navigateToActivity
@@ -33,7 +35,7 @@ class AccountFragment : Fragment() {
     val firebaseViewModel: FirebaseViewModel by activityViewModels()
     private val binding get() = _binding!!
     private lateinit var accountViewModel: AccountViewModel
-
+    val friendListViewModel:FriendListViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,6 +46,7 @@ class AccountFragment : Fragment() {
         accountViewModel = ViewModelProvider(this)[AccountViewModel::class.java]
         _binding = FragmentAccountBinding.inflate(inflater, container, false)
         auth = FirebaseAuth.getInstance()
+        friendListViewModel.fetchAllUsersInfo()
         return binding.root
     }
 

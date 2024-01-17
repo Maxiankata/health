@@ -45,5 +45,6 @@
     <string name="password_help">Password should be 6 or more symbols long</string>
     <string name="email_help">Input a real e-mail, so you can recover your password</string>
     <string name="close">CLOSE</string>
+    <string name="new_friend">A user has added you to their friends list!</string>
 
 </resources>

@@ -43,7 +43,7 @@ class WalkViewModel : ViewModel() {
 
     fun saveLeaveSteps() {
         val database = Firebase.database.reference
-        database.child("user").child("userAutomaticInfo").child("steps").child("onLeaveSteps")
+        database.child("user").child(auth.currentUser!!.uid).child("userAutomaticInfo").child("steps").child("onLeaveSteps")
             .setValue(previousSteps)
     }
 
