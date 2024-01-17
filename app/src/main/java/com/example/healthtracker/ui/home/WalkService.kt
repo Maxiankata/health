@@ -17,8 +17,24 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
-class WalkService(context: Context) : SensorEventListener {
 
+//FIXME this is not a good way to do this
+// Define an interface, e.g. StepCountProvider (you also use Repository with a DataSource, since user
+// steps are persisted, in that case the DataSource should use SensorManager)
+// Then add implementation that uses SensorManager. This provider should have na observable field
+// (probably a flow) that updates with the current step count and will also take care of step data
+// persistence and management. Then your VMs should only use this provider class and consume the step
+// data it provides.
+// You might also want to use the process lifecycle, so you can save the last step count available to
+// your app when the application is closed. Check https://developer.android.com/jetpack/androidx/releases/lifecycle,
+// more specifically  "androidx.lifecycle:lifecycle-process:$lifecycle_version".
+// Make sure to use the application context when creating the Provider, you can make it a Singleton
+// for simplicity or use dependency injection to provide the instance if you have time to invest in
+// DI (https://developer.android.com/training/dependency-injection/hilt-android)
+// Another note - the process lifecycle will tell you when the app goes in the background, but that doesn't necessary mean it has been stopped.
+// If you want to keep tracking the steps while the app is in the background, you should use a foreground service and make
+// sure the user can stop it.
+class WalkService(context: Context) : SensorEventListener {
 
     private var sensorManager: SensorManager? = null
     var currentSteps = MutableLiveData<Int>()

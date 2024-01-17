@@ -31,11 +31,13 @@ class AccountViewModel : ViewModel() {
         _imageUri.value = uri
     }
 
+    //FIXME try not to pass android classes to your VMs
     fun handleImageSelectionResult(data: Intent?) {
         val selectedImageUri: Uri? = data?.data
         setImageUri(selectedImageUri)
     }
 
+    //FIXME try not to pass android classes to your VMs
     fun openImagePicker(launcher: ActivityResultLauncher<Intent>) {
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/*"

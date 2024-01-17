@@ -10,6 +10,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.database.values
 import com.google.firebase.ktx.Firebase
 
+//FIXME check comments in WalkService about step tracking - this should not be done in a VM
 class WalkViewModel : ViewModel() {
     lateinit var walkService: WalkService
 

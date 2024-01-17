@@ -17,6 +17,7 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val homeViewModel:HomeViewModel by activityViewModels()
+    //FIXME check the comments in WalkViewModel
     val walkViewModel:WalkViewModel by activityViewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,11 +39,20 @@ class HomeFragment : Fragment() {
         val weightRecyclerVal = WeightRecyclerAdapter()
 
         binding.apply {
+            //FIXME styling is best applied in the layout definition, in this case in the XML file
+            // You can set a rounded corners drawable as background to the containers and set the desired
+            // background tint on it. The default outlineProvider is set to background, so the view will
+            // drop the expected shadow when elevation is applied. Also, if you want your UI
+            // to look consistent across devices - this will not work, as you are setting the corner radius to
+            // 30px and it will be different on different densities.
+            // If you want to stick to this implementation you need to pass dps. An easy way to do this is to
+            // define the radius value in dimens.xml and then use resources.getDimensionPixelSize(resId)
             weight.setRoundedCorners(30F)
             water.setRoundedCorners(30F)
             sleep.setRoundedCorners(30F)
             walkViewModel.walkService.currentSteps.observe(viewLifecycleOwner) {
                 stepcount.apply {
+                    //FIXME use string resources
                     text = "Steps: $it"
                     setOnLongClickListener {
                         walkViewModel.walkService.resetSteps()
@@ -55,6 +65,7 @@ class HomeFragment : Fragment() {
                 }
             walkViewModel.walkService.caloriesBurned.observe(viewLifecycleOwner) {
                 binding.apply {
+                    //FIXME use string resources
                     calorieCount.text = "Calories: $it"
                     caloriesProgressBar.apply {
                         setProgressWithAnimation(it.toFloat())
@@ -69,6 +80,7 @@ class HomeFragment : Fragment() {
                 adapter = weightRecyclerVal
 
                 layoutManager = GridLayoutManager(context,  1, GridLayoutManager.VERTICAL, false)
+                //FIXME this does not make sense as declared here - you don't have to obtain the same references from the recycler view
                 val fakelayoutmanager = this.layoutManager as GridLayoutManager
                 val fakeadapter = adapter
 

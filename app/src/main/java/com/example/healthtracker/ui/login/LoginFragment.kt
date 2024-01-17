@@ -16,7 +16,7 @@ import com.example.healthtracker.databinding.FragmentLoginBinding
 import com.example.healthtracker.ui.login.LoginActivity.Companion.auth
 import com.example.healthtracker.ui.navigateToActivity
 
-
+//FIXME _binding should be cleared in onDestroyView()
 class LoginFragment : Fragment() {
     private var _binding: FragmentLoginBinding? = null
 
@@ -39,6 +39,7 @@ class LoginFragment : Fragment() {
             }
             signInButton.apply {
                 setOnClickListener {
+                    //FIXME this logic does not belong in a fragment, see comment in FirebaseViewModel
                     try {
                         auth.signInWithEmailAndPassword(
                             usernameInput.text.toString(), passwordInput.text.toString()

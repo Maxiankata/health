@@ -17,10 +17,13 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlin.coroutines.coroutineContext
 
+//FIXME check the comment in FirebaseViewModel - all DB related stuff here should be
+// in a repository implementation that the VM operates with
 class FriendListViewModel : ViewModel() {
     private val _user = MutableLiveData<MutableList<UserInfo>?>()
     val user: MutableLiveData<MutableList<UserInfo>?> get() = _user
     private val database = FirebaseDatabase.getInstance()
+    //FIXME try to pick more descriptive and self-explanatory names
     private var _searchState = MutableLiveData<Boolean>()
     lateinit var threat:Thread
     private var auth: FirebaseAuth = LoginActivity.auth
@@ -31,6 +34,11 @@ class FriendListViewModel : ViewModel() {
         _searchState.value=false
 
     }
+
+    //FIXME assuming this logic will live in a repository, you should secure your data - you probably don't
+    // want provide access to other users' data to everyone. See how data can be secured here: https://firebase.google.com/docs/database/security
+    // Figure out which user data will be public and try to limit your access to it.
+    // In a real world scenario data privacy and security is a big deal.
     val ref: DatabaseReference = database.getReference("user")
     val ref2 = database.getReference("user/${auth.currentUser!!.uid}/userFriends")
 

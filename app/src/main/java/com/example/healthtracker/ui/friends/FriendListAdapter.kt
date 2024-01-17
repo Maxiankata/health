@@ -19,7 +19,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
-
+//FIXME passing the VM here looks very fishy
 class FriendListAdapter(private val friendListViewModel: FriendListViewModel) :
     RecyclerView.Adapter<FriendListAdapter.FriendListViewHolder>() {
     var items = ArrayList<UserInfo>()
@@ -50,6 +50,10 @@ class FriendListAdapter(private val friendListViewModel: FriendListViewModel) :
                 )
 
             }
+            //FIXME This is not ok, you are adding an observer to the searchState LiveData
+            // that will never be removed for each ViewHolder created by the RecyclerView
+            // the VM is scoped to the activity and will outlive the views created here
+            // The views will kept in-memory and leaked when the fragment is scrapped
             friendListViewModel.searchState.observeForever{
                 if (it) {
                     cardButton.apply {
@@ -76,6 +80,7 @@ class FriendListAdapter(private val friendListViewModel: FriendListViewModel) :
 
     @SuppressLint("NotifyDataSetChanged")
     fun updateItems(newItems: List<UserInfo>) {
+        //FIXME use DiffUtil
         items.clear()
         items.addAll(newItems)
         notifyDataSetChanged()

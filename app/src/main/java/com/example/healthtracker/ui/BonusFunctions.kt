@@ -26,14 +26,25 @@ import java.io.ByteArrayOutputStream
 import java.io.FileNotFoundException
 import java.io.IOException
 
+//FIXME This file name made me chuckle, helper functions usually go into Utils but since all these
+// functions can be converted to extension functions (more idiomatic for kotlin), file can be renamed
+// to Extensions - standard naming that makes it easier to locate extensions
+
 fun navigateToActivity(currentActivity: Activity, targetActivityClass: Class<*>) {
     val intent = Intent(currentActivity, targetActivityClass)
     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
     currentActivity.startActivity(intent)
     currentActivity.finish()
 }
+
+//FIXME when you have a function with a lambda param as topmost statement in a function like in this case
+// it's better to use
+// fun doSomething(...) = withContext(...) {...}
+// This will save you one indentation level and make the code more readable
 suspend fun uriToBitmap(contentResolver: ContentResolver, uri: Uri): Bitmap? {
     return withContext(Dispatchers.IO) {
+        //FIXME instead of swallowing the exceptions you can use kotlin.runCatching that
+        // returns a Result object and the consumer of the function can decide how to proceed on error
         var bitmap: Bitmap? = null
         try {
             val inputStream = contentResolver.openInputStream(uri)
@@ -59,6 +70,10 @@ fun base64ToBitmap(base64String: String): Bitmap {
     val decodedBytes = Base64.decode(base64String, Base64.DEFAULT)
     return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
 }
+
+//FIXME this should not be here, functions operating ot the database belong to a repository interface
+// Another point is that you don't want to use Android classes in your data access interfaces as it makes
+// testing a pain
 suspend fun saveBitmapToDatabase(bitmap: Bitmap) {
     val currentUser = FirebaseAuth.getInstance().currentUser
     val database: DatabaseReference = Firebase.database.getReference("user/${currentUser!!.uid}/userInfo/image")
@@ -101,6 +116,7 @@ fun cropImageToSquare(context: Context, uri: Uri): Bitmap? {
                 imageWidth
             }
 
+            //FIXME check the warnings, something's off
             val left = if (imageWidth >= imageHeight) 0 else (imageWidth - squareSize) / 2
             val top = if (imageHeight >= imageWidth) 0 else (imageHeight - squareSize) / 2
 

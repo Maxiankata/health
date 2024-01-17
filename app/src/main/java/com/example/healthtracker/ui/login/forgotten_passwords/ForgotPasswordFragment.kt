@@ -48,6 +48,7 @@ class ForgotPasswordFragment : Fragment() {
     }
 
 
+    //FIXME this logic does not belong in a fragment, see comment in FirebaseViewModel
     private fun resetPassword(email:String){
         Firebase.auth.sendPasswordResetEmail(email)
             .addOnCompleteListener { task ->
