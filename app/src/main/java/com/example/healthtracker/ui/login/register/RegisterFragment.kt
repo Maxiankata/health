@@ -1,4 +1,4 @@
-package com.example.healthtracker.ui.login
+package com.example.healthtracker.ui.login.register
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,22 +6,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.example.healthtracker.FirebaseViewModel
+import com.example.healthtracker.AuthImpl
+import com.example.healthtracker.AuthInterface
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.FragmentRegisterBinding
-import com.example.healthtracker.ui.login.LoginActivity.Companion.auth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import javax.inject.Singleton
 
 class RegisterFragment : Fragment() {
-    private val firebaseViewModel: FirebaseViewModel by activityViewModels()
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
+    val registerViewModel:RegisterViewModel by viewModels()
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         super.onCreate(savedInstanceState)
         _binding = FragmentRegisterBinding.inflate(inflater, container, false)
@@ -39,22 +42,25 @@ class RegisterFragment : Fragment() {
                         .isNotEmpty() && confirmPasswordInput.text.toString() == passwordInput.text.toString() && emailInput.text.toString()
                         .isNotEmpty()
                 ) {
-                    firebaseViewModel.createAcc(
-                        emailInput.text.toString(),
-                        passwordInput.text.toString(),
-                        usernameInput.text.toString()
+                    runBlocking {
+                        launch {
+                            registerViewModel.register(
+                                emailInput.text.toString(),
+                                passwordInput.text.toString(),
+                                usernameInput.text.toString()
+                            )
+                        }
+                    }
+                    Firebase.auth.signInWithEmailAndPassword(
+                        usernameInput.text.toString(), passwordInput.text.toString()
                     )
-                    auth.signInWithEmailAndPassword(
-                        usernameInput.text.toString(),
-                        passwordInput.text.toString()
-                    )
-                    val user = auth.currentUser
                     val intent = Intent(context, MainActivity::class.java)
                     startActivity(intent)
                 }
             }
         }
     }
+
 }
 
 

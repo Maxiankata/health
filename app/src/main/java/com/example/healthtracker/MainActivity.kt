@@ -2,24 +2,26 @@ package com.example.healthtracker
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.room.Room
+import com.example.healthtracker.data.room.UserDB
 import com.example.healthtracker.databinding.ActivityMainBinding
 import com.example.healthtracker.ui.home.WalkViewModel
-import com.example.healthtracker.ui.login.LoginActivity.Companion.auth
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.coroutineContext
 
 class MainActivity : AppCompatActivity() {
 
@@ -41,7 +43,6 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.hide()
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-        auth = FirebaseAuth.getInstance()
 
         buildNotification()
 
@@ -61,18 +62,39 @@ class MainActivity : AppCompatActivity() {
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        walkViewModel.saveLeaveSteps()
+        if(Firebase.auth.currentUser!=null){
+            walkViewModel.saveLeaveSteps()
+        }
     }
-    private fun buildNotification(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+
+    private fun buildNotification() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.friends)
             val descriptionText = getString(R.string.new_friend)
             val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(channelID, name, importance).apply { description=descriptionText }
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val channel = NotificationChannel(channelID, name, importance).apply {
+                description = descriptionText
+            }
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
             Log.d("NOTIICATION CHANNEL BUILT", channel.toString())
         }
     }
+    companion object {
+        private lateinit var db: UserDB
+
+        fun getDatabaseInstance(context: Context): UserDB {
+            if (!::db.isInitialized) {
+                db = Room.databaseBuilder(
+                    context.applicationContext,
+                    UserDB::class.java, "user-base"
+                ).build()
+            }
+            return db
+        }
+    }
+
+
 }
 

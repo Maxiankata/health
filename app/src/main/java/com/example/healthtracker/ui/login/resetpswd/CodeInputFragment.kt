@@ -1,10 +1,10 @@
-package com.example.healthtracker.ui.login.forgotten_passwords
+package com.example.healthtracker.ui.login.resetpswd
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.FragmentCodeInputBinding
@@ -12,12 +12,13 @@ import com.example.healthtracker.databinding.FragmentCodeInputBinding
 
 class CodeInputFragment : Fragment() {
 
-    lateinit var binding: FragmentCodeInputBinding
+    private var _binding: FragmentCodeInputBinding? = null
+    private val binding get() = _binding!!
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentCodeInputBinding.inflate(inflater, container,false)
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentCodeInputBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -30,5 +31,10 @@ class CodeInputFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

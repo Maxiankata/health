@@ -46,5 +46,11 @@
     <string name="email_help">Input a real e-mail, so you can recover your password</string>
     <string name="close">CLOSE</string>
     <string name="new_friend">A user has added you to their friends list!</string>
+    <string name="friend">Friend</string>
+    <string name="removed">removed</string>
+    <string name="missing_sensor">No sensor found</string>
+    <string name="login_issue">Incorrect e-mail or password</string>
+    <string name="empty_field">Empty field</string>
+    <string name="added">added</string>
 
 </resources>

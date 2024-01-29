@@ -1,6 +1,5 @@
 package com.example.healthtracker.ui
-import android.app.Activity
-import android.content.Intent
+
 import android.graphics.Outline
 import android.graphics.Path
 import android.graphics.Rect
@@ -10,7 +9,7 @@ import android.view.View
 import android.view.ViewOutlineProvider
 import androidx.annotation.RequiresApi
 
-class RoundedCorners (private val radius: Float) : ViewOutlineProvider() {
+class RoundedCorners(private val radius: Float) : ViewOutlineProvider() {
     private val bounds = Rect()
 
     override fun getOutline(view: View?, outline: Outline?) {
@@ -18,6 +17,7 @@ class RoundedCorners (private val radius: Float) : ViewOutlineProvider() {
         outline?.setRoundRect(bounds, radius)
     }
 }
+
 class ExplicableRoundedCorners(
     private val topLeftRadius: Float,
     private val topRightRadius: Float,

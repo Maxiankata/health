@@ -132,16 +132,21 @@
         <TextView
             android:id="@+id/textView2"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="match_parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/minus"
             app:layout_constraintEnd_toStartOf="@id/plus"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:textColor="@color/white"
+            android:textAlignment="center"
+            android:textSize="30sp"
+            />
         <ImageView
             android:id="@+id/plus"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/plus"
+            android:tint="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/textView2"
             app:layout_constraintEnd_toEndOf="parent"

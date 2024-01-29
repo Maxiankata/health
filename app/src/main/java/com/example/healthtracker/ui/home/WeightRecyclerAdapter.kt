@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.healthtracker.R
 
 class WeightRecyclerAdapter:RecyclerView.Adapter<WeightRecyclerAdapter.WeightViewHolder>() {
-    private val weight = Weight.weight
+    private val weight = Weight.weight.toList()
 
 
     inner class WeightViewHolder(view: View):RecyclerView.ViewHolder(view){
@@ -17,6 +17,7 @@ class WeightRecyclerAdapter:RecyclerView.Adapter<WeightRecyclerAdapter.WeightVie
             text.text = double.toString()
         }
     }
+//    what the hell have i written here
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WeightViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.weigh_card,parent,false)

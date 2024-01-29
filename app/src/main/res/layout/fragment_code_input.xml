@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    tools:context=".ui.login.forgotten_passwords.ForgotPasswordFragment">
+    tools:context=".ui.login.resetpswd.ForgotPasswordFragment">
 
     <TextView
         android:id="@+id/code_input_text"

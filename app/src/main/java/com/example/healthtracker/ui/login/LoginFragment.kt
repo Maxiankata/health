@@ -4,17 +4,17 @@ import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.FragmentLoginBinding
-import com.example.healthtracker.ui.login.LoginActivity.Companion.auth
-import com.example.healthtracker.ui.navigateToActivity
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 
 class LoginFragment : Fragment() {
@@ -40,28 +40,28 @@ class LoginFragment : Fragment() {
             signInButton.apply {
                 setOnClickListener {
                     try {
-                        auth.signInWithEmailAndPassword(
+                        Firebase.auth.signInWithEmailAndPassword(
                             usernameInput.text.toString(), passwordInput.text.toString()
                         ).addOnCompleteListener(requireActivity()) { task ->
-                                if (task.isSuccessful) {
-                                    Log.d(TAG, "signInWithEmail:success")
-                                    val user = auth.currentUser
-                                    val intent = Intent(context, MainActivity::class.java)
-                                    startActivity(intent)
+                            if (task.isSuccessful) {
+                                Log.d(TAG, "signInWithEmail:success")
+                                val user = Firebase.auth.currentUser
+                                val intent = Intent(context, MainActivity::class.java)
+                                startActivity(intent)
 
-                                } else {
-                                    Toast.makeText(
-                                        context,
-                                        "Incorrect e-mail or password",
-                                        Toast.LENGTH_SHORT,
-                                    ).show()
-                                }
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    getString(R.string.login_issue),
+                                    Toast.LENGTH_SHORT,
+                                ).show()
                             }
+                        }
                     } catch (e: Exception) {
                         Log.d("empty", "$e")
                         Toast.makeText(
                             context,
-                            "Empty field",
+                            getString(R.string.empty_field),
                             Toast.LENGTH_SHORT,
                         ).show()
                     }
@@ -75,5 +75,10 @@ class LoginFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

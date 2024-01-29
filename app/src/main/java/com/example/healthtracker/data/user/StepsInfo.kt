@@ -1,4 +1,4 @@
-package com.example.healthtracker.user
+package com.example.healthtracker.data.user
 
 data class StepsInfo(
     val totalSteps:Int?=null,

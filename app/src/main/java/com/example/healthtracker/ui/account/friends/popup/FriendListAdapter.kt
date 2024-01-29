@@ -1,4 +1,4 @@
-package com.example.healthtracker.ui.friends
+package com.example.healthtracker.ui.account.friends.popup
 
 import android.annotation.SuppressLint
 import android.util.Base64
@@ -11,30 +11,23 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.healthtracker.R
-import com.example.healthtracker.ui.login.LoginActivity.Companion.auth
+import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.ui.setRoundedCorners
-import com.example.healthtracker.user.UserInfo
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
-class FriendListAdapter(private val friendListViewModel: FriendListViewModel) :
+class FriendListAdapter :
     RecyclerView.Adapter<FriendListAdapter.FriendListViewHolder>() {
-    var items = ArrayList<UserInfo>()
+    private var items = ArrayList<UserInfo>()
     var itemClickListener: ItemClickListener<UserInfo>? = null
-
-//    init {
-//        updateItems(items)
-//    }
-
+    private val friendListViewModel = FriendListViewModel()
     inner class FriendListViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.friend_name)
-        val email: TextView = view.findViewById(R.id.friend_mail)
-        val image: ImageView = view.findViewById(R.id.friend_photo)
-        val cardButton: ImageView = view.findViewById(R.id.card_button)
-        val friendCardContainer: View = view.findViewById(R.id.friend_card_container)
+        private val email: TextView = view.findViewById(R.id.friend_mail)
+        private val image: ImageView = view.findViewById(R.id.friend_photo)
+        private val cardButton: ImageView = view.findViewById(R.id.card_button)
+        private val friendCardContainer: View = view.findViewById(R.id.friend_card_container)
 
 
         fun bind(userInfo: UserInfo) {
@@ -50,16 +43,17 @@ class FriendListAdapter(private val friendListViewModel: FriendListViewModel) :
                 )
 
             }
-            friendListViewModel.searchState.observeForever{
+            friendListViewModel.searchState.observeForever(){
                 if (it) {
                     cardButton.apply {
                         setImageResource(R.drawable.friend_add)
                         setOnClickListener {
-                            userInfo.uid?.let { it1 -> friendListViewModel.addFriend(it1) }
+                            runBlocking {
+                                launch {
+                                    userInfo.uid?.let { it1 -> friendListViewModel.addFriend(it1) }
+                                }
+                            }
                         }
-                    }
-                    image.apply {
-
                     }
                 } else {
                     cardButton.apply {

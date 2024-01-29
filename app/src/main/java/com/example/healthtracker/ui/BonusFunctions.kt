@@ -1,17 +1,15 @@
 package com.example.healthtracker.ui
 
+import android.animation.ObjectAnimator
 import android.app.Activity
 import android.content.ContentResolver
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Rect
 import android.net.Uri
 import android.util.Base64
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.fragment.app.FragmentActivity
 import com.example.healthtracker.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -32,8 +30,9 @@ fun navigateToActivity(currentActivity: Activity, targetActivityClass: Class<*>)
     currentActivity.startActivity(intent)
     currentActivity.finish()
 }
-suspend fun uriToBitmap(contentResolver: ContentResolver, uri: Uri): Bitmap? {
-    return withContext(Dispatchers.IO) {
+
+suspend fun uriToBitmap(contentResolver: ContentResolver, uri: Uri): Bitmap? =
+    withContext(Dispatchers.IO) {
         var bitmap: Bitmap? = null
         try {
             val inputStream = contentResolver.openInputStream(uri)
@@ -48,25 +47,22 @@ suspend fun uriToBitmap(contentResolver: ContentResolver, uri: Uri): Bitmap? {
         }
         bitmap
     }
-}
+
+
 fun bitmapToBase64(bitmap: Bitmap): String {
     val byteArrayOutputStream = ByteArrayOutputStream()
     bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
     val byteArray = byteArrayOutputStream.toByteArray()
     return Base64.encodeToString(byteArray, Base64.DEFAULT)
 }
+
 fun base64ToBitmap(base64String: String): Bitmap {
     val decodedBytes = Base64.decode(base64String, Base64.DEFAULT)
     return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
 }
-suspend fun saveBitmapToDatabase(bitmap: Bitmap) {
-    val currentUser = FirebaseAuth.getInstance().currentUser
-    val database: DatabaseReference = Firebase.database.getReference("user/${currentUser!!.uid}/userInfo/image")
-    val base64String = bitmapToBase64(bitmap)
-    withContext(Dispatchers.IO) {
-        database.setValue(base64String).await()
-    }
-}
+
+
+
 fun FragmentActivity.hideBottomNav() {
     findViewById<BottomNavigationView>(R.id.nav_view).apply {
         visibility = View.GONE
@@ -78,57 +74,10 @@ fun FragmentActivity.showBottomNav() {
         visibility = View.VISIBLE
     }
 }
-fun cropImageToSquare(context: Context, uri: Uri): Bitmap? {
-    var bitmap: Bitmap? = null
-    try {
-        val inputStream = context.contentResolver.openInputStream(uri)
-        inputStream?.use { stream ->
-            val options = BitmapFactory.Options()
-            options.inJustDecodeBounds = true
-            BitmapFactory.decodeStream(stream, null, options)
-            val imageWidth = options.outWidth
-            val imageHeight = options.outHeight
 
-            val scaleFactor = if (imageWidth >= imageHeight) {
-                imageWidth.toFloat() / imageHeight.toFloat()
-            } else {
-                imageHeight.toFloat() / imageWidth.toFloat()
-            }
-
-            val squareSize = if (imageWidth >= imageHeight) {
-                imageHeight
-            } else {
-                imageWidth
-            }
-
-            val left = if (imageWidth >= imageHeight) 0 else (imageWidth - squareSize) / 2
-            val top = if (imageHeight >= imageWidth) 0 else (imageHeight - squareSize) / 2
-
-            val squareBitmap = Bitmap.createBitmap(
-                squareSize,
-                squareSize,
-                Bitmap.Config.ARGB_8888
-            )
-
-            val paint = Paint().apply {
-                isAntiAlias = true
-                isFilterBitmap = true
-                isDither = true
-            }
-
-            Canvas(squareBitmap).apply {
-                drawBitmap(
-                    squareBitmap,
-                    Rect(left, top, left + squareSize, top + squareSize),
-                    Rect(0, 0, squareSize, squareSize),
-                    paint
-                )
-            }
-
-            bitmap = Bitmap.createScaledBitmap(squareBitmap, 1, 1, true)
-        }
-    } catch (e: IOException) {
-        e.printStackTrace()
-    }
-    return bitmap
+fun rotateView(imageView: View, angle: Float) {
+    val rotationAnim = ObjectAnimator.ofFloat(imageView, "rotation", angle)
+    rotationAnim.duration = 300
+    rotationAnim.interpolator = AccelerateDecelerateInterpolator()
+    rotationAnim.start()
 }

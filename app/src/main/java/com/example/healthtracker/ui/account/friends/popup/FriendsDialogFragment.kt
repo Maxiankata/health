@@ -1,6 +1,5 @@
-package com.example.healthtracker.ui.friends
+package com.example.healthtracker.ui.account.friends.popup
 
-import android.animation.ObjectAnimator
 import android.content.res.ColorStateList
 import android.graphics.PorterDuff
 import android.os.Bundle
@@ -8,20 +7,18 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.healthtracker.R
+import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.databinding.PopupFriendsBinding
-import com.example.healthtracker.ui.login.LoginActivity.Companion.auth
-import com.example.healthtracker.user.UserInfo
-import com.google.firebase.database.database
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import com.example.healthtracker.ui.rotateView
+import kotlinx.coroutines.launch
 
 class FriendsDialogFragment : DialogFragment() {
     private var _binding: PopupFriendsBinding? = null
@@ -34,13 +31,11 @@ class FriendsDialogFragment : DialogFragment() {
     private val friendListViewModel: FriendListViewModel by activityViewModels()
     private lateinit var friendListAdapter: FriendListAdapter
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        friendListAdapter = FriendListAdapter(friendListViewModel)
+        friendListAdapter = FriendListAdapter()
         _binding = PopupFriendsBinding.inflate(inflater, container, false)
-        friendListViewModel.fetchUserFriends()
+
 
         return binding?.root
     }
@@ -58,15 +53,14 @@ class FriendsDialogFragment : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding?.apply {
-            friendListViewModel.user.observe(viewLifecycleOwner) {
+            friendListViewModel.usersList.observe(viewLifecycleOwner) {
                 if (it != null) {
                     friendListAdapter.updateItems(it)
                 }
             }
             usernameInput.setOnFocusChangeListener { _, hasFocus ->
                 val color = if (hasFocus) (ContextCompat.getColor(
-                    requireContext(),
-                    R.color.light_green
+                    requireContext(), R.color.light_green
                 )) else (ContextCompat.getColor(requireContext(), R.color.input_grey))
                 textInputLayout.setEndIconTintList(ColorStateList.valueOf(color))
 
@@ -81,19 +75,33 @@ class FriendsDialogFragment : DialogFragment() {
             searchSwitch.apply {
                 friendListViewModel.searchState.observe(viewLifecycleOwner) { it1 ->
                     if (it1 == true) {
-                        friendListViewModel.fetchAllUsersInfo()
-                        rotateView(searchSwitch, 45F)
-                        textInputLayout.helperText = "new friend mode on"
-                        setOnClickListener {
-                            friendListViewModel.switchSearchState()
+                        lifecycleScope.launch {
+                            try {
+                                friendListViewModel.fetchAllUsersInfo()
+                                rotateView(searchSwitch, 45F)
+                                textInputLayout.helperText = "new friend mode on"
+                                setOnClickListener {
+                                    friendListViewModel.switchSearchState()
+                                }
+                            } catch (e: Exception) {
+                                Log.e("FetchUsersError", "Error fetching users", e)
+                            }
                         }
+
                     } else {
-                        friendListViewModel.fetchUserFriends()
-                        rotateView(searchSwitch, 0F)
-                        textInputLayout.helperText = "current friend mode on"
-                        setOnClickListener {
-                            friendListViewModel.switchSearchState()
+                        lifecycleScope.launch {
+                            try {
+                                friendListViewModel.fetchUserFriends()
+                                rotateView(searchSwitch, 0F)
+                                textInputLayout.helperText = "current friend mode on"
+                                setOnClickListener {
+                                    friendListViewModel.switchSearchState()
+                                }
+                            } catch (e: Exception) {
+                                Log.e("FetchFriendsError", "Error fetching friends", e)
+                            }
                         }
+
                     }
                 }
             }
@@ -116,10 +124,5 @@ class FriendsDialogFragment : DialogFragment() {
         }
     }
 
-    fun rotateView(imageView: View, angle: Float) {
-        val rotationAnim = ObjectAnimator.ofFloat(imageView, "rotation", angle)
-        rotationAnim.duration = 300
-        rotationAnim.interpolator = AccelerateDecelerateInterpolator()
-        rotationAnim.start()
-    }
+
 }

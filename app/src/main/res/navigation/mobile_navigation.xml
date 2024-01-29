@@ -28,11 +28,11 @@
     </fragment>
     <fragment
         android:id="@+id/friendAccountFragment"
-        android:name="com.example.healthtracker.ui.friends.FriendAccountFragment"
+        android:name="com.example.healthtracker.ui.account.friends.profile.FriendAccountFragment"
         android:label="FriendAccountFragment" />
     <dialog
         android:id="@+id/friendsDialogFragment"
-        android:name="com.example.healthtracker.ui.friends.FriendsDialogFragment"
+        android:name="com.example.healthtracker.ui.account.friends.popup.FriendsDialogFragment"
         android:label="FriendsDialogFragment" >
         <action
             android:id="@+id/action_friendsDialogFragment_to_friendAccountFragment"

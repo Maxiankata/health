@@ -1,4 +1,4 @@
-package com.example.healthtracker.ui.login.forgotten_passwords
+package com.example.healthtracker.ui.login.resetpswd
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -15,7 +15,7 @@ class ResetPasswordFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding =  FragmentResetPasswordBinding.inflate(inflater, container, false)
         return binding.root

@@ -25,7 +25,7 @@
 
     <fragment
         android:id="@+id/registerFragment"
-        android:name="com.example.healthtracker.ui.login.RegisterFragment"
+        android:name="com.example.healthtracker.ui.login.register.RegisterFragment"
         android:label="RegisterFragment" >
         <action
             android:id="@+id/action_registerFragment_to_loginFragment"
@@ -37,7 +37,7 @@
 
     <fragment
         android:id="@+id/forgotPasswordFragment"
-        android:name="com.example.healthtracker.ui.login.forgotten_passwords.ForgotPasswordFragment"
+        android:name="com.example.healthtracker.ui.login.resetpswd.ForgotPasswordFragment"
         android:label="fragment_forgot_password"
         tools:layout="@layout/fragment_forgot_password" >
         <action
@@ -47,7 +47,7 @@
     </fragment>
     <fragment
         android:id="@+id/codeInputFragment"
-        android:name="com.example.healthtracker.ui.login.forgotten_passwords.CodeInputFragment"
+        android:name="com.example.healthtracker.ui.login.resetpswd.CodeInputFragment"
         android:label="fragment_code_input"
         tools:layout="@layout/fragment_code_input" >
         <action
@@ -57,7 +57,7 @@
     </fragment>
     <fragment
         android:id="@+id/resetPasswordFragment"
-        android:name="com.example.healthtracker.ui.login.forgotten_passwords.ResetPasswordFragment"
+        android:name="com.example.healthtracker.ui.login.resetpswd.ResetPasswordFragment"
         android:label="fragment_reset_password"
         tools:layout="@layout/fragment_reset_password" >
         <action

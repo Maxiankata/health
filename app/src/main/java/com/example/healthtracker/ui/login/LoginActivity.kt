@@ -24,7 +24,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        val currentUser = auth.currentUser
+        val currentUser = Firebase.auth.currentUser
         if (currentUser != null) {
             intent = Intent(applicationContext,MainActivity::class.java)
             startActivity(intent)
@@ -47,7 +47,5 @@ class LoginActivity : AppCompatActivity() {
         })
         animatedVectorDrawable.start()
     }
-    companion object{
-        var auth: FirebaseAuth = Firebase.auth
-    }
+
 }

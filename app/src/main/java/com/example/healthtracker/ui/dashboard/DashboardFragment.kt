@@ -19,9 +19,7 @@ class DashboardFragment : Fragment() {
     ): View {
         requireActivity().showBottomNav()
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
-        val root: View = binding.root
-
-        return root
+        return binding.root
     }
 
     override fun onDestroyView() {
