@@ -13,6 +13,7 @@ import androidx.navigation.findNavController
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.FragmentLoginBinding
+import com.example.healthtracker.ui.isInternetAvailable
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -49,11 +50,17 @@ class LoginFragment : Fragment() {
                                 val intent = Intent(context, MainActivity::class.java)
                                 startActivity(intent)
 
+                            } else if (isInternetAvailable(context)) {
+                                Toast.makeText(
+                                    context,
+                                    R.string.login_issue,
+                                    Toast.LENGTH_SHORT,
+                                ).show()
                             } else {
                                 Toast.makeText(
                                     context,
-                                    getString(R.string.login_issue),
-                                    Toast.LENGTH_SHORT,
+                                    R.string.no_internet,
+                                    Toast.LENGTH_SHORT
                                 ).show()
                             }
                         }

@@ -13,6 +13,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.healthtracker.CropActivity
 import com.example.healthtracker.MainActivity
+import com.example.healthtracker.R
+import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.databinding.FragmentAccountBinding
 import com.example.healthtracker.ui.account.friends.popup.FriendsDialogFragment
 import com.example.healthtracker.ui.base64ToBitmap
@@ -43,12 +45,13 @@ class AccountFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val dialog = FriendsDialogFragment()
         viewLifecycleOwner.lifecycleScope.launch {
-            val user = accountViewModel.getUser()
+            val user = accountViewModel.getWholeUser()
 
-            val photo = user?.image
-            Log.d("PHOTO", photo.toString())
+            val photo = user?.userInfo?.image
             if (photo != null && photo != "") {
                 binding.profilePhoto.setImageBitmap(base64ToBitmap(photo))
+            } else {
+                binding.profilePhoto.setImageResource(R.drawable.profile_photo_placeholder)
             }
         }
 
@@ -64,8 +67,8 @@ class AccountFragment : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            val user = accountViewModel.getUser()
-            val userName = user?.username
+            val user = accountViewModel.getWholeUser()
+            val userName = user?.userInfo?.username
             binding.username.text = userName
         }
 
@@ -74,10 +77,8 @@ class AccountFragment : Fragment() {
                 setRoundedCorners(25F)
                 setOnClickListener {
                     navigateToActivity(requireActivity(), LoginActivity::class.java)
-                    runBlocking {
-                        launch {
-                            accountViewModel.signOut()
-                        }
+                    lifecycleScope.launch {
+                        accountViewModel.signOut()
                     }
                 }
             }
@@ -116,7 +117,7 @@ class AccountFragment : Fragment() {
                 binding.profilePhoto.setImageURI(resultUri)
                 lifecycleScope.launch {
                     uriToBitmap(contentResolver, resultUri)?.let {
-                        accountViewModel.saveBitmapToDatabase(it)
+                        context?.let { it1 -> accountViewModel.saveBitmapToDatabase(it, it1) }
                     }
                 }
             }

@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -57,6 +59,13 @@ class FriendsDialogFragment : DialogFragment() {
                 if (it != null) {
                     friendListAdapter.updateItems(it)
                 }
+                if (it != null && it != listOf<UserInfo>()) {
+                    noFriends.visibility = GONE
+                    noFriendsText.visibility = GONE
+                } else {
+                    noFriends.visibility = VISIBLE
+                    noFriendsText.visibility = VISIBLE
+                }
             }
             usernameInput.setOnFocusChangeListener { _, hasFocus ->
                 val color = if (hasFocus) (ContextCompat.getColor(
@@ -75,28 +84,30 @@ class FriendsDialogFragment : DialogFragment() {
             searchSwitch.apply {
                 friendListViewModel.searchState.observe(viewLifecycleOwner) { it1 ->
                     if (it1 == true) {
-                        lifecycleScope.launch {
+                        setOnClickListener {
+                            friendListViewModel.switchSearchState()
+                        }
+                        viewLifecycleOwner.lifecycleScope.launch {
                             try {
                                 friendListViewModel.fetchAllUsersInfo()
                                 rotateView(searchSwitch, 45F)
                                 textInputLayout.helperText = "new friend mode on"
-                                setOnClickListener {
-                                    friendListViewModel.switchSearchState()
-                                }
+
                             } catch (e: Exception) {
                                 Log.e("FetchUsersError", "Error fetching users", e)
                             }
                         }
 
                     } else {
-                        lifecycleScope.launch {
+                        setOnClickListener {
+                            friendListViewModel.switchSearchState()
+                        }
+                        viewLifecycleOwner.lifecycleScope.launch {
                             try {
                                 friendListViewModel.fetchUserFriends()
                                 rotateView(searchSwitch, 0F)
                                 textInputLayout.helperText = "current friend mode on"
-                                setOnClickListener {
-                                    friendListViewModel.switchSearchState()
-                                }
+
                             } catch (e: Exception) {
                                 Log.e("FetchFriendsError", "Error fetching friends", e)
                             }

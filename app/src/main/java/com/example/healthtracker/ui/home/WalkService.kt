@@ -41,6 +41,7 @@ class WalkService(context: Context) : SensorEventListener {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun isMidnight(): Boolean {
         val time = LocalTime.now()
         val resetTime = LocalTime.of(23, 59)

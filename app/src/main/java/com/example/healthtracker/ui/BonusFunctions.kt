@@ -3,22 +3,29 @@ package com.example.healthtracker.ui
 import android.animation.ObjectAnimator
 import android.app.Activity
 import android.content.ContentResolver
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
 import android.util.Base64
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.fragment.app.FragmentActivity
 import com.example.healthtracker.R
+import com.example.healthtracker.data.room.UserData
+import com.example.healthtracker.data.user.StepsInfo
+import com.example.healthtracker.data.user.UserAutomaticInfo
+import com.example.healthtracker.data.user.UserInfo
+import com.example.healthtracker.data.user.UserMegaInfo
+import com.example.healthtracker.data.user.UserPutInInfo
+import com.example.healthtracker.data.user.UserSettingsInfo
+import com.example.healthtracker.data.user.WaterInfo
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.database.DataSnapshot
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.FileNotFoundException
@@ -62,7 +69,6 @@ fun base64ToBitmap(base64String: String): Bitmap {
 }
 
 
-
 fun FragmentActivity.hideBottomNav() {
     findViewById<BottomNavigationView>(R.id.nav_view).apply {
         visibility = View.GONE
@@ -80,4 +86,97 @@ fun rotateView(imageView: View, angle: Float) {
     rotationAnim.duration = 300
     rotationAnim.interpolator = AccelerateDecelerateInterpolator()
     rotationAnim.start()
+}
+
+fun UserMegaInfo.toUserData(): UserData {
+    return UserData(
+        userId = this.userInfo.uid ?: "kurec",
+        userInfo = this.userInfo,
+        userAutomaticInfo = this.userAutomaticInfo,
+        userFriends = this.userFriends,
+        userPutInInfo = this.userPutInInfo,
+        userSettingsInfo = this.userSettingsInfo
+    )
+}
+
+fun DataSnapshot.toUserMegaInfo(): UserMegaInfo {
+    return UserMegaInfo(
+        userInfo = child("userInfo").toUserInfo(),
+        userAutomaticInfo = child("userAutomaticInfo").toUserAutomaticInfo(),
+        userFriends = child("userFriends").toUserFriendsList(),
+        userPutInInfo = child("userPutInInfo").toUserPutInInfo(),
+        userSettingsInfo = child("userSettingsInfo").toUserSettingsInfo()
+    )
+}
+
+fun DataSnapshot.toUserInfo(): UserInfo {
+    return UserInfo(
+        username = child("username").getValue(String::class.java) ?: "",
+        uid = child("uid").getValue(String::class.java) ?: "",
+        image = child("image").getValue(String::class.java) ?: "",
+        mail = child("mail").getValue(String::class.java) ?: "",
+        theme = child("theme").getValue(String::class.java) ?: "",
+        bgImage = child("bgImage").getValue(String::class.java) ?: ""
+    )
+}
+
+fun DataSnapshot.toUserAutomaticInfo(): UserAutomaticInfo {
+    return UserAutomaticInfo(
+        steps = child("steps").toStepsInfo(),
+        totalSleepHours = child("totalSleepHours").getValue(Double::class.java),
+        challengesPassed = child("challengesPassed").getValue(Int::class.java)
+    )
+}
+
+fun DataSnapshot.toUserPutInInfo(): UserPutInInfo {
+    return UserPutInInfo(
+        waterInfo = child("waterInfo").toWaterInfo(),
+        weight = child("weight").getValue(Double::class.java)
+    )
+}
+
+fun DataSnapshot.toWaterInfo(): WaterInfo {
+    return WaterInfo(
+        waterGoal = child("waterGoal").getValue(Int::class.java) ?: 6,
+        currentWater = child("currentWater").getValue(Int::class.java) ?: 0,
+        waterCompletion = child("waterCompletion").getValue(Boolean::class.java) ?: false
+    )
+}
+
+fun DataSnapshot.toUserSettingsInfo(): UserSettingsInfo {
+    return UserSettingsInfo(
+        language = child("language").getValue(String::class.java) ?: "",
+        units = child("units").getValue(String::class.java) ?: ""
+    )
+}
+
+fun DataSnapshot.toStepsInfo(): StepsInfo {
+    return StepsInfo(
+        totalSteps = child("totalSteps").getValue(Int::class.java),
+        totalCalories = child("totalCalories").getValue(Int::class.java),
+        onLeaveSteps = child("onLeaveSteps").getValue(Int::class.java),
+        onLogSteps = child("onLogSteps").getValue(Int::class.java),
+        currentSteps = child("currentSteps").getValue(Int::class.java),
+        currentCalories = child("currentCalories").getValue(Int::class.java)
+    )
+}
+
+fun DataSnapshot.toUserFriendsList(): List<UserInfo> {
+    val userFriendsList = mutableListOf<UserInfo>()
+    for (childSnapshot in children) {
+        userFriendsList.add(childSnapshot.toUserInfo())
+    }
+    return userFriendsList
+}
+
+fun isInternetAvailable(context: Context): Boolean {
+    val connectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+    val network = connectivityManager.activeNetwork
+    val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+
+    return networkCapabilities != null &&
+            (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                    networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
 }

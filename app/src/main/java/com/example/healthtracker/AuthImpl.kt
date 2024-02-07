@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.ui.bitmapToBase64
+import com.example.healthtracker.ui.toUserMegaInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -14,6 +15,8 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
@@ -48,16 +51,16 @@ class AuthImpl : AuthInterface {
                 }
         }
     }
-    override suspend fun getEntireUser(): UserMegaInfo? {
-        return try {
-            val userPhotoRef =
-                Firebase.database.getReference("user/${Firebase.auth.currentUser!!.uid}")
-            val dataSnapshot = userPhotoRef.get().await()
-            dataSnapshot.getValue(UserMegaInfo::class.java)
-        } catch (e: Exception) {
-            null
+    override suspend fun getEntireUser(): Flow<UserMegaInfo?> = flow {
+        Firebase.auth.currentUser?.uid?.let {uid ->
+            Log.d("FLOW ID", uid)
+            val user = Firebase.database.getReference("user/$uid").get().await()
+            Log.d("USER INFORMATION", user.toString())
+            emit(user.toUserMegaInfo())
         }
     }
+
+
     override suspend fun getCurrentUser(): UserInfo? {
         return try {
             val userPhotoRef =
@@ -95,10 +98,8 @@ class AuthImpl : AuthInterface {
                 val friendInfo = getUserInfo(friendUid)
                 friendInfo?.let {
                     userFriendList.add(it)
-                    Log.d("USER LIST POST ADD", userFriendList.toString())
                 }
             }
-            Log.d("READY FOR RETURN USER LIST", userFriendList.toString())
             userFriendList
         }
 

@@ -1,4 +1,5 @@
 package com.example.healthtracker.data.room
+
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -8,9 +9,9 @@ import com.example.healthtracker.data.user.UserPutInInfo
 import com.example.healthtracker.data.user.UserSettingsInfo
 
 @Entity
-data class UserData(
-    @PrimaryKey val userId:Int,
-    @ColumnInfo (name = "userInfo") val userInfo: UserInfo,
+data class  UserData(
+    @PrimaryKey val userId: String,
+    @ColumnInfo(name = "userInfo") val userInfo: UserInfo,
     @ColumnInfo(name = "userSettingsInfo") val userSettingsInfo: UserSettingsInfo?,
     @ColumnInfo(name = "userAutomaticInfo") val userAutomaticInfo: UserAutomaticInfo?,
     @ColumnInfo(name = "userPutInInfo") val userPutInInfo: UserPutInInfo?,

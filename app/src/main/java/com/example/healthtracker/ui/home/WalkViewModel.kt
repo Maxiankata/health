@@ -26,36 +26,9 @@ class WalkViewModel : ViewModel() {
     fun nullifySteps() {
         _currentSteps.postValue(0)
     }
-
-    fun resumeSteps() {
-        var prevSteps: Int
-        Firebase.database.getReference("user/${Firebase.auth.currentUser!!.uid}/userAutomaticInfo/steps/onLeaveSteps").get()
-            .addOnCompleteListener { task ->
-                prevSteps = task.result.getValue(Int::class.java)!!
-                var newSteps: Int
-                Firebase.database.getReference("user/${Firebase.auth.currentUser!!.uid}/userAutomaticInfo/steps/onLogSteps").get()
-                    .addOnCompleteListener {
-                        newSteps = it.result.getValue(Int::class.java)!!
-                        val resumedSteps = prevSteps - newSteps
-                        _currentSteps.postValue(resumedSteps)
-                    }
-            }
-    }
-
-    fun saveLeaveSteps() {
-        val database = Firebase.database.reference
-        database.child("user").child(Firebase.auth.currentUser!!.uid).child("userAutomaticInfo").child("steps").child("onLeaveSteps")
-            .setValue(previousSteps)
-    }
-
-    fun saveCurrentSteps() {
-        val database = Firebase.database.reference
-        database.child("user").child("userAutomaticInfo").child("steps").child("currentSteps")
-            .setValue(currentSteps)
-    }
-
     fun walkingStart(context: Context) {
         walkService = WalkService(context)
+        _previousSteps.postValue(walkService.currentSteps.value)
     }
 
 }

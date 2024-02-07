@@ -52,5 +52,11 @@
     <string name="login_issue">Incorrect e-mail or password</string>
     <string name="empty_field">Empty field</string>
     <string name="added">added</string>
+    <string name="no_friends">Your friends list is empty! Add friends to see them here.</string>
+    <string name="running">Running</string>
+    <string name="cycling">Cycling</string>
+    <string name="hiking">Hiking</string>
+    <string name="power_walking">Power\nWalking</string>
+    <string name="no_internet">\"Inacessability to the internet\"</string>
 
 </resources>

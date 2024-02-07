@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.AndroidViewModel
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.healthtracker.R
@@ -41,12 +42,12 @@ class FriendListAdapter :
                 itemClickListener?.onItemClicked(
                     userInfo, adapterPosition
                 )
-
             }
-            friendListViewModel.searchState.observeForever(){
+            friendListViewModel.searchState.observeForever{
                 if (it) {
                     cardButton.apply {
                         setImageResource(R.drawable.friend_add)
+                        Log.d("FRIEND", "ICON SHOULD BE HERE")
                         setOnClickListener {
                             runBlocking {
                                 launch {
@@ -57,6 +58,7 @@ class FriendListAdapter :
                     }
                 } else {
                     cardButton.apply {
+                        Log.d("CHALLENGE", "ICON SHOULD BE HERE")
                         setImageResource(R.drawable.flag)
                         setOnClickListener {
                             Log.d("clicked challenge", "clicked challenge")

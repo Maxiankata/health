@@ -9,8 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.healthtracker.MainActivity
 import com.example.healthtracker.R
+import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.databinding.FragmentHomeBinding
 import com.example.healthtracker.ui.setRoundedCorners
 import kotlinx.coroutines.launch
@@ -41,17 +41,13 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val weightRecyclerVal = WeightRecyclerAdapter()
-         val userDB = MainActivity.getDatabaseInstance(requireContext())
-        val userDao = userDB.dao()
-        lifecycleScope.launch{
-            val user = homeViewModel.getUser()
-            Log.d("CAUGHT USER", user.toString())
-            if (user != null) {
-                userDao.saveUser(user)
-
-            }
-        }
         binding.apply {
+
+            activityGrid.setRoundedCorners(30F)
+            runLayout.setRoundedCorners(40F)
+            cyclingLayout.setRoundedCorners(40F)
+            hikingLayout.setRoundedCorners(40F)
+            run4Layout.setRoundedCorners(40F)
             weight.setRoundedCorners(30F)
             water.setRoundedCorners(30F)
             sleep.setRoundedCorners(30F)
@@ -84,25 +80,37 @@ class HomeFragment : Fragment() {
 
                     }
                 }
-                plus.apply {
-                    setOnClickListener {
-                        // dao_water++, save dao, set new dao to the drinkCurrent, could also be from viewModel actually
-                    }
-                }
-                minus.apply {
-                    setOnClickListener {
-                        // dao_water--, save dao, set new dao to the drinkCurrent, could also be from viewModel actually
-                    }
-                }
+                homeViewModel.user.observe(viewLifecycleOwner) {
+                    textView2.apply {
+                        text = buildString {
+                            homeViewModel.water.observe(viewLifecycleOwner) {
+                                Log.d("water information", it.toString())
+                                append(it?.currentWater ?: 0)
+                                append("/")
+                                append(it?.waterGoal ?: 6)
+                            }
 
-            }
-            textView2.apply {
-                text = buildString {
-                    append("0") //capture and set water current water dao
-                    append("/")
-                    append("6") //capture and set water goal dao
+                        }
+                    }
+                    plus.apply {
+                        setOnClickListener {
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                homeViewModel.waterIncrement(1)
+                                Log.d("INCREMENTED", "INCREMENTED")
+                            }
+                        }
+                    }
+                    minus.apply {
+                        setOnClickListener {
+                            lifecycleScope.launch {
+                                homeViewModel.waterIncrement(-1)
+                                Log.d("DECREMENTED", "DECREMENTED")
+                            }
+                        }
+                    }
                 }
             }
+
             weightRecycler.apply {
                 adapter = weightRecyclerVal
 

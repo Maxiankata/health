@@ -1,244 +1,352 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="top|center"
-    android:orientation="vertical"
-    android:paddingTop="60dp"
-    tools:context=".ui.home.HomeFragment"
     android:fadingEdgeLength="20dp"
+    tools:context=".ui.home.HomeFragment">
 
-    >
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="@+id/stepsCircularProgressBar"
-        app:layout_constraintEnd_toEndOf="@+id/stepsCircularProgressBar"
-        app:layout_constraintStart_toStartOf="@+id/stepsCircularProgressBar"
-        app:layout_constraintTop_toTopOf="@+id/stepsCircularProgressBar">
-        <com.mikhaellopez.circularprogressbar.CircularProgressBar
-            android:id="@+id/stepsCircularProgressBar"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            app:cpb_background_progressbar_color="@color/input_grey"
-            app:cpb_background_progressbar_width="5dp"
-            app:cpb_progress_direction="to_right"
-            app:cpb_progressbar_color="@color/light_green"
-            app:cpb_progressbar_width="20dp"
-            app:cpb_round_border="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginBottom="60dp"
+        android:orientation="vertical">
 
-        <com.mikhaellopez.circularprogressbar.CircularProgressBar
-            android:id="@+id/caloriesProgressBar"
-            android:layout_width="220dp"
-            android:layout_height="wrap_content"
-            app:cpb_background_progressbar_color="@color/input_grey"
-            app:cpb_background_progressbar_width="5dp"
-            app:cpb_progress_direction="to_right"
-            app:cpb_progressbar_color="@color/orange"
-            app:cpb_progressbar_width="20dp"
-            app:cpb_round_border="true"
-            app:layout_constraintBottom_toBottomOf="@+id/stepsCircularProgressBar"
-            app:layout_constraintEnd_toEndOf="@+id/stepsCircularProgressBar"
-            app:layout_constraintStart_toStartOf="@+id/stepsCircularProgressBar"
-            app:layout_constraintTop_toTopOf="@+id/stepsCircularProgressBar" />
-
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp">
 
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="@+id/stepsCircularProgressBar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            <com.mikhaellopez.circularprogressbar.CircularProgressBar
+                android:id="@+id/stepsCircularProgressBar"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                app:cpb_background_progressbar_color="@color/input_grey"
+                app:cpb_background_progressbar_width="5dp"
+                app:cpb_progress_direction="to_right"
+                app:cpb_progressbar_color="@color/light_green"
+                app:cpb_progressbar_width="20dp"
+                app:cpb_round_border="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/stepcount"
+            <com.mikhaellopez.circularprogressbar.CircularProgressBar
+                android:id="@+id/caloriesProgressBar"
+                android:layout_width="220dp"
+                android:layout_height="220dp"
+                app:cpb_background_progressbar_color="@color/input_grey"
+                app:cpb_background_progressbar_width="5dp"
+                app:cpb_progress_direction="to_right"
+                app:cpb_progressbar_color="@color/orange"
+                app:cpb_progressbar_width="20dp"
+                app:cpb_round_border="true"
+                app:layout_constraintBottom_toBottomOf="@+id/stepsCircularProgressBar"
+                app:layout_constraintEnd_toEndOf="@+id/stepsCircularProgressBar"
+                app:layout_constraintStart_toStartOf="@+id/stepsCircularProgressBar"
+                app:layout_constraintTop_toTopOf="@+id/stepsCircularProgressBar" />
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/steps"
-                android:textColor="@color/light_green"
-                android:textSize="30sp"
-                />
+                android:layout_height="match_parent"
 
-            <TextView
-                android:id="@+id/calorieCount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/calories"
-                android:textColor="@color/orange"
-                android:textSize="30sp"
-                />
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="@+id/stepsCircularProgressBar"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/stepcount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/steps"
+                    android:textColor="@color/light_green"
+                    android:textSize="30sp" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-    <androidx.constraintlayout.widget.ConstraintLayout
+                <TextView
+                    android:id="@+id/calorieCount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/calories"
+                    android:textColor="@color/orange"
+                    android:textSize="30sp" />
 
-        android:layout_marginTop="20dp"
-        android:id="@+id/water"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginHorizontal="25dp"
-        android:layout_marginBottom="10dp"
-        android:background="#5EABC6"
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+
+            android:id="@+id/water"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="25dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:background="#5EABC6"
+            android:orientation="horizontal"
 
 
-        >
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:src="@drawable/glass_cup"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:fontFamily="sans-serif-black"
-            android:gravity="center"
-
-            android:text="@string/water"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageView"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/minus"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/minus"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/textView3"
-            app:layout_constraintEnd_toStartOf="@id/textView2"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/minus"
-            app:layout_constraintEnd_toStartOf="@id/plus"
-            app:layout_constraintTop_toTopOf="parent"
-            android:textColor="@color/white"
-            android:textAlignment="center"
-            android:textSize="30sp"
-            />
-        <ImageView
-            android:id="@+id/plus"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/plus"
-            android:tint="@color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/textView2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/sleep"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginHorizontal="25dp"
-        android:layout_marginBottom="10dp"
-        android:background="#84419C"
-        >
-
-        <ImageView
-            android:id="@+id/imageView2"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:src="@drawable/moon_icon"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:fontFamily="sans-serif-black"
-            android:gravity="center"
-            android:text="@string/sleep"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageView2"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/weight"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginHorizontal="25dp"
-        android:layout_marginBottom="10dp"
-        android:background="@color/orange"
-        >
-        <ImageView
-            android:id="@+id/scaleImage"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:src="@drawable/weight_scale"
-            />
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:fontFamily="sans-serif-black"
-            android:gravity="center"
-            android:text="@string/daily_weight"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/scaleImage"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_marginLeft="50dp"
-            android:id="@+id/weight_recycler"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/textView"
-            app:layout_constraintTop_toTopOf="parent"
             >
 
-        </androidx.recyclerview.widget.RecyclerView>
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/glass_cup"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/second_weight_recycler"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/weight_recycler"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:itemCount="1">
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:fontFamily="sans-serif-black"
+                android:gravity="center"
 
-        </androidx.recyclerview.widget.RecyclerView>
+                android:text="@string/water"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageView"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</LinearLayout>
+            <ImageView
+                android:id="@+id/minus"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/minus"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/textView2"
+                app:layout_constraintStart_toEndOf="@+id/textView3"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="30sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/plus"
+                app:layout_constraintStart_toEndOf="@+id/minus"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/plus"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/plus"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/textView2"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/white" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/sleep"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="25dp"
+            android:layout_marginBottom="10dp"
+            android:background="#84419C"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/moon_icon"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:fontFamily="sans-serif-black"
+                android:gravity="center"
+                android:text="@string/sleep"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageView2"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/weight"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="25dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/orange"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/scaleImage"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/weight_scale"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:fontFamily="sans-serif-black"
+                android:gravity="center"
+                android:text="@string/daily_weight"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/scaleImage"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/weight_recycler"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="50dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/textView"
+                app:layout_constraintTop_toTopOf="parent">
+
+            </androidx.recyclerview.widget.RecyclerView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/second_weight_recycler"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/weight_recycler"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:itemCount="1">
+
+            </androidx.recyclerview.widget.RecyclerView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <GridLayout
+            android:id="@+id/activity_grid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="25dp"
+            android:background="@color/input_grey"
+            android:columnCount="2"
+            android:padding="8dp"
+            android:rowCount="2"
+            android:useDefaultMargins="true"
+            >
+
+            <LinearLayout
+                android:id="@+id/run_layout"
+                android:layout_height="0dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_marginEnd="8dp"
+                android:background="@color/dark_background"
+                android:gravity="center"
+                android:orientation="horizontal"
+                >
+
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/friend_add"
+                    app:tint="@color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/running"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/cycling_layout"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_marginEnd="8dp"
+                android:background="@color/dark_background"
+                android:gravity="center"
+                android:orientation="horizontal"
+                >
+
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/friend_add"
+                    app:tint="@color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/cycling"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/hiking_layout"
+                android:layout_height="0dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_marginEnd="8dp"
+                android:background="@color/dark_background"
+                android:gravity="center"
+                android:orientation="horizontal"
+                >
+
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/friend_add"
+                    app:tint="@color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/hiking"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/run4_layout"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_marginEnd="8dp"
+                android:background="@color/dark_background"
+                android:gravity="center"
+                android:orientation="horizontal"
+                >
+
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/friend_add"
+                app:tint="@color/white" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/power_walking"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
+            </LinearLayout>
+
+        </GridLayout>
+    </LinearLayout>
+</ScrollView>

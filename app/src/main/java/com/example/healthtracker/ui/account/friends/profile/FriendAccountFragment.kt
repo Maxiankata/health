@@ -25,7 +25,7 @@ import kotlinx.coroutines.runBlocking
 class FriendAccountFragment : Fragment() {
     private var _binding: FragmentFriendAccountBinding? = null
     private lateinit var auth: FirebaseAuth
-    val friendListViewModel: FriendListViewModel by activityViewModels()
+    private val friendListViewModel: FriendListViewModel by activityViewModels()
     private var notificationId = 1
 
     private val binding get() = _binding!!

@@ -34,6 +34,7 @@ class FriendListViewModel : ViewModel() {
             } as MutableList<UserInfo>
             _usersList.postValue(filteredUsers)
         }
+
     }
 
     suspend fun removeFriend(userId: String) {
@@ -45,6 +46,7 @@ class FriendListViewModel : ViewModel() {
 
     suspend fun fetchUserFriends() {
         viewModelScope.launch {
+
                 friendsInfoList = auth.fetchUserFriends() as MutableList<UserInfo>
                 _friendsList.postValue(friendsInfoList)
                 _usersList.postValue(friendsInfoList)
