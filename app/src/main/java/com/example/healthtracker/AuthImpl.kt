@@ -15,8 +15,11 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
@@ -34,39 +37,63 @@ class AuthImpl : AuthInterface {
         )
     }
 
+    override suspend fun checkCurrentUser() = Firebase.auth.currentUser!=null
+
+    override suspend fun logIn(email: String, password: String): Boolean {
+        return try {
+            Firebase.auth.signInWithEmailAndPassword(email, password).await()
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     override suspend fun signOut() {
         withContext(Dispatchers.IO) {
             Firebase.auth.signOut()
         }
     }
 
-    override suspend fun createAcc(email: String, password: String, username: String) {
-        withContext(Dispatchers.IO) {
-            Firebase.auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val user = Firebase.auth.currentUser
-                        setUser(email, username, user!!.uid)
-                    }
+    override suspend fun createAcc(email: String, password: String, username: String): String? {
+        return withContext(Dispatchers.IO) {
+            var uidReturn: String? = null
+            try {
+                suspendCoroutine{ continuation ->
+                    Firebase.auth.createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener {
+                            val user = Firebase.auth.currentUser
+                            setUser(email, username, user?.uid ?: "")
+                            uidReturn = user?.uid
+                            Log.d("REGISTERED USER ID", uidReturn.toString())
+                            continuation.resume(Unit)
+                        }
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            Log.d("Returning id", uidReturn.toString())
+            uidReturn
         }
     }
+
+    override suspend fun sync(megaInfo: UserMegaInfo){
+        Firebase.database.reference.child("user/${Firebase.auth.currentUser?.uid}").setValue(megaInfo)
+    }
+
     override suspend fun getEntireUser(): Flow<UserMegaInfo?> = flow {
-        Firebase.auth.currentUser?.uid?.let {uid ->
-            Log.d("FLOW ID", uid)
+        Firebase.auth.currentUser?.uid?.let { uid ->
             val user = Firebase.database.getReference("user/$uid").get().await()
-            Log.d("USER INFORMATION", user.toString())
             emit(user.toUserMegaInfo())
         }
     }
 
 
-    override suspend fun getCurrentUser(): UserInfo? {
+    override suspend fun getCurrentUser(): UserMegaInfo? {
         return try {
-            val userPhotoRef =
-                Firebase.database.getReference("user/${Firebase.auth.currentUser!!.uid}/userInfo")
-            val dataSnapshot = userPhotoRef.get().await()
-            dataSnapshot.getValue(UserInfo::class.java)
+            val userRef =
+                Firebase.database.getReference("user/${Firebase.auth.currentUser!!.uid}")
+            val dataSnapshot = userRef.get().await()
+            dataSnapshot.getValue(UserMegaInfo::class.java)
         } catch (e: Exception) {
             null
         }
@@ -120,6 +147,7 @@ class AuthImpl : AuthInterface {
             instance ?: AuthImpl().also { instance = it }
         }
     }
+
     override suspend fun saveBitmapToDatabase(bitmap: Bitmap) {
         val currentUser = FirebaseAuth.getInstance().currentUser
         val database: DatabaseReference =
@@ -129,6 +157,7 @@ class AuthImpl : AuthInterface {
             database.setValue(base64String).await()
         }
     }
+
     override suspend fun fetchAllUsersInfo(): MutableList<UserInfo> =
         suspendCoroutine { continuation ->
             val ref: DatabaseReference = Firebase.database.getReference("user")
@@ -139,13 +168,14 @@ class AuthImpl : AuthInterface {
                         val userInfoSnapshot = userSnapshot.child("userInfo")
                         val userInfo = userInfoSnapshot.getValue(UserInfo::class.java)
                         userInfo?.let {
-                            if (it.uid != Firebase.auth.currentUser!!.uid){
+                            if (it.uid != Firebase.auth.currentUser!!.uid) {
                                 tempList.add(it)
                             }
                         }
                     }
                     continuation.resume(tempList)
                 }
+
                 override fun onCancelled(databaseError: DatabaseError) {
                     Log.e("FirebaseError", "Error fetching data", databaseError.toException())
                     continuation.resumeWithException(databaseError.toException())

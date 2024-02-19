@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_marginVertical="10dp"
     android:layout_marginHorizontal="20dp"
+    android:backgroundTint="@color/light_green"
     android:background="@drawable/friend_card_rounded_background"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -16,6 +17,8 @@
         android:scaleType="centerCrop"
         android:orientation="vertical"
         android:src="@drawable/profile_icon"
+        android:background="@drawable/circle_background"
+        android:clipToOutline="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -38,7 +41,7 @@
         android:layout_width="200dp"
         android:layout_height="20dp"
         android:layout_margin="10dp"
-        android:textSize="10sp"
+        android:textSize="12sp"
         android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/friend_photo"

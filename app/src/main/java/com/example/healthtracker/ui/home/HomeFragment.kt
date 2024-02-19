@@ -10,9 +10,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.healthtracker.R
-import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.databinding.FragmentHomeBinding
-import com.example.healthtracker.ui.setRoundedCorners
+import com.example.healthtracker.ui.home.walking.WalkViewModel
 import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
@@ -42,15 +41,6 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val weightRecyclerVal = WeightRecyclerAdapter()
         binding.apply {
-
-            activityGrid.setRoundedCorners(30F)
-            runLayout.setRoundedCorners(40F)
-            cyclingLayout.setRoundedCorners(40F)
-            hikingLayout.setRoundedCorners(40F)
-            run4Layout.setRoundedCorners(40F)
-            weight.setRoundedCorners(30F)
-            water.setRoundedCorners(30F)
-            sleep.setRoundedCorners(30F)
             walkViewModel.walkService.currentSteps.observe(viewLifecycleOwner) {
                 stepcount.apply {
                     text = buildString {
@@ -75,57 +65,52 @@ class HomeFragment : Fragment() {
                         caloriesProgressBar.apply {
                             setProgressWithAnimation(it.toFloat())
                             progressMax = 240f
-
                         }
-
                     }
                 }
                 homeViewModel.user.observe(viewLifecycleOwner) {
-                    textView2.apply {
-                        text = buildString {
-                            homeViewModel.water.observe(viewLifecycleOwner) {
-                                Log.d("water information", it.toString())
-                                append(it?.currentWater ?: 0)
-                                append("/")
-                                append(it?.waterGoal ?: 6)
-                            }
+                    textView2.text = buildString {
+                        homeViewModel.water.observe(viewLifecycleOwner) {
+                            Log.d("water information", it.toString())
+                            append(it?.currentWater ?: 0)
+                            append("/")
+                            append(it?.waterGoal ?: 6)
+                        }
+                    }
 
-                        }
-                    }
-                    plus.apply {
-                        setOnClickListener {
-                            viewLifecycleOwner.lifecycleScope.launch {
-                                homeViewModel.waterIncrement(1)
-                                Log.d("INCREMENTED", "INCREMENTED")
-                            }
-                        }
-                    }
-                    minus.apply {
-                        setOnClickListener {
-                            lifecycleScope.launch {
-                                homeViewModel.waterIncrement(-1)
-                                Log.d("DECREMENTED", "DECREMENTED")
-                            }
-                        }
+
+                }
+                plus.setOnClickListener {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        homeViewModel.waterIncrement(1)
+                        Log.d("INCREMENTED", "INCREMENTED")
                     }
                 }
+                minus.setOnClickListener {
+                        lifecycleScope.launch {
+                            homeViewModel.waterIncrement(-1)
+                            Log.d("DECREMENTED", "DECREMENTED")
+                        }
+
+                    }
             }
 
-            weightRecycler.apply {
-                adapter = weightRecyclerVal
 
-                layoutManager = GridLayoutManager(context, 1, GridLayoutManager.VERTICAL, false)
-                val fakelayoutmanager = this.layoutManager as GridLayoutManager
-                val fakeadapter = adapter
+        weightRecycler.apply {
+            adapter = weightRecyclerVal
 
-                if (fakeadapter is WeightRecyclerAdapter) {
-                    scaleImage.setOnClickListener {
-                        val middleItem =
-                            fakeadapter.getItem((fakelayoutmanager.findFirstVisibleItemPosition() + fakelayoutmanager.findLastVisibleItemPosition()) / 2)
-                        Log.d("Middle Item", middleItem)
-                    }
+            layoutManager = GridLayoutManager(context, 1, GridLayoutManager.VERTICAL, false)
+            val fakeLayoutManager = this.layoutManager as GridLayoutManager
+            val fakeadapter = adapter
+
+            if (fakeadapter is WeightRecyclerAdapter) {
+                scaleImage.setOnClickListener {
+                    val middleItem =
+                        fakeadapter.getItem((fakeLayoutManager.findFirstVisibleItemPosition() + fakeLayoutManager.findLastVisibleItemPosition()) / 2)
+                    Log.d("Middle Item", middleItem)
                 }
             }
+        }
 //            secondWeightRecycler.apply{
 //                adapter = weightRecyclerVal
 //                layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL,false)
@@ -138,16 +123,16 @@ class HomeFragment : Fragment() {
 //                        fakeadapter.getItem((fakelayoutmanager.findFirstVisibleItemPosition() + fakelayoutmanager.findLastVisibleItemPosition()))
 //                }
 //            }
-        }
     }
+}
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+}
 
-    fun findMid() {
+fun findMid() {
 
-    }
+}
 
 }

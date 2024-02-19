@@ -1,4 +1,4 @@
-package com.example.healthtracker.ui.login.register
+package com.example.healthtracker.ui.login
 
 import android.app.Application
 import android.content.Context
@@ -11,17 +11,15 @@ import com.example.healthtracker.data.room.UserMegaInfoToRoomAdapter
 import com.example.healthtracker.data.user.UserMegaInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.internal.wait
 
-class RegisterViewModel(private val application: Application) : AndroidViewModel(application) {
+class LoginFragmentViewModel(private val application: Application): AndroidViewModel(application) {
     private val auth = AuthImpl.getInstance()
     private val userDao = MainActivity.getDatabaseInstance(application.applicationContext).dao()
-    private var toRoomAdapter= UserMegaInfoToRoomAdapter()
-    private var fromRoomAdapter= RoomToUserMegaInfoAdapter()
+    private val toRoomAdapter = UserMegaInfoToRoomAdapter()
+    private val fromRoomAdapter = RoomToUserMegaInfoAdapter()
 
-    suspend fun register(email: String, password: String, name: String){
-        auth.createAcc(email, password, name)
-        auth.logIn(email,password)
+    suspend fun logIn(email:String,password:String): Boolean {
+        return auth.logIn(email,password)
     }
     suspend fun getUser() {
         auth.getEntireUser().collect {
@@ -32,7 +30,6 @@ class RegisterViewModel(private val application: Application) : AndroidViewModel
                         userDao.getEntireUser()
                             ?.let { it2 -> fromRoomAdapter.adapt(it2) }
                             ?.let { it3 -> UserMegaInfo.setCurrentUser(it3)
-                                Log.d("new get user from login", UserMegaInfo.setCurrentUser(it3).toString())
                             }
                     }
                 }

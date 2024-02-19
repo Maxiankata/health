@@ -3,6 +3,7 @@ package com.example.healthtracker.data
 import androidx.room.TypeConverter
 import com.example.healthtracker.data.user.StepsInfo
 import com.example.healthtracker.data.user.UserAutomaticInfo
+import com.example.healthtracker.data.user.UserDays
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.UserPutInInfo
@@ -10,6 +11,7 @@ import com.example.healthtracker.data.user.UserSettingsInfo
 import com.example.healthtracker.data.user.WaterInfo
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.util.Date
 
 class GsonTypeConverter {
 
@@ -94,4 +96,22 @@ class GsonTypeConverter {
         val listType = object : TypeToken<List<UserInfo>>() {}.type
         return gson.fromJson(userInfoListString, listType)
     }
+    @TypeConverter
+    fun fromUserDaysList(userDaysList: List<UserDays>?):String?{
+        return gson.toJson(userDaysList)
+    }
+    @TypeConverter
+    fun toUserDaysList(userDaysListString: String?):List<UserDays>?{
+        val listType = object : TypeToken<List<UserDays>>(){}.type
+        return gson.fromJson(userDaysListString,listType)
+    }
+//    @TypeConverter
+//    fun fromDate(value: Long?): Date? {
+//        return if (value == null) null else Date(value)
+//    }
+//
+//    @TypeConverter
+//    fun toDate(date: Date?): Long? {
+//        return date?.time
+//    }
 }

@@ -34,6 +34,8 @@ class FriendListAdapter :
         fun bind(userInfo: UserInfo) {
             if (userInfo.image != null && userInfo.image != "") {
                 Glide.with(image).load(Base64.decode(userInfo.image, Base64.DEFAULT)).into(image)
+            }else{
+                Glide.with(image).load(R.drawable.profile_icon).into(image)
             }
             image.setRoundedCorners(360F)
             name.text = userInfo.username

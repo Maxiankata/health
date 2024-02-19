@@ -1,20 +1,26 @@
 package com.example.healthtracker.ui.login
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Animatable2
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.R
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
+    private val loginActivityViewModel:LoginActivityViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -24,11 +30,13 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        val currentUser = Firebase.auth.currentUser
-        if (currentUser != null) {
-            intent = Intent(applicationContext,MainActivity::class.java)
-            startActivity(intent)
-            finish()
+        lifecycleScope.launch {
+            if (loginActivityViewModel.checkCurrentUser()) {
+                Log.d("running through login activity", loginActivityViewModel.checkCurrentUser().toString())
+                intent = Intent(applicationContext,MainActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
         }
         val imageView: ImageView = findViewById(R.id.animation)
         val navHostFragment: View = findViewById(R.id.nav_host_fragment)

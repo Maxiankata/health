@@ -3,7 +3,6 @@ package com.example.healthtracker.ui.account
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,9 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.healthtracker.CropActivity
-import com.example.healthtracker.MainActivity
 import com.example.healthtracker.R
-import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.databinding.FragmentAccountBinding
 import com.example.healthtracker.ui.account.friends.popup.FriendsDialogFragment
 import com.example.healthtracker.ui.base64ToBitmap
@@ -24,7 +21,6 @@ import com.example.healthtracker.ui.setRoundedCorners
 import com.example.healthtracker.ui.showBottomNav
 import com.example.healthtracker.ui.uriToBitmap
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class AccountFragment : Fragment() {
 
@@ -50,8 +46,12 @@ class AccountFragment : Fragment() {
             val photo = user?.userInfo?.image
             if (photo != null && photo != "") {
                 binding.profilePhoto.setImageBitmap(base64ToBitmap(photo))
+                binding.profilePhoto.setBackgroundResource(R.drawable.circle_background)
+
             } else {
                 binding.profilePhoto.setImageResource(R.drawable.profile_photo_placeholder)
+                binding.profilePhoto.setBackgroundResource(R.drawable.circle_background)
+
             }
         }
 
@@ -73,36 +73,26 @@ class AccountFragment : Fragment() {
         }
 
         binding.apply {
-            signOutButton.apply {
-                setRoundedCorners(25F)
-                setOnClickListener {
-                    navigateToActivity(requireActivity(), LoginActivity::class.java)
-                    lifecycleScope.launch {
-                        accountViewModel.signOut()
-                    }
+            signOutButton.setOnClickListener {
+                navigateToActivity(requireActivity(), LoginActivity::class.java)
+                lifecycleScope.launch {
+                    accountViewModel.signOut()
+                    accountViewModel.dropTable()
                 }
             }
-            achievements.apply {
-                setRoundedCorners(25F)
-            }
-
-            friends.apply {
-                setRoundedCorners(25F)
-                setOnClickListener {
-                    dialog.show(requireActivity().supportFragmentManager, "friends dialog")
-                }
+            friends.setOnClickListener {
+                dialog.show(requireActivity().supportFragmentManager, "friends dialog")
             }
             profilePhoto.apply {
-                setRoundedCorners(360F)
                 setOnClickListener {
                     val intent = Intent(Intent.ACTION_GET_CONTENT)
                     intent.type = "image/*"
                     pickImage.launch(intent)
+                    setBackgroundResource(R.drawable.circle_background)
+
                 }
             }
-            statistics.apply {
-                setRoundedCorners(25F)
-            }
+
         }
     }
 
@@ -117,7 +107,8 @@ class AccountFragment : Fragment() {
                 binding.profilePhoto.setImageURI(resultUri)
                 lifecycleScope.launch {
                     uriToBitmap(contentResolver, resultUri)?.let {
-                        context?.let { it1 -> accountViewModel.saveBitmapToDatabase(it, it1) }
+                        accountViewModel.saveBitmapToDatabase(it)
+                        accountViewModel.getUser()
                     }
                 }
             }

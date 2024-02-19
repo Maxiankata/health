@@ -24,6 +24,8 @@
             android:layout_width="180dp"
             android:layout_height="180dp"
             android:scaleType="centerCrop"
+            android:background="@drawable/circle_background"
+            android:clipToOutline="true"
             android:src="@drawable/profile_photo_placeholder" />
     </FrameLayout>
     <TextView

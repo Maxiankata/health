@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -16,19 +17,20 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.room.Room
 import com.example.healthtracker.data.room.UserDB
 import com.example.healthtracker.databinding.ActivityMainBinding
-import com.example.healthtracker.ui.home.WalkViewModel
+import com.example.healthtracker.ui.home.walking.WalkViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
-    private val mainViewModel:MainViewModel by viewModels()
+    private lateinit var mainViewModel: MainViewModel
     private lateinit var binding: ActivityMainBinding
-    val walkViewModel: WalkViewModel by viewModels()
+    private val walkViewModel: WalkViewModel by viewModels()
     private val channelID = "friend_channel"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         val navView: BottomNavigationView = binding.navView
@@ -38,20 +40,25 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
             )
         )
+        walkViewModel.setupDailyTask()
         supportActionBar?.hide()
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-        buildNotification()
-
-
-    }
-
-    init {
         lifecycleScope.launch {
             mainViewModel.getUser()
+            mainViewModel.syncCloud()
+        }
+        buildNotification()
+    }
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+
+        if (hasFocus) {
+        } else {
+            // The window lost focus
+            // Perform actions when the window loses focus
         }
     }
-
     private fun buildNotification() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.friends)
@@ -63,7 +70,7 @@ class MainActivity : AppCompatActivity() {
             val notificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
-            Log.d("NOTIICATION CHANNEL BUILT", channel.toString())
+            Log.d("NOTIFICATION CHANNEL BUILT", channel.toString())
         }
     }
 

@@ -3,5 +3,6 @@
         android:shape="oval">
         <stroke
             android:width="5dp"
-        android:color="@color/light_green" /> >
+        android:color="@color/light_green" />
+    <corners android:radius="360dp"/>
     </shape>

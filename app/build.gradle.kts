@@ -64,7 +64,12 @@ dependencies {
     implementation ("com.github.yalantis:ucrop:2.2.8")
     implementation ("com.google.code.gson:gson:2.10")
     implementation ("com.google.code.gson:gson:2.8.9")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.datastore:datastore-preferences-rxjava2:1.0.0")
+    implementation ("androidx.work:work-runtime-ktx:2.7.0")
 
+    // optional - RxJava3 support
+    implementation("androidx.datastore:datastore-preferences-rxjava3:1.0.0")
     //noinspection LifecycleAnnotationProcessorWithJava8
     kapt ("androidx.lifecycle:lifecycle-compiler:2.8.0-alpha01")
     kapt ("androidx.room:room-compiler:2.6.1")

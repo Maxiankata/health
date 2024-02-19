@@ -57,6 +57,6 @@
     <string name="cycling">Cycling</string>
     <string name="hiking">Hiking</string>
     <string name="power_walking">Power\nWalking</string>
-    <string name="no_internet">\"Inacessability to the internet\"</string>
+    <string name="no_internet">Inacessability to the internet</string>
 
 </resources>

@@ -10,14 +10,17 @@ import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
+import android.os.Build
 import android.util.Base64
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.FragmentActivity
 import com.example.healthtracker.R
 import com.example.healthtracker.data.room.UserData
 import com.example.healthtracker.data.user.StepsInfo
 import com.example.healthtracker.data.user.UserAutomaticInfo
+import com.example.healthtracker.data.user.UserDays
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.UserPutInInfo
@@ -30,6 +33,8 @@ import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.time.LocalDateTime
+import java.util.Date
 
 fun navigateToActivity(currentActivity: Activity, targetActivityClass: Class<*>) {
     val intent = Intent(currentActivity, targetActivityClass)
@@ -90,22 +95,25 @@ fun rotateView(imageView: View, angle: Float) {
 
 fun UserMegaInfo.toUserData(): UserData {
     return UserData(
-        userId = this.userInfo.uid ?: "kurec",
+        userId = this.userInfo.uid ?: "",
         userInfo = this.userInfo,
         userAutomaticInfo = this.userAutomaticInfo,
         userFriends = this.userFriends,
         userPutInInfo = this.userPutInInfo,
-        userSettingsInfo = this.userSettingsInfo
+        userSettingsInfo = this.userSettingsInfo,
+        userDays = this.userDays
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 fun DataSnapshot.toUserMegaInfo(): UserMegaInfo {
     return UserMegaInfo(
         userInfo = child("userInfo").toUserInfo(),
         userAutomaticInfo = child("userAutomaticInfo").toUserAutomaticInfo(),
         userFriends = child("userFriends").toUserFriendsList(),
         userPutInInfo = child("userPutInInfo").toUserPutInInfo(),
-        userSettingsInfo = child("userSettingsInfo").toUserSettingsInfo()
+        userSettingsInfo = child("userSettingsInfo").toUserSettingsInfo(),
+        userDays = child("userDays").toUserDaysList()
     )
 }
 
@@ -149,6 +157,14 @@ fun DataSnapshot.toUserSettingsInfo(): UserSettingsInfo {
         units = child("units").getValue(String::class.java) ?: ""
     )
 }
+@RequiresApi(Build.VERSION_CODES.O)
+fun DataSnapshot.toUserDays(): UserDays {
+    return UserDays(
+        dateTime = child("dateTime").getValue(Date::class.java)!!,
+        putInInfo = child("userPutInInfo").toUserPutInInfo(),
+        automaticInfo = child("userAutomaticInfo").toUserAutomaticInfo()
+    )
+}
 
 fun DataSnapshot.toStepsInfo(): StepsInfo {
     return StepsInfo(
@@ -167,6 +183,14 @@ fun DataSnapshot.toUserFriendsList(): List<UserInfo> {
         userFriendsList.add(childSnapshot.toUserInfo())
     }
     return userFriendsList
+}
+@RequiresApi(Build.VERSION_CODES.O)
+fun DataSnapshot.toUserDaysList(): List<UserDays> {
+    val userDaysList = mutableListOf<UserDays>()
+    for (childSnapshot in children) {
+        userDaysList.add(childSnapshot.toUserDays())
+    }
+    return userDaysList
 }
 
 fun isInternetAvailable(context: Context): Boolean {

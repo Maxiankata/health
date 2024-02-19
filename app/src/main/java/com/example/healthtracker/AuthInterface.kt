@@ -9,10 +9,13 @@ interface AuthInterface {
     fun setUser(email: String, username: String, uid: String)
 
     suspend fun signOut()
-    suspend fun getCurrentUser(): UserInfo?
+    suspend fun getCurrentUser(): UserMegaInfo?
     suspend fun getEntireUser(): Flow<UserMegaInfo?>
     suspend fun getUserInfo(uid: String): UserInfo?
-    suspend fun createAcc(email: String, password: String, username: String)
+    suspend fun createAcc(email: String, password: String, username: String):String?
+    suspend fun logIn(email: String, password: String):Boolean?
+    suspend fun checkCurrentUser():Boolean
+    suspend fun sync(megaInfo: UserMegaInfo)
     suspend fun addFriend(userId: String)
     suspend fun fetchUserFriends(): List<UserInfo>?
     suspend fun removeFriend(userId: String, userFriendList: List<UserInfo>)

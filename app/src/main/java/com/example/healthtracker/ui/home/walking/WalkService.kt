@@ -1,4 +1,4 @@
-package com.example.healthtracker.ui.home
+package com.example.healthtracker.ui.home.walking
 
 import android.content.Context
 import android.content.Context.SENSOR_SERVICE
@@ -11,7 +11,6 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.MutableLiveData
 import com.example.healthtracker.R
-import java.time.LocalTime
 
 class WalkService(context: Context) : SensorEventListener {
 
@@ -19,7 +18,6 @@ class WalkService(context: Context) : SensorEventListener {
     private val sensorManager: SensorManager? =
         context.getSystemService(SENSOR_SERVICE) as? SensorManager
     private val stepSensor: Sensor? = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-    private val walkViewModel = WalkViewModel()
     var currentSteps = MutableLiveData<Int>().apply { value = 0 }
     var caloriesBurned = MutableLiveData<Int>().apply { value = 0 }
 
@@ -28,6 +26,7 @@ class WalkService(context: Context) : SensorEventListener {
             showToast(R.string.missing_sensor)
         } else {
             sensorManager?.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_UI)
+
         }
     }
 
@@ -36,16 +35,6 @@ class WalkService(context: Context) : SensorEventListener {
         currentSteps.value = (currentSteps.value ?: 0) + 1
         caloriesBurned.value = currentSteps.value!! / 25
 
-        if (isMidnight()) {
-            walkViewModel.nullifySteps()
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun isMidnight(): Boolean {
-        val time = LocalTime.now()
-        val resetTime = LocalTime.of(23, 59)
-        return time == resetTime
     }
 
     fun resetSteps() {
