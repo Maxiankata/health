@@ -12,7 +12,6 @@ data class UserMegaInfo(
     val userDays:List<UserDays>? = null
 ){
     companion object {
-
         private var _currentUser= MutableLiveData<UserMegaInfo?>()
         val currentUser: LiveData<UserMegaInfo?> get() = _currentUser
         fun setCurrentUser(user: UserMegaInfo) {

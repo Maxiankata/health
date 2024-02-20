@@ -16,6 +16,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.room.Room
 import com.example.healthtracker.data.room.UserDB
+import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.databinding.ActivityMainBinding
 import com.example.healthtracker.ui.home.walking.WalkViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -52,11 +53,18 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
+        lifecycleScope.launch {
 
-        if (hasFocus) {
-        } else {
-            // The window lost focus
-            // Perform actions when the window loses focus
+            if (hasFocus) {
+                UserMegaInfo.currentUser.value?.userAutomaticInfo?.let {
+                    mainViewModel.joinedWindow(it)
+                }
+
+            } else {
+                UserMegaInfo.currentUser.value?.userAutomaticInfo?.let {
+                    mainViewModel.leftWindow(it)
+                }
+            }
         }
     }
     private fun buildNotification() {

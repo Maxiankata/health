@@ -48,10 +48,14 @@ class FriendAccountFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
             profilePhoto.apply {
-                setRoundedCorners(360F)
+                setBackgroundResource(R.drawable.circle_background)
                 if (user.image != null && user.image != "") {
                     setImageBitmap(user.image?.let { base64ToBitmap(it) })
                 }
+            }
+            backButton.setOnClickListener {
+                requireActivity().supportFragmentManager.popBackStack()
+
             }
             userName.apply {
                 text = user.username

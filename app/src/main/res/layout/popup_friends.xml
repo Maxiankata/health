@@ -14,7 +14,6 @@
         android:id="@+id/textInputLayout"
         android:layout_width="match_parent"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-
     android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="50dp"
@@ -41,6 +40,13 @@
             android:maxLines="1"
             android:nextFocusForward="@+id/next_edit_text" />
     </com.google.android.material.textfield.TextInputLayout>
+<!--    <androidx.appcompat.widget.SearchView-->
+<!--        android:id="@+id/textInputLayout"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        android:hint="@string/searchFriend"-->
+<!--        />-->
     <ImageView
         android:id="@+id/search_switch"
         android:layout_width="40dp"

@@ -14,13 +14,10 @@
     <fragment
         android:id="@+id/navigation_dashboard"
         android:name="com.example.healthtracker.ui.dashboard.DashboardFragment"
-
         tools:layout="@layout/fragment_dashboard" />
-
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.example.healthtracker.ui.account.AccountFragment"
-
         tools:layout="@layout/fragment_account" >
         <action
             android:id="@+id/action_navigation_notifications_to_friendAccountFragment"
@@ -37,6 +34,7 @@
         <action
             android:id="@+id/action_friendsDialogFragment_to_friendAccountFragment"
             app:destination="@id/friendAccountFragment" />
+
     </dialog>
 
 </navigation>

@@ -31,7 +31,11 @@ class MainViewModel(private val application: Application):AndroidViewModel(appli
         viewModelScope.launch {
             withContext(Dispatchers.IO){
                 val user = userDao.getEntireUser()
-                user?.let { fromRoomAdapter.adapt(it) }?.let { auth.sync(it) }
+                user?.let {
+                    fromRoomAdapter.adapt(it)
+                }?.let {
+                    auth.sync(it)
+                }
             }
         }
     }

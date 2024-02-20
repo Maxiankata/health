@@ -17,7 +17,6 @@ import com.example.healthtracker.ui.account.friends.popup.FriendsDialogFragment
 import com.example.healthtracker.ui.base64ToBitmap
 import com.example.healthtracker.ui.login.LoginActivity
 import com.example.healthtracker.ui.navigateToActivity
-import com.example.healthtracker.ui.setRoundedCorners
 import com.example.healthtracker.ui.showBottomNav
 import com.example.healthtracker.ui.uriToBitmap
 import kotlinx.coroutines.launch
@@ -84,11 +83,11 @@ class AccountFragment : Fragment() {
                 dialog.show(requireActivity().supportFragmentManager, "friends dialog")
             }
             profilePhoto.apply {
+                setBackgroundResource(R.drawable.circle_background)
                 setOnClickListener {
                     val intent = Intent(Intent.ACTION_GET_CONTENT)
                     intent.type = "image/*"
                     pickImage.launch(intent)
-                    setBackgroundResource(R.drawable.circle_background)
 
                 }
             }

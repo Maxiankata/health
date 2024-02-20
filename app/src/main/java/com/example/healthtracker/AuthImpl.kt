@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.ui.bitmapToBase64
+import com.example.healthtracker.ui.toUserInfo
 import com.example.healthtracker.ui.toUserMegaInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -76,8 +77,68 @@ class AuthImpl : AuthInterface {
         }
     }
 
+    override suspend fun fetchSearchedFriends(string: String):MutableList<UserInfo> =
+        suspendCoroutine { continuation ->
+            val ref = Firebase.database.getReference("user/${Firebase.auth.currentUser!!.uid}")
+            ref.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    val tempList = mutableListOf<UserInfo>()
+                    for (userSnapshot in dataSnapshot.children) {
+                        val userInfoSnapshot = userSnapshot.child("UserFriends")
+                        val userInfo = userInfoSnapshot.getValue(UserInfo::class.java)
+                        userInfo?.let {
+                            if (it.username == string) {
+                                tempList.add(it)
+                                Log.d("Adding friend name ${it.username} to friend list", tempList.toString())
+                            }else{
+                                Log.d("not friend name adding anything friend for this query", "friend idiot")
+                            }
+                        }
+                    }
+                    continuation.resume(tempList)
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.e("FirebaseError", "Error fetching data", databaseError.toException())
+                    continuation.resumeWithException(databaseError.toException())
+                }
+            })
+
+        }
+    override suspend fun fetchSearchedUsers(string: String):MutableList<UserInfo> =
+        suspendCoroutine { continuation ->
+            val ref: DatabaseReference = Firebase.database.getReference("user")
+            ref.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    val tempList = mutableListOf<UserInfo>()
+                    for (userSnapshot in dataSnapshot.children) {
+                        val userInfoSnapshot = userSnapshot.child("userInfo")
+                        val userInfo = userInfoSnapshot.getValue(UserInfo::class.java)
+                        userInfo?.let {
+                            if (it.username == string) {
+                                tempList.add(it)
+                                Log.d("Adding name ${it.username} to list", tempList.toString())
+                            }else{
+                                Log.d("not adding anything for this query", "idiot")
+                            }
+                        }
+                    }
+                    continuation.resume(tempList)
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.e("FirebaseError", "Error fetching data", databaseError.toException())
+                    continuation.resumeWithException(databaseError.toException())
+                }
+            })
+        }
+
     override suspend fun sync(megaInfo: UserMegaInfo){
-        Firebase.database.reference.child("user/${Firebase.auth.currentUser?.uid}").setValue(megaInfo)
+        Firebase.database.reference.child("user/${Firebase.auth.currentUser?.uid}/userInfo").setValue(megaInfo.userInfo)
+        Firebase.database.reference.child("user/${Firebase.auth.currentUser?.uid}/userAutomaticInfo").setValue(megaInfo.userAutomaticInfo)
+        Firebase.database.reference.child("user/${Firebase.auth.currentUser?.uid}/userPutInInfo").setValue(megaInfo.userPutInInfo)
+        Firebase.database.reference.child("user/${Firebase.auth.currentUser?.uid}/userSettingsInfo").setValue(megaInfo.userSettingsInfo)
+        Firebase.database.reference.child("user/${Firebase.auth.currentUser?.uid}/userUserDays").setValue(megaInfo.userDays)
     }
 
     override suspend fun getEntireUser(): Flow<UserMegaInfo?> = flow {
