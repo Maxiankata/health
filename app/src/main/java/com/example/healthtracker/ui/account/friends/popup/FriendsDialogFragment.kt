@@ -21,6 +21,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.healthtracker.R
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.databinding.PopupFriendsBinding
+import com.example.healthtracker.ui.hideLoading
+import com.example.healthtracker.ui.hideMainLoading
 import com.example.healthtracker.ui.rotateView
 import kotlinx.coroutines.launch
 
@@ -59,7 +61,10 @@ class FriendsDialogFragment : DialogFragment() {
         binding?.apply {
             friendListViewModel.usersList.observe(viewLifecycleOwner) {
                 if (it != null) {
-                    friendListAdapter.updateItems(it)
+                    loadingPanelMain.visibility=VISIBLE
+                    friendListAdapter.updateItems(it).also {
+                        loadingPanelMain.visibility = GONE
+                    }
                 }
                 if (it != null && it != listOf<UserInfo>()) {
                     noFriends.visibility = GONE
@@ -74,31 +79,31 @@ class FriendsDialogFragment : DialogFragment() {
                 if (actionId == EditorInfo.IME_ACTION_DONE || (event != null && event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)) {
                     val query = editText.text?.toString()
                     editText.clearFocus()
-                        if (!query.isNullOrBlank()) {
-                            friendListViewModel.searchState.observe(viewLifecycleOwner){
-                                lifecycleScope.launch {
-                                    if (it) {
-                                        friendListViewModel.fetchSearchedUsers(query)
-                                    }else{
-                                        friendListViewModel.fetchSearchedFriends(query)
-                                    }
+                    if (!query.isNullOrBlank()) {
+                        friendListViewModel.searchState.observe(viewLifecycleOwner) {
+                            lifecycleScope.launch {
+                                if (it) {
+                                    friendListViewModel.clearList()
+                                    friendListViewModel.fetchSearchedUsers(query)
+                                } else {
+                                    friendListViewModel.fetchUserFriends()
+                                    friendListViewModel.fetchSearchedFriends(query)
                                 }
+                            }
                         }
-                    }else(Log.d("blank query", "luluu"))
+                    } else (Log.d("blank query", "luluu"))
                     return@setOnEditorActionListener true
                 }
                 false
             }
             editText?.setOnFocusChangeListener { _, hasFocus ->
-                if(!hasFocus)editText.text?.clear()
+                if (!hasFocus) editText.text?.clear()
             }
             usernameInput.setOnFocusChangeListener { _, hasFocus ->
-                val color = if (hasFocus)
-                    (ContextCompat.getColor(
-                        requireContext(), R.color.light_green
-                    ))
-                else
-                    (ContextCompat.getColor(requireContext(), R.color.input_grey))
+                val color = if (hasFocus) (ContextCompat.getColor(
+                    requireContext(), R.color.light_green
+                ))
+                else (ContextCompat.getColor(requireContext(), R.color.input_grey))
 
                 textInputLayout.setEndIconTintList(ColorStateList.valueOf(color))
 

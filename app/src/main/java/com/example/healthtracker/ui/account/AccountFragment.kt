@@ -18,6 +18,8 @@ import com.example.healthtracker.ui.base64ToBitmap
 import com.example.healthtracker.ui.login.LoginActivity
 import com.example.healthtracker.ui.navigateToActivity
 import com.example.healthtracker.ui.showBottomNav
+import com.example.healthtracker.ui.showLoading
+import com.example.healthtracker.ui.showMainLoading
 import com.example.healthtracker.ui.uriToBitmap
 import kotlinx.coroutines.launch
 

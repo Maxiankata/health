@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -16,7 +17,9 @@ import androidx.navigation.findNavController
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.FragmentLoginBinding
+import com.example.healthtracker.ui.hideLoading
 import com.example.healthtracker.ui.isInternetAvailable
+import com.example.healthtracker.ui.showLoading
 import kotlinx.coroutines.launch
 
 
@@ -34,7 +37,9 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().hideLoading()
         binding.apply {
+
             registerButton.apply {
                 setOnClickListener {
                     findNavController().navigate(R.id.action_login_to_register)
@@ -42,6 +47,7 @@ class LoginFragment : Fragment() {
             }
             signInButton.apply {
                 setOnClickListener {
+                    requireActivity().showLoading()
                     lifecycleScope.launch {
                         try {
                             if (loginFragmentViewModel.logIn(
@@ -50,20 +56,26 @@ class LoginFragment : Fragment() {
                             ) {
                                 val intent = Intent(context, MainActivity::class.java)
                                 startActivity(intent)
-                                loginFragmentViewModel.getUser()
+                                loginFragmentViewModel.getUser().also {
+                                    requireActivity().hideLoading()
+                                }
                                 activity?.finish()
                             } else if (isInternetAvailable(context)) {
                                 Toast.makeText(
                                     context,
                                     R.string.login_issue,
                                     Toast.LENGTH_SHORT,
-                                ).show()
+                                ).show().also {
+                                    requireActivity().hideLoading()
+                                }
                             } else {
                                 Toast.makeText(
                                     context,
                                     R.string.no_internet,
                                     Toast.LENGTH_SHORT
-                                ).show()
+                                ).show().also {
+                                    requireActivity().hideLoading()
+                                }
                             }
                         } catch (e: Exception) {
                             Log.d("empty", "$e")
@@ -71,7 +83,9 @@ class LoginFragment : Fragment() {
                                 context,
                                 getString(R.string.empty_field),
                                 Toast.LENGTH_SHORT,
-                            ).show()
+                            ).show().also {
+                                findViewById<RelativeLayout>(R.id.loadingPanel).visibility = View.GONE
+                            }
                         }
                     }
 

@@ -114,6 +114,7 @@ class AuthImpl : AuthInterface {
                     for (userSnapshot in dataSnapshot.children) {
                         val userInfoSnapshot = userSnapshot.child("userInfo")
                         val userInfo = userInfoSnapshot.getValue(UserInfo::class.java)
+                        Log.d("Entered fetchSearchedFriends", "i hate you")
                         userInfo?.let {
                             if (it.username == string) {
                                 tempList.add(it)
@@ -186,6 +187,7 @@ class AuthImpl : AuthInterface {
                 val friendInfo = getUserInfo(friendUid)
                 friendInfo?.let {
                     userFriendList.add(it)
+                    Log.d("Adding it in authimpl", it.toString())
                 }
             }
             userFriendList
@@ -193,6 +195,15 @@ class AuthImpl : AuthInterface {
 
     }
 
+    override suspend fun resetPassword(email: String): Boolean {
+        return suspendCoroutine { continuation ->
+            Firebase.auth.sendPasswordResetEmail(email)
+                .addOnCompleteListener { task ->
+                    val isSuccessful = task.isSuccessful
+                    continuation.resume(isSuccessful)
+                }
+        }
+    }
     override suspend fun removeFriend(userId: String, userFriendList: List<UserInfo>) {
         val friend = getUserInfo(userId)
         if (userFriendList.contains(friend)) {

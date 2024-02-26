@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
             )
         )
-        walkViewModel.setupDailyTask()
+//        walkViewModel.setupDailyTask()
         supportActionBar?.hide()
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
@@ -67,6 +67,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun buildNotification() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.friends)

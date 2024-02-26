@@ -14,6 +14,7 @@ import android.os.Build
 import android.util.Base64
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.widget.RelativeLayout
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.FragmentActivity
 import com.example.healthtracker.R
@@ -83,6 +84,26 @@ fun FragmentActivity.hideBottomNav() {
 fun FragmentActivity.showBottomNav() {
     findViewById<BottomNavigationView>(R.id.nav_view).apply {
         visibility = View.VISIBLE
+    }
+}
+fun FragmentActivity.showLoading() {
+    findViewById<RelativeLayout>(R.id.loadingPanel).apply {
+        visibility = View.VISIBLE
+    }
+}
+fun FragmentActivity.hideLoading() {
+    findViewById<RelativeLayout>(R.id.loadingPanel).apply {
+        visibility = View.GONE
+    }
+}
+fun FragmentActivity.showMainLoading() {
+    findViewById<RelativeLayout>(R.id.loadingPanelMain).apply {
+        visibility = View.VISIBLE
+    }
+}
+fun FragmentActivity.hideMainLoading() {
+    findViewById<RelativeLayout>(R.id.loadingPanelMain).apply {
+        visibility = View.GONE
     }
 }
 

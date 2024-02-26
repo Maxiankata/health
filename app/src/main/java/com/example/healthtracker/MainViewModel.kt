@@ -35,6 +35,7 @@ class MainViewModel(private val application: Application):AndroidViewModel(appli
                     fromRoomAdapter.adapt(it)
                 }?.let {
                     auth.sync(it)
+
                 }
             }
         }

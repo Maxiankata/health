@@ -55,7 +55,6 @@ class FriendAccountFragment : Fragment() {
             }
             backButton.setOnClickListener {
                 requireActivity().supportFragmentManager.popBackStack()
-
             }
             userName.apply {
                 text = user.username

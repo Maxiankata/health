@@ -10,6 +10,5 @@ import com.google.firebase.database.FirebaseDatabase
 class FriendAccountViewModel(application: Application):AndroidViewModel(application) {
     private val _friend=MutableLiveData<UserInfo>()
     val friend : LiveData<UserInfo> get() = _friend
-    private val database = FirebaseDatabase.getInstance()
 
 }

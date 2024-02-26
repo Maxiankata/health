@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.healthtracker.R
+import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.databinding.FragmentHomeBinding
 import com.example.healthtracker.ui.home.walking.WalkViewModel
 import kotlinx.coroutines.launch
@@ -23,12 +24,6 @@ class HomeFragment : Fragment() {
     private val homeViewModel: HomeViewModel by activityViewModels()
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        walkViewModel.walkingStart(requireContext())
-
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -39,9 +34,25 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        lifecycleScope.launch {
+            walkViewModel.walkStart()
+            homeViewModel.feedUser()
+        }
         val weightRecyclerVal = WeightRecyclerAdapter()
         binding.apply {
             walkViewModel.walkService.currentSteps.observe(viewLifecycleOwner) {
+                lifecycleScope.launch {
+                    UserMegaInfo.currentUser.value?.let {
+                        val user = homeViewModel.getUser()
+                        Log.d("SYNCED MEGA USER", user?.userAutomaticInfo.toString())
+                    }
+                    walkViewModel.walkService.writeSteps()
+
+                }
+                Log.d(
+                    "changed userAutoInfo",
+                    UserMegaInfo.currentUser.value?.userAutomaticInfo.toString()
+                )
                 stepcount.apply {
                     text = buildString {
                         append(getString(R.string.steps))
@@ -68,17 +79,22 @@ class HomeFragment : Fragment() {
                         }
                     }
                 }
-                homeViewModel.user.observe(viewLifecycleOwner) {
+                homeViewModel.water.observe(viewLifecycleOwner) {
+                    Log.d("water information", it.toString())
                     textView2.text = buildString {
-                        homeViewModel.water.observe(viewLifecycleOwner) {
-                            Log.d("water information", it.toString())
-                            append(it?.currentWater ?: 0)
-                            append("/")
-                            append(it?.waterGoal ?: 6)
+                        if (it != null) {
+                            if (it.currentWater!=null&&it.currentWater!=0){
+                                append(it.currentWater)
+                            }else{
+                                append(0)
+                            }
+                            Log.d("CurrentWater", it.currentWater.toString())
+                        } else {
+                            Log.d("Water is null", it.toString())
                         }
+                        append("/")
+                        append(it?.waterGoal ?: 6)
                     }
-
-
                 }
                 plus.setOnClickListener {
                     viewLifecycleOwner.lifecycleScope.launch {
@@ -87,30 +103,30 @@ class HomeFragment : Fragment() {
                     }
                 }
                 minus.setOnClickListener {
-                        lifecycleScope.launch {
-                            homeViewModel.waterIncrement(-1)
-                            Log.d("DECREMENTED", "DECREMENTED")
-                        }
-
+                    lifecycleScope.launch {
+                        homeViewModel.waterIncrement(-1)
+                        Log.d("DECREMENTED", "DECREMENTED")
                     }
-            }
 
-
-        weightRecycler.apply {
-            adapter = weightRecyclerVal
-
-            layoutManager = GridLayoutManager(context, 1, GridLayoutManager.VERTICAL, false)
-            val fakeLayoutManager = this.layoutManager as GridLayoutManager
-            val fakeadapter = adapter
-
-            if (fakeadapter is WeightRecyclerAdapter) {
-                scaleImage.setOnClickListener {
-                    val middleItem =
-                        fakeadapter.getItem((fakeLayoutManager.findFirstVisibleItemPosition() + fakeLayoutManager.findLastVisibleItemPosition()) / 2)
-                    Log.d("Middle Item", middleItem)
                 }
             }
-        }
+
+
+            weightRecycler.apply {
+                adapter = weightRecyclerVal
+
+                layoutManager = GridLayoutManager(context, 1, GridLayoutManager.VERTICAL, false)
+                val fakeLayoutManager = this.layoutManager as GridLayoutManager
+                val fakeadapter = adapter
+
+                if (fakeadapter is WeightRecyclerAdapter) {
+                    scaleImage.setOnClickListener {
+                        val middleItem =
+                            fakeadapter.getItem((fakeLayoutManager.findFirstVisibleItemPosition() + fakeLayoutManager.findLastVisibleItemPosition()) / 2)
+                        Log.d("Middle Item", middleItem)
+                    }
+                }
+            }
 //            secondWeightRecycler.apply{
 //                adapter = weightRecyclerVal
 //                layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL,false)
@@ -123,16 +139,16 @@ class HomeFragment : Fragment() {
 //                        fakeadapter.getItem((fakelayoutmanager.findFirstVisibleItemPosition() + fakelayoutmanager.findLastVisibleItemPosition()))
 //                }
 //            }
+        }
     }
-}
 
-override fun onDestroyView() {
-    super.onDestroyView()
-    _binding = null
-}
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
-fun findMid() {
+    fun findMid() {
 
-}
+    }
 
 }

@@ -66,6 +66,7 @@ class FriendListViewModel : ViewModel() {
                 friendsInfoList = auth.fetchUserFriends() as MutableList<UserInfo>
                 _friendsList.postValue(friendsInfoList)
                 _usersList.postValue(friendsInfoList)
+            Log.d("Fetched Friends", _usersList.value.toString())
         }
     }
 

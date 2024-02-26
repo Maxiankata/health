@@ -35,7 +35,7 @@ interface UserDao {
 
     @Query("UPDATE UserData SET userPutInInfo = :updatedUserPutInInfo")
     fun updateUserPutInInfo(updatedUserPutInInfo: UserPutInInfo)
-    @Query("UPDATE UserData SET userPutInInfo = :updatedUserAutomaticInfo")
+    @Query("UPDATE UserData SET userAutomaticInfo = :updatedUserAutomaticInfo")
     fun updateUserAutomaticInfo(updatedUserAutomaticInfo: UserAutomaticInfo)
     @Query("UPDATE UserData SET UserInfo = :updatedUserInfo")
     suspend fun updateImage( updatedUserInfo: UserInfo)
