@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
 data class UserMegaInfo(
-    val userInfo: UserInfo,
+    var userInfo: UserInfo,
     var userAutomaticInfo: UserAutomaticInfo? = null,
     val userFriends: List<UserInfo>? = listOf(),
     val userPutInInfo: UserPutInInfo? = null,
@@ -16,6 +16,9 @@ data class UserMegaInfo(
         val currentUser: LiveData<UserMegaInfo?> get() = _currentUser
         fun setCurrentUser(user: UserMegaInfo) {
             _currentUser.postValue(user)
+        }
+        fun clearCurrentUser(){
+            _currentUser.postValue(null)
         }
         fun getCurrentUser(): UserMegaInfo? {
             return _currentUser.value

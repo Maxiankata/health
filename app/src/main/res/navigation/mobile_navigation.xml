@@ -22,6 +22,9 @@
         <action
             android:id="@+id/action_navigation_notifications_to_friendAccountFragment"
             app:destination="@id/friendAccountFragment" />
+        <action
+            android:id="@+id/action_navigation_notifications_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/friendAccountFragment"
@@ -36,5 +39,9 @@
             app:destination="@id/friendAccountFragment" />
 
     </dialog>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.healthtracker.ui.settings.SettingsFragment"
+        android:label="SettingsFragment" />
 
 </navigation>

@@ -18,7 +18,9 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -75,5 +77,6 @@ dependencies {
     kapt ("androidx.room:room-compiler:2.6.1")
     implementation ("androidx.room:room-ktx:2.6.1")
 
-
+    coreLibraryDesugaring ("com.android.tools:desugar_jdk_libs:2.0.4")
+    implementation ("com.kizitonwose.calendar:view:2.0.0")
 }

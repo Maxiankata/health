@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <View
+        android:id="@+id/colorView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="@color/black" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/redLayout"
+            layout="@layout/rgb_slider_layout" />
+
+        <include
+            android:id="@+id/greenLayout"
+            layout="@layout/rgb_slider_layout" />
+
+        <include
+            android:id="@+id/blueLayout"
+            layout="@layout/rgb_slider_layout" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:gravity="center_horizontal"
+            >
+            <Button
+                android:text="@string/cancel"
+                app:layout_constraintTop_toTopOf="parent"
+                android:id="@+id/cancel"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/pick"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/black"
+                />
+            <Button
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/cancel"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:id="@+id/pick"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="@string/pick"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</androidx.appcompat.widget.LinearLayoutCompat>

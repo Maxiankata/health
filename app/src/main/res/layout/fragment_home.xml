@@ -224,7 +224,7 @@
                 android:layout_height="0dp"
                 android:layout_marginStart="50dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/second_weight_recycler"
                 app:layout_constraintStart_toEndOf="@+id/textView"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -232,12 +232,13 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/second_weight_recycler"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/weight_recycler"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:itemCount="1">
+                app:layout_constraintEnd_toEndOf="parent"
+                >
 
             </androidx.recyclerview.widget.RecyclerView>
 
@@ -248,8 +249,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="25dp"
-            android:backgroundTint="@color/input_grey"
-            android:background="@drawable/rounded_background"
             android:columnCount="2"
             android:padding="8dp"
             android:rowCount="2"
@@ -262,7 +261,7 @@
                 android:layout_columnWeight="1"
                 android:layout_rowWeight="1"
                 android:layout_marginEnd="8dp"
-                android:backgroundTint="@color/dark_background"
+                android:backgroundTint="@color/light_green"
                 android:background="@drawable/rounded_background"
                 android:gravity="center"
                 android:orientation="horizontal"
@@ -271,7 +270,7 @@
                 <ImageView
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/friend_add"
+                    android:src="@drawable/running_icon"
                     app:tint="@color/white" />
 
                 <TextView
@@ -287,7 +286,7 @@
                 android:layout_columnWeight="1"
                 android:layout_rowWeight="1"
                 android:layout_marginEnd="8dp"
-                android:backgroundTint="@color/dark_background"
+                android:backgroundTint="@color/light_green"
                 android:background="@drawable/rounded_background"
                 android:gravity="center"
                 android:orientation="horizontal"
@@ -296,7 +295,7 @@
                 <ImageView
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/friend_add"
+                    android:src="@drawable/cycling_icon"
                     app:tint="@color/white" />
 
                 <TextView
@@ -312,7 +311,7 @@
                 android:layout_columnWeight="1"
                 android:layout_rowWeight="1"
                 android:layout_marginEnd="8dp"
-                android:backgroundTint="@color/dark_background"
+                android:backgroundTint="@color/light_green"
                 android:background="@drawable/rounded_background"
                 android:gravity="center"
                 android:orientation="horizontal"
@@ -321,7 +320,7 @@
                 <ImageView
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/friend_add"
+                    android:src="@drawable/hiking_icon"
                     app:tint="@color/white" />
 
                 <TextView
@@ -333,11 +332,11 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/run4_layout"
+                android:id="@+id/power_walking_layout"
                 android:layout_columnWeight="1"
                 android:layout_rowWeight="1"
                 android:layout_marginEnd="8dp"
-                android:backgroundTint="@color/dark_background"
+                android:backgroundTint="@color/light_green"
                 android:background="@drawable/rounded_background"
                 android:gravity="center"
                 android:orientation="horizontal"
@@ -346,7 +345,7 @@
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:src="@drawable/friend_add"
+                android:src="@drawable/power_walking_icon"
                 app:tint="@color/white" />
 
             <TextView

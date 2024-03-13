@@ -1,17 +1,21 @@
 package com.example.healthtracker.ui.account
 
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.example.healthtracker.CropActivity
 import com.example.healthtracker.R
+import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.databinding.FragmentAccountBinding
 import com.example.healthtracker.ui.account.friends.popup.FriendsDialogFragment
 import com.example.healthtracker.ui.base64ToBitmap
@@ -74,13 +78,18 @@ class AccountFragment : Fragment() {
         }
 
         binding.apply {
+            settings.setOnClickListener {
+                findNavController().navigate(
+                    R.id.action_navigation_notifications_to_settingsFragment
+                )
+            }
             signOutButton.setOnClickListener {
                 navigateToActivity(requireActivity(), LoginActivity::class.java)
                 lifecycleScope.launch {
                     accountViewModel.signOut()
-                    accountViewModel.dropTable()
                 }
             }
+
             friends.setOnClickListener {
                 dialog.show(requireActivity().supportFragmentManager, "friends dialog")
             }
@@ -93,7 +102,9 @@ class AccountFragment : Fragment() {
 
                 }
             }
+            backgroundFrame.apply {
 
+            }
         }
     }
 

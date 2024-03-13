@@ -24,4 +24,5 @@ interface AuthInterface {
     suspend fun saveBitmapToDatabase(bitmap: Bitmap)
     suspend fun fetchSearchedUsers(string: String):List<UserInfo>
     suspend fun fetchSearchedFriends(string: String):List<UserInfo>
+    suspend fun deleteCurrentUser()
 }

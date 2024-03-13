@@ -52,6 +52,7 @@ class AuthImpl : AuthInterface {
     override suspend fun signOut() {
         withContext(Dispatchers.IO) {
             Firebase.auth.signOut()
+            UserMegaInfo.clearCurrentUser()
         }
     }
 
@@ -254,5 +255,16 @@ class AuthImpl : AuthInterface {
                 }
             })
         }
-}
+
+    override suspend fun deleteCurrentUser() {
+        val user = Firebase.auth.currentUser?.uid
+        Log.d("User to be deleted", user.toString())
+        val database = Firebase.database.reference
+        if (user != null) {
+            database.child(user).removeValue()
+        }
+        Firebase.auth.currentUser?.delete()
+    }
+
+    }
 

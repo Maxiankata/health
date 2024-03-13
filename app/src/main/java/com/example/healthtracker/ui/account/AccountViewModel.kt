@@ -28,17 +28,15 @@ class AccountViewModel(private val application: Application) : AndroidViewModel(
     suspend fun signOut() {
         viewModelScope.launch {
             auth.signOut()
+            withContext(Dispatchers.IO){
+                userDao.dropUser()
+            }
         }
     }
     suspend fun getUser(){
         withContext(Dispatchers.IO){
             userDao.getEntireUser()?.let { fromRoomAdapter.adapt(it) }
                 ?.let { UserMegaInfo.setCurrentUser(it) }
-        }
-    }
-    suspend fun dropTable(){
-        withContext(Dispatchers.IO){
-            userDao.dropUser()
         }
     }
     suspend fun saveBitmapToDatabase(bitmap: Bitmap) {

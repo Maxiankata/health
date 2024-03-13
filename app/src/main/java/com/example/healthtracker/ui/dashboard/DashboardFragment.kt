@@ -5,11 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.example.healthtracker.databinding.FragmentDashboardBinding
 import com.example.healthtracker.ui.showBottomNav
 
 class DashboardFragment : Fragment() {
-
+    private val dashboardViewModel : DashboardViewModel by viewModels()
     private var _binding: FragmentDashboardBinding? = null
     private val binding get() = _binding!!
     override fun onCreateView(
