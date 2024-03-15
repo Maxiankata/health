@@ -12,6 +12,10 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.work.Constraints
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.example.healthtracker.AuthImpl
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.R
@@ -29,6 +33,7 @@ import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.Date
+import java.util.concurrent.TimeUnit
 
 class WalkService(context: Context) : SensorEventListener {
 
@@ -59,7 +64,7 @@ class WalkService(context: Context) : SensorEventListener {
             try {
                 if (steps != null) {
                     Log.d("STEPS FROM DAO ARE NOT NULL", steps.toString())
-                    if (steps.steps?.totalSteps != null) _currentSteps.postValue(steps.steps.totalSteps)
+                    if (steps.steps?.currentSteps != null) _currentSteps.postValue(steps.steps.currentSteps)
                     if (steps.steps?.currentCalories != null) _caloriesBurned.postValue(steps.steps.currentCalories) else {}
                 } else {
                     Log.d("STEPS FROM DAO ARE NULL", steps.toString())
@@ -108,10 +113,35 @@ class WalkService(context: Context) : SensorEventListener {
         _currentSteps.value = _currentSteps.value?.plus(1)
         UserMegaInfo.currentUser.value?.userAutomaticInfo = UserAutomaticInfo(
             StepsInfo(
-                totalSteps = _currentSteps.value,
+                currentSteps = _currentSteps.value,
+                onLeaveSteps = totalSteps.toInt(),
                 currentCalories = _caloriesBurned.value
             )
         )
+        val constraints = Constraints.Builder()
+            .setRequiresBatteryNotLow(true)
+            .build()
+        val inputData = workDataOf("input" to _currentSteps.value)
+        val workRequest = PeriodicWorkRequestBuilder<StepCountWorker>(1, TimeUnit.MINUTES)
+            .setInputData(inputData)
+            .setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance(appContext).enqueue(workRequest)
+        customCoroutineScope.launch {
+            Log.d("User stepped", UserMegaInfo.currentUser.value?.userAutomaticInfo.toString()
+            )
+            writeSteps()
+            withContext(Dispatchers.IO){
+                val user = userDao.getEntireUser()
+                if (user != null) {
+                    Log.d("User auto dao", user.userAutomaticInfo.toString())
+                }else{
+                    Log.d("kill yourself retarded faggot", "fuck you")
+                }
+            }
+
+        }
         if (_currentSteps.value!! % 10 == 0) {
             customCoroutineScope.launch {
                 syncToFirebase()

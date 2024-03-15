@@ -22,14 +22,14 @@ class WeightRecyclerAdapter:RecyclerView.Adapter<WeightRecyclerAdapter.WeightVie
         private val text = view.findViewById<TextView>(R.id.weight)
 
 //        init {
-//            // Attach a focus change listener to the root view
+//            // attach a focus change listener to the root view
 //            view.setOnFocusChangeListener { _, hasFocus ->
 //                if (hasFocus) {
-//                    animateScale(view, 1.2f) // Scale up when gaining focus
+//                    animateScale(view, 1.2f) // scale up when gaining focus
 //                    Log.d("Has focus", text.toString())
 //                } else {
 //                    Log.d("NO HAS FOCUS", text.toString())
-//                    animateScale(view, 1.0f) // Revert to normal size when losing focus
+//                    animateScale(view, 1.0f) // revert to normal size when losing focus
 //                }
 //            }
 //        }
@@ -39,7 +39,6 @@ class WeightRecyclerAdapter:RecyclerView.Adapter<WeightRecyclerAdapter.WeightVie
         }
     }
 
-    // ... (unchanged code)
 
     private fun animateScale(view: View, scale: Float) {
         val scaleAnimator = ObjectAnimator.ofPropertyValuesHolder(
@@ -47,7 +46,7 @@ class WeightRecyclerAdapter:RecyclerView.Adapter<WeightRecyclerAdapter.WeightVie
             PropertyValuesHolder.ofFloat(View.SCALE_X, scale),
             PropertyValuesHolder.ofFloat(View.SCALE_Y, scale)
         )
-        scaleAnimator.duration = 300 // Adjust the duration as needed
+        scaleAnimator.duration = 300 // adjust the duration
         scaleAnimator.interpolator = AccelerateDecelerateInterpolator()
         scaleAnimator.start()
     }

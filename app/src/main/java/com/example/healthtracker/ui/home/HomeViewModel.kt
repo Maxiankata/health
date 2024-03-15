@@ -1,12 +1,16 @@
 package com.example.healthtracker.ui.home
 
-import android.app.Application
+import android .app.Application
+import android.content.Context
 import android.hardware.SensorEventListener
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.healthtracker.AuthImpl
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.R
@@ -14,9 +18,11 @@ import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
 import com.example.healthtracker.data.room.UserMegaInfoToRoomAdapter
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.WaterInfo
-import com.example.healthtracker.ui.home.running.RunningService
+import com.example.healthtracker.ui.home.running.RunningSensorListener
 import com.example.healthtracker.ui.home.walking.WalkService
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class HomeViewModel(private val application: Application) : AndroidViewModel(application) {
@@ -42,6 +48,24 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
             val user = userDao.getEntireUser()?.let { roomToUserMegaInfoAdapter.adapt(it) }
             _water.postValue(user?.userPutInInfo?.waterInfo)
             _user.postValue(user)
+        }
+    }
+    suspend fun syncMetrics(){
+        if (UserMegaInfo.currentUser.value?.userSettingsInfo?.units ==""||UserMegaInfo.currentUser.value?.userSettingsInfo?.language ==""){
+            UserMegaInfo.currentUser.value?.userSettingsInfo?.units ="kg"
+            UserMegaInfo.currentUser.value?.userSettingsInfo?.language ="english"
+            withContext(Dispatchers.IO){
+                userMegaInfoToRoomAdapter.adapt(UserMegaInfo.currentUser.value!!)
+                    ?.let { userDao.saveUser(it) }
+            }
+            if (isInternetAvailable(application)){
+                viewModelScope.launch {
+                    auth.sync(UserMegaInfo.currentUser.value!!)
+                }
+            }else{
+                Log.d("cant sync metrics, no internet", isInternetAvailable(application).toString()
+                )
+            }
         }
     }
 
@@ -107,11 +131,22 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
     suspend fun switchActivity(userActivityStates: UserActivityStates) {
         when (userActivityStates) {
             UserActivityStates.WALKING -> _currentService.value = WalkService(application)
-            UserActivityStates.RUNNING -> _currentService.value = RunningService(application)
+            UserActivityStates.RUNNING -> _currentService.value = RunningSensorListener(application)
             UserActivityStates.CYCLING -> Log.d("cycling", "")
             UserActivityStates.HIKING -> Log.d("hiking", "")
             UserActivityStates.POWER_WALKING -> Log.d("power walking", "")
         }
 
+    }
+    fun isInternetAvailable(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        val network = connectivityManager.activeNetwork
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+
+        return networkCapabilities != null &&
+                (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                        networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
     }
 }

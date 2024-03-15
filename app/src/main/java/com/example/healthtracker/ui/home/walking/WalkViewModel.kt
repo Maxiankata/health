@@ -8,8 +8,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.healthtracker.AuthImpl
 import com.example.healthtracker.MainActivity
+import com.example.healthtracker.data.room.UserMegaInfoToRoomAdapter
 import com.example.healthtracker.data.user.UserDays
+import com.example.healthtracker.data.user.UserMegaInfo
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Date
 
 class WalkViewModel(private val application: Application) : AndroidViewModel(application) {
@@ -26,8 +30,8 @@ class WalkViewModel(private val application: Application) : AndroidViewModel(app
         walkService.starter()
     }
     @RequiresApi(Build.VERSION_CODES.O)
-    fun nullifySteps() {
-        viewModelScope.launch {
+    suspend fun nullifySteps() {
+            withContext(Dispatchers.IO){
             val existingUserDays = userDao.getEntireUser()?.userDays
             val updatedUserDays = existingUserDays?.toMutableList()
             val date = Date()
@@ -40,6 +44,8 @@ class WalkViewModel(private val application: Application) : AndroidViewModel(app
             userDao.wipeUserAutomaticInfo()
         }
     }
+
+
     init {
         _previousSteps.postValue(walkService.currentSteps.value)
     }

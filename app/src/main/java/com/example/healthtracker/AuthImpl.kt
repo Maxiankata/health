@@ -66,6 +66,7 @@ class AuthImpl : AuthInterface {
                             val user = Firebase.auth.currentUser
                             setUser(email, username, user?.uid ?: "")
                             uidReturn = user?.uid
+
                             Log.d("REGISTERED USER ID", uidReturn.toString())
                             continuation.resume(Unit)
                         }

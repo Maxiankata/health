@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +27,7 @@ import com.example.healthtracker.ui.showLoading
 import com.example.healthtracker.ui.showMainLoading
 import com.example.healthtracker.ui.uriToBitmap
 import kotlinx.coroutines.launch
+import kotlin.math.log
 
 class AccountFragment : Fragment() {
 
@@ -89,7 +91,9 @@ class AccountFragment : Fragment() {
                     accountViewModel.signOut()
                 }
             }
+            friends.apply {
 
+            }
             friends.setOnClickListener {
                 dialog.show(requireActivity().supportFragmentManager, "friends dialog")
             }
@@ -102,9 +106,16 @@ class AccountFragment : Fragment() {
 
                 }
             }
-            backgroundFrame.apply {
-
-            }
+//            backgroundColor.apply {
+//                val bgcolor = UserMegaInfo.currentUser.value?.userInfo?.theme
+//                Log.d("BGCOLOR", bgcolor.toString())
+//                if (bgcolor != null&& bgcolor!="") {
+//                    setBackgroundColor(Color.parseColor(bgcolor))
+//                }
+//            }
+//            backgroundFrame.apply {
+//
+//            }
         }
     }
 

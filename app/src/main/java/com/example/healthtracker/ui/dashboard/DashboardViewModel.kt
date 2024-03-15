@@ -5,9 +5,21 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.healthtracker.data.user.UserDays
+import com.example.healthtracker.data.user.UserMegaInfo
+import com.example.healthtracker.data.user.WaterInfo
 import java.lang.Appendable
+import java.util.Date
 
 class DashboardViewModel(private val application: Application) : AndroidViewModel(application) {
-
-
+    val user = UserMegaInfo.currentUser
+    private var _userDay = MutableLiveData<UserDays?>()
+    val userDay : LiveData<UserDays?> get() = _userDay
+    fun feedDay(date:Date){
+        for (item in user.value?.userDays!!){
+            if (date==item.dateTime){
+                _userDay.postValue(item)
+            }
+        }
+    }
 }

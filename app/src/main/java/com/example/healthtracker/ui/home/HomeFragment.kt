@@ -16,7 +16,7 @@ import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.databinding.FragmentHomeBinding
 import com.example.healthtracker.ui.account.friends.popup.FriendsDialogFragment
 import com.example.healthtracker.ui.home.running.RunningDialogFragment
-import com.example.healthtracker.ui.home.running.RunningService
+import com.example.healthtracker.ui.home.running.RunningSensorListener
 import com.example.healthtracker.ui.home.walking.WalkService
 import com.example.healthtracker.ui.home.walking.WalkViewModel
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +31,7 @@ class HomeFragment : Fragment() {
     private val walkViewModel: WalkViewModel by activityViewModels()
     private val homeViewModel: HomeViewModel by activityViewModels()
     private val weightRecyclerAdapter : WeightRecyclerAdapter = WeightRecyclerAdapter()
-    private lateinit var speedTracker: RunningService
+    private lateinit var speedTracker: RunningSensorListener
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -44,12 +44,15 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch {
-            speedTracker = RunningService(requireContext())
+            speedTracker = RunningSensorListener(requireContext())
             walkViewModel.walkStart()
             homeViewModel.feedUser()
+            homeViewModel.syncMetrics()
+            Log.d("Kg spotted", UserMegaInfo.currentUser.value?.userSettingsInfo?.units.toString())
 
-//            if (UserMegaInfo.currentUser.value?.userSettingsInfo?.units == "kg"){
-//            }
+        }
+        if (UserMegaInfo.currentUser.value?.userSettingsInfo?.units=="kg"){
+
         }
         lateinit var dialog:Fragment
         val weightRecyclerVal = WeightRecyclerAdapter()
@@ -99,7 +102,6 @@ class HomeFragment : Fragment() {
                             } else {
                                 append(0)
                             }
-                        } else {
                         }
                         append("/")
                         append(it?.waterGoal ?: 6)

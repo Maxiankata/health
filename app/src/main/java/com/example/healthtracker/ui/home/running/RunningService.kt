@@ -1,89 +1,56 @@
 package com.example.healthtracker.ui.home.running
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
-import android.util.Log
-import androidx.core.app.ActivityCompat
-import kotlin.math.sqrt
+import android.app.Service
+import android.content.Intent
+import android.os.IBinder
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContentProviderCompat.requireContext
+import com.example.healthtracker.R
+import java.util.Date
 
-class RunningService(private val context: Context) : SensorEventListener, LocationListener {
+class RunningService:Service() {
+    val timeHelper = TimeHelper(this)
+    override fun onBind(intent: Intent?): IBinder? {
+        return null
+    }
 
-    private val sensorManager: SensorManager =
-        context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-    private val locationManager: LocationManager =
-        context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        when(intent?.action){
+            Active.START.toString()-> start()
+                Active.STOP.toString()-> stopSelf()
 
-
-    private var lastAccelerometerReading = FloatArray(3)
-    private var lastAccelerationUpdateTime: Long = 0
-
-
-    init {
-        val accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL)
-        if (ActivityCompat.checkSelfPermission(
-                context, Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                context, Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-//            return
         }
-        locationManager.requestLocationUpdates(
-            LocationManager.GPS_PROVIDER, 0, 0f, this
-        )
-    }
-    val gravitationalAcceleration = 9.8f
-    override fun onSensorChanged(event: SensorEvent?) {
-        if (event?.sensor?.type == Sensor.TYPE_ACCELEROMETER) {
-            val currentTime = System.currentTimeMillis()
-            if (currentTime - lastAccelerationUpdateTime > 1000) { // Update every 100 milliseconds
-                val alpha = 0.8f
-                lastAccelerometerReading[0] =
-                    alpha * lastAccelerometerReading[0] + (1 - alpha) * event.values[0]
-                lastAccelerometerReading[1] =
-                    alpha * lastAccelerometerReading[1] + (1 - alpha) * event.values[1]
-                lastAccelerometerReading[2] =
-                    alpha * lastAccelerometerReading[2] + (1 - alpha) * event.values[2]
-
-                val linearAcceleration = calculateLinearAcceleration(
-                    event.values[0],
-                    event.values[1],
-                    event.values[2],
-                )
-                // TODO: Use acceleration to calculate speed
-                // For simplicity, you can just log the acceleration values
-                Log.d("SpeedTracker", "Acceleration: $linearAcceleration")
-
-                lastAccelerationUpdateTime = currentTime
-            }
-        }
+        return super.onStartCommand(intent, flags, startId)
     }
 
-    private fun calculateLinearAcceleration(x: Float, y: Float, z: Float): Float {
-        val totalAcceleration = sqrt((x * x + y * y + z * z).toDouble()).toFloat()
-        val linearAcceleration = totalAcceleration - gravitationalAcceleration
-        return maxOf(0f, linearAcceleration) // Ensure the result is non-negative
+    private fun start() {
+        val notification = NotificationCompat.Builder(this, "running_channel")
+            .setSmallIcon(R.drawable.running_icon)
+            .setContentTitle(getString(R.string.running))
+            .setContentText(buildString {
+                val time = Date().time - restartTime().time
+                append(timeStringFromLong(time))
+            })
+            .build()
+
+        startForeground(1, notification)
+    }
+    private fun restartTime(): Date {
+        val diff = timeHelper.startTime()!!.time - timeHelper.stopTime()!!.time
+        return Date(System.currentTimeMillis() + diff)
+    }
+    private fun timeStringFromLong(time: Long): String {
+        val seconds = (time / 1000) % 60
+        val minutes = ((time / (1000 * 60)) % 60)
+        val hours = ((time / (1000 * 60 * 60)) % 24)
+        return makeTimeString(seconds, minutes, hours)
+
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+    private fun makeTimeString(seconds: Long, minutes: Long, hours: Long): String {
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds)
     }
-
-    override fun onLocationChanged(location: Location) {
+    enum class Active{
+        STOP, START
     }
 }

@@ -1,5 +1,7 @@
 package com.example.healthtracker.ui.home.running
 
+import android.app.Application
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,15 +15,14 @@ import java.util.Date
 import java.util.Timer
 import java.util.TimerTask
 
-class RunningDialogFragment: DialogFragment() {
+class RunningDialogFragment : DialogFragment() {
     private var _binding: RunningDialogBinding? = null
     private val binding get() = _binding!!
-    lateinit var timeHelper : TimeHelper
+    lateinit var timeHelper: TimeHelper
     private val timer = Timer()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        timeHelper= TimeHelper(requireContext())
         _binding = RunningDialogBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -36,37 +37,53 @@ class RunningDialogFragment: DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        timeHelper = TimeHelper(requireContext())
         binding.apply {
-
-            timer.apply {
-//                setProgressWithAnimation(it.toFloat())
-//                progressMax = 6000f
+            val inputTime = timerInput.text.toString().trim()
+            if (inputTime.isNotEmpty()) {
+                val (hours, minutes, seconds) = inputTime.split(":").map { it.trim().toLongOrNull() ?: 0 }
+                val durationMillis = (hours * 3600 + minutes * 60 + seconds) * 1000
+                timer.apply {
+                setProgressWithAnimation(durationMillis.toFloat())
+                progressMax = durationMillis.toFloat()
+                }
             }
+
             start.setOnClickListener {
+                Intent(requireContext(),RunningService::class.java).also {
+                    Log.d("Starting service", "Service start")
+                    it.action=RunningService.Active.START.toString()
+                    requireContext().startService(it)
+                }
                 startStopAction()
             }
             cancel.setOnClickListener {
+                Intent(requireContext(),RunningService::class.java).also {
+                    Log.d("Stopping service", "Service Stop")
+                    it.action=RunningService.Active.STOP.toString()
+                    requireContext().startService(it)
+                }
                 dismiss()
             }
             timerInput.apply {
                 visibility = GONE
             }
-            if (timeHelper.timerCounting()){
+            if (timeHelper.timerCounting()) {
                 startTimer()
-            }else{
+            } else {
                 stopTimer()
-                if(timeHelper.startTime()!=null && timeHelper.stopTime()!=null){
+                if (timeHelper.startTime() != null && timeHelper.stopTime() != null) {
                     val time = Date().time - restartTime().time
-                    timePicker.text= timeStringFromLong(time)
+                    timePicker.text = timeStringFromLong(time)
                 }
             }
         }
         timer.scheduleAtFixedRate(TimeTask(), 0, 500)
     }
 
-    private inner class TimeTask:TimerTask(){
+    private inner class TimeTask : TimerTask() {
         override fun run() {
-            if (timeHelper.timerCounting()){
+            if (timeHelper.timerCounting()) {
                 val time = Date().time - timeHelper.startTime()!!.time
                 activity?.runOnUiThread {
                     binding.timePicker.text = timeStringFromLong(time)
@@ -75,38 +92,41 @@ class RunningDialogFragment: DialogFragment() {
         }
 
     }
+
     private fun startStopAction() {
-        if (timeHelper.timerCounting()){
+        if (timeHelper.timerCounting()) {
             timeHelper.setStopTime(Date())
+
             stopTimer()
-        }else{
-            if (timeHelper.stopTime()!=null){
+        } else {
+            if (timeHelper.stopTime() != null) {
                 timeHelper.setStartTime(restartTime())
                 timeHelper.setStopTime(null)
-            }else{
+            } else {
                 timeHelper.setStartTime(Date())
             }
+
             startTimer()
         }
     }
 
     private fun restartTime(): Date {
         val diff = timeHelper.startTime()!!.time - timeHelper.stopTime()!!.time
-        return Date(System.currentTimeMillis()+diff)
+        return Date(System.currentTimeMillis() + diff)
     }
 
-    private fun resetTimer(){
+    private fun resetTimer() {
         timeHelper.setStartTime(null)
         timeHelper.setStopTime(null)
         stopTimer()
         binding.timePicker.text = timeStringFromLong(0)
     }
 
-    private fun timeStringFromLong(time:Long): String{
-            val seconds = (time/1000)%60
+    private fun timeStringFromLong(time: Long): String {
+        val seconds = (time / 1000) % 60
         val minutes = ((time / (1000 * 60)) % 60)
         val hours = ((time / (1000 * 60 * 60)) % 24)
-        return makeTimeString(seconds,minutes,hours)
+        return makeTimeString(seconds, minutes, hours)
 
     }
 
@@ -118,6 +138,7 @@ class RunningDialogFragment: DialogFragment() {
         timeHelper.setTimerCounting(true)
         binding.start.text = getString(R.string.stop)
     }
+
     private fun stopTimer() {
         timeHelper.setTimerCounting(false)
         binding.start.text = getString(R.string.start)

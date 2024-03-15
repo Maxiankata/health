@@ -5,9 +5,12 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.Log
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
@@ -31,6 +34,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -49,6 +54,7 @@ class MainActivity : AppCompatActivity() {
             mainViewModel.getUser()
             mainViewModel.syncCloud()
         }
+        buildActivityNotification()
         buildNotification()
     }
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -68,6 +74,29 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+
+    override fun onPause() {
+        super.onPause()
+        lifecycleScope.launch {
+            UserMegaInfo.currentUser.value?.userAutomaticInfo?.let {
+                mainViewModel.leftWindow(it)
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        lifecycleScope.launch {
+            UserMegaInfo.currentUser.value?.userAutomaticInfo?.let {
+                mainViewModel.joinedWindow(it)
+            }
+        }
+    }
+
+
+
+
     private fun buildNotification() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.friends)
@@ -80,6 +109,20 @@ class MainActivity : AppCompatActivity() {
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
             Log.d("NOTIFICATION CHANNEL BUILT", channel.toString())
+        }
+    }
+    private fun buildActivityNotification() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            val channel = NotificationChannel(
+                "running_channel",
+                "Running Notification",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+            Log.d("Notification Built", channel.toString())
         }
     }
 
