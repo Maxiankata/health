@@ -34,7 +34,6 @@ import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.FileNotFoundException
 import java.io.IOException
-import java.time.LocalDateTime
 import java.util.Date
 
 fun navigateToActivity(currentActivity: Activity, targetActivityClass: Class<*>) {
@@ -86,21 +85,25 @@ fun FragmentActivity.showBottomNav() {
         visibility = View.VISIBLE
     }
 }
+
 fun FragmentActivity.showLoading() {
     findViewById<RelativeLayout>(R.id.loadingPanel).apply {
         visibility = View.VISIBLE
     }
 }
+
 fun FragmentActivity.hideLoading() {
     findViewById<RelativeLayout>(R.id.loadingPanel).apply {
         visibility = View.GONE
     }
 }
+
 fun FragmentActivity.showMainLoading() {
     findViewById<RelativeLayout>(R.id.loadingPanelMain).apply {
         visibility = View.VISIBLE
     }
 }
+
 fun FragmentActivity.hideMainLoading() {
     findViewById<RelativeLayout>(R.id.loadingPanelMain).apply {
         visibility = View.GONE
@@ -178,6 +181,7 @@ fun DataSnapshot.toUserSettingsInfo(): UserSettingsInfo {
         units = child("units").getValue(String::class.java) ?: ""
     )
 }
+
 @RequiresApi(Build.VERSION_CODES.O)
 fun DataSnapshot.toUserDays(): UserDays {
     return UserDays(
@@ -191,8 +195,6 @@ fun DataSnapshot.toStepsInfo(): StepsInfo {
     return StepsInfo(
         totalSteps = child("totalSteps").getValue(Int::class.java),
         totalCalories = child("totalCalories").getValue(Int::class.java),
-        onLeaveSteps = child("onLeaveSteps").getValue(Int::class.java),
-        onLogSteps = child("onLogSteps").getValue(Int::class.java),
         currentSteps = child("currentSteps").getValue(Int::class.java),
         currentCalories = child("currentCalories").getValue(Int::class.java)
     )
@@ -205,6 +207,7 @@ fun DataSnapshot.toUserFriendsList(): List<UserInfo> {
     }
     return userFriendsList
 }
+
 @RequiresApi(Build.VERSION_CODES.O)
 fun DataSnapshot.toUserDaysList(): List<UserDays> {
     val userDaysList = mutableListOf<UserDays>()

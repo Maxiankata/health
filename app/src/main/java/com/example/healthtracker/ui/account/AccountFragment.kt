@@ -47,9 +47,9 @@ class AccountFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val dialog = FriendsDialogFragment()
-        viewLifecycleOwner.lifecycleScope.launch {
+        lifecycleScope.launch {
             val user = accountViewModel.getWholeUser()
-
+            Log.d("USER TAKEN", user?.userInfo.toString())
             val photo = user?.userInfo?.image
             if (photo != null && photo != "") {
                 binding.profilePhoto.setImageBitmap(base64ToBitmap(photo))
@@ -60,6 +60,8 @@ class AccountFragment : Fragment() {
                 binding.profilePhoto.setBackgroundResource(R.drawable.circle_background)
 
             }
+            val userName = user?.userInfo?.username
+            binding.username.text = userName
         }
 
         val pickImage = registerForActivityResult(StartActivityForResult()) { result ->
@@ -71,12 +73,6 @@ class AccountFragment : Fragment() {
                 }
             }
             onActivityResult(result.data)
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            val user = accountViewModel.getWholeUser()
-            val userName = user?.userInfo?.username
-            binding.username.text = userName
         }
 
         binding.apply {
@@ -131,7 +127,6 @@ class AccountFragment : Fragment() {
                 lifecycleScope.launch {
                     uriToBitmap(contentResolver, resultUri)?.let {
                         accountViewModel.saveBitmapToDatabase(it)
-                        accountViewModel.getUser()
                     }
                 }
             }

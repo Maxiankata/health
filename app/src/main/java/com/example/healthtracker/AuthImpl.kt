@@ -52,7 +52,6 @@ class AuthImpl : AuthInterface {
     override suspend fun signOut() {
         withContext(Dispatchers.IO) {
             Firebase.auth.signOut()
-            UserMegaInfo.clearCurrentUser()
         }
     }
 

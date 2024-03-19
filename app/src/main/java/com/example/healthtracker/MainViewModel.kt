@@ -19,14 +19,6 @@ class MainViewModel(private val application: Application):AndroidViewModel(appli
     private var fromRoomAdapter= RoomToUserMegaInfoAdapter()
     private var toRoomAdapter = UserMegaInfoToRoomAdapter()
 
-    suspend fun getUser(){
-        viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                val user = userDao.getEntireUser()
-                user?.let { fromRoomAdapter.adapt(it) }?.let { UserMegaInfo.setCurrentUser(it) }
-            }
-        }
-    }
     suspend fun syncCloud(){
         viewModelScope.launch {
             withContext(Dispatchers.IO){

@@ -14,9 +14,6 @@ import com.example.healthtracker.data.user.UserSettingsInfo
 interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveUser(userMegaInfoEntity: UserData)
-//    @Query("SELECT userAutomaticInfo, userPutInInfo FROM UserData WHERE userId=:userId")
-//    fun getStatistics(userId: Int): Pair<List<UserAutomaticInfo>, List<UserPutInInfo>>?
-
     @Query("SELECT * FROM UserData")
     fun getEntireUser(): UserData?
     @Query("DELETE FROM UserData")
@@ -37,6 +34,8 @@ interface UserDao {
     fun updateUserPutInInfo(updatedUserPutInInfo: UserPutInInfo)
     @Query("UPDATE UserData SET userAutomaticInfo = :updatedUserAutomaticInfo")
     fun updateUserAutomaticInfo(updatedUserAutomaticInfo: UserAutomaticInfo)
+    @Query("UPDATE UserData SET userSettingsInfo = :updatedUserSettingsInfo")
+    fun updateUserSettings(updatedUserSettingsInfo: UserSettingsInfo)
     @Query("UPDATE UserData SET UserInfo = :updatedUserInfo")
     suspend fun updateImage( updatedUserInfo: UserInfo)
 

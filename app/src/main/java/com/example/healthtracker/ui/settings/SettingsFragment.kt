@@ -55,13 +55,21 @@ class SettingsFragment : Fragment() {
                 requireActivity().supportFragmentManager.popBackStack()
             }
             rgbPickerDialogBinding.pick.setOnClickListener {
-                val user = UserMegaInfo.currentUser.value
-                user?.userInfo = UserInfo(theme = setRgbColor())
-                Log.d("User Background Color", user?.userInfo?.theme.toString())
-                if (user != null) {
-                    UserMegaInfo.setCurrentUser(user)
+                lifecycleScope.launch {
+                    val user = settingsViewModel.getUser()
+                    if (user!=null){
+                        user.userInfo = UserInfo(
+                            username = user.userInfo.username,
+                            uid = user.userInfo.uid,
+                            image= user.userInfo.image,
+                            mail= user.userInfo.mail,
+                            bgImage = user.userInfo.bgImage,
+                            theme = setRgbColor())
+                        Log.d("User Background Color", user.userInfo?.theme.toString())
+                        settingsViewModel.updateUser(user)
+                    }
+                    rgbDialog.dismiss()
                 }
-                rgbDialog.dismiss()
             }
             setOnSeekBar(
                 "R",

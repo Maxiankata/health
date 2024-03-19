@@ -27,10 +27,6 @@ class LoginFragmentViewModel(private val application: Application): AndroidViewM
                 withContext(Dispatchers.IO) {
                     toRoomAdapter.adapt(it)?.let { it1 ->
                         userDao.saveUser(it1)
-                        userDao.getEntireUser()
-                            ?.let { it2 -> fromRoomAdapter.adapt(it2) }
-                            ?.let { it3 -> UserMegaInfo.setCurrentUser(it3)
-                            }
                     }
                 }
             }

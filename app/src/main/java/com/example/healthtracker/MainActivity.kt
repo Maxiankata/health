@@ -3,14 +3,12 @@ package com.example.healthtracker
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.Log
-import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
@@ -19,9 +17,8 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.room.Room
 import com.example.healthtracker.data.room.UserDB
-import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.databinding.ActivityMainBinding
-import com.example.healthtracker.ui.home.walking.WalkViewModel
+import com.example.healthtracker.ui.home.walking.StepCounterService
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
 
@@ -29,13 +26,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mainViewModel: MainViewModel
     private lateinit var binding: ActivityMainBinding
-    private val walkViewModel: WalkViewModel by viewModels()
     private val channelID = "friend_channel"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -46,56 +40,19 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
             )
         )
-//        walkViewModel.setupDailyTask()
+        val intent = Intent(this, StepCounterService::class.java)
+        Log.d("intent", intent.toString())
+        startService(intent)
+        Log.d("starting intent", startService(intent).toString())
+        startStepCounterService()
         supportActionBar?.hide()
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
         lifecycleScope.launch {
-            mainViewModel.getUser()
             mainViewModel.syncCloud()
         }
-        buildActivityNotification()
         buildNotification()
     }
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        lifecycleScope.launch {
-
-            if (hasFocus) {
-                UserMegaInfo.currentUser.value?.userAutomaticInfo?.let {
-                    mainViewModel.joinedWindow(it)
-                }
-
-            } else {
-                UserMegaInfo.currentUser.value?.userAutomaticInfo?.let {
-                    mainViewModel.leftWindow(it)
-                }
-            }
-        }
-    }
-
-
-
-    override fun onPause() {
-        super.onPause()
-        lifecycleScope.launch {
-            UserMegaInfo.currentUser.value?.userAutomaticInfo?.let {
-                mainViewModel.leftWindow(it)
-            }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        lifecycleScope.launch {
-            UserMegaInfo.currentUser.value?.userAutomaticInfo?.let {
-                mainViewModel.joinedWindow(it)
-            }
-        }
-    }
-
-
-
 
     private fun buildNotification() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -111,21 +68,12 @@ class MainActivity : AppCompatActivity() {
             Log.d("NOTIFICATION CHANNEL BUILT", channel.toString())
         }
     }
-    private fun buildActivityNotification() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
-            val channel = NotificationChannel(
-                "running_channel",
-                "Running Notification",
-                NotificationManager.IMPORTANCE_HIGH
-            )
-            val notificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-            Log.d("Notification Built", channel.toString())
-        }
+    fun startStepCounterService() {
+        val serviceIntent = Intent(this, StepCounterService::class.java)
+        ContextCompat.startForegroundService(this, serviceIntent)
+        Log.d("starting stepper" ,ContextCompat.startForegroundService(this, serviceIntent)
+            .toString())
     }
-
     companion object {
         private lateinit var db: UserDB
         fun getDatabaseInstance(context: Context): UserDB {

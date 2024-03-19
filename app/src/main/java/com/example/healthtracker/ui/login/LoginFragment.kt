@@ -54,12 +54,14 @@ class LoginFragment : Fragment() {
                                     usernameInput.text.toString(), passwordInput.text.toString()
                                 )
                             ) {
-                                val intent = Intent(context, MainActivity::class.java)
-                                startActivity(intent)
-                                loginFragmentViewModel.getUser().also {
-                                    requireActivity().hideLoading()
+                                lifecycleScope.launch {
+                                    loginFragmentViewModel.getUser().also {
+                                        requireActivity().hideLoading()
+                                        val intent = Intent(context, MainActivity::class.java)
+                                        startActivity(intent)
+                                        activity?.finish()
+                                    }
                                 }
-                                activity?.finish()
                             } else if (isInternetAvailable(context)) {
                                 Toast.makeText(
                                     context,

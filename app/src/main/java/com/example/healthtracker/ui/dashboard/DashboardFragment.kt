@@ -7,9 +7,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.FragmentDashboardBinding
 import com.example.healthtracker.ui.showBottomNav
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -35,7 +37,9 @@ class DashboardFragment : Fragment() {
                 val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                 val formattedDate = dateFormat.format(selectedDate.time)
                 Toast.makeText(requireContext(), "Selected date: $formattedDate", Toast.LENGTH_SHORT).show()
-                dashboardViewModel.feedDay(selectedDate.time)
+                lifecycleScope.launch {
+                    dashboardViewModel.feedDay(selectedDate.time)
+                }
                 dashboardViewModel.userDay.observe(viewLifecycleOwner){
                     date.apply {
                         text = buildString {

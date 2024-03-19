@@ -5,20 +5,26 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.healthtracker.MainActivity
 import com.example.healthtracker.data.user.UserDays
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.WaterInfo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.lang.Appendable
 import java.util.Date
 
 class DashboardViewModel(private val application: Application) : AndroidViewModel(application) {
-    val user = UserMegaInfo.currentUser
+    val userDao= MainActivity.getDatabaseInstance(application).dao()
     private var _userDay = MutableLiveData<UserDays?>()
     val userDay : LiveData<UserDays?> get() = _userDay
-    fun feedDay(date:Date){
-        for (item in user.value?.userDays!!){
-            if (date==item.dateTime){
-                _userDay.postValue(item)
+    suspend fun feedDay(date:Date){
+        withContext(Dispatchers.IO) {
+            val user = userDao.getEntireUser()
+            for (item in user?.userDays!!) {
+                if (date == item.dateTime) {
+                    _userDay.postValue(item)
+                }
             }
         }
     }

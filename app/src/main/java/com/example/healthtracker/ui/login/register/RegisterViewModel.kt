@@ -31,9 +31,6 @@ class RegisterViewModel(private val application: Application) : AndroidViewModel
                         userDao.saveUser(it1)
                         userDao.getEntireUser()
                             ?.let { it2 -> fromRoomAdapter.adapt(it2) }
-                            ?.let { it3 -> UserMegaInfo.setCurrentUser(it3)
-                                Log.d("new get user from login", UserMegaInfo.setCurrentUser(it3).toString())
-                            }
                     }
                 }
             }
