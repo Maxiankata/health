@@ -14,6 +14,7 @@ import com.example.healthtracker.AuthImpl
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
 import com.example.healthtracker.data.room.UserMegaInfoToRoomAdapter
+import com.example.healthtracker.data.user.UserGoals
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.UserPutInInfo
 import com.example.healthtracker.data.user.UserSettingsInfo
@@ -22,10 +23,11 @@ import com.example.healthtracker.ui.home.running.RunningSensorListener
 import com.example.healthtracker.ui.home.walking.StepCounterService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 class HomeViewModel(private val application: Application) : AndroidViewModel(application) {
-    private val userDao = MainActivity.getDatabaseInstance(application.applicationContext).dao()
+    private val userDao = MainActivity.getDatabaseInstance().dao()
 
     private val _currentService: MutableLiveData<SensorEventListener> = MutableLiveData()
     val currentService: LiveData<SensorEventListener> get() = _currentService
@@ -44,34 +46,20 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
         withContext(Dispatchers.IO) {
             val user = userDao.getEntireUser()?.let { roomToUserMegaInfoAdapter.adapt(it) }
             _water.postValue(user?.userPutInInfo?.waterInfo)
-            _user.postValue(user)
-        }
-    }
-
-    suspend fun syncMetrics() {
-        withContext(Dispatchers.IO) {
-            val user = userDao.getEntireUser()
-            if (user?.userSettingsInfo?.units == "" || user?.userSettingsInfo?.units == "") {
-                val settings = UserSettingsInfo(
-                    language = "english", units = "kg"
-                )
-                userDao.updateUserSettings(settings)
-                if (isInternetAvailable(application)) {
-                    viewModelScope.launch {
-                        auth.sync(roomToUserMegaInfoAdapter.adapt(user))
-                    }
-                } else {
-                    Log.d(
-                        "cant sync metrics, no internet",
-                        isInternetAvailable(application).toString()
-                    )
-                }
+            Log.d("water col", _water.value.toString())
+            runBlocking {
+                _user.postValue(user)
             }
         }
     }
 
     suspend fun getUser(): UserMegaInfo? {
-        return auth.getCurrentUser()
+        return withContext(Dispatchers.IO) {
+            val user = userDao.getEntireUser()
+            user?.let {
+                roomToUserMegaInfoAdapter.adapt(it)
+            }
+        }
     }
 
     suspend fun syncToFireBase(userMegaInfo: UserMegaInfo) {
@@ -83,7 +71,6 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
         withContext(Dispatchers.IO) {
             if (_water.value != null) {
                     val newWater = WaterInfo(
-                        waterGoal = _water.value!!.waterGoal,
                         waterCompletion = _water.value!!.waterCompletion,
                         currentWater = _water.value!!.currentWater?.plus(incrementation)
                     )
@@ -91,17 +78,15 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
                     val userWeight = userDao.getEntireUser()?.userPutInInfo?.weight
                     val newPutInInfo = UserPutInInfo(waterInfo = newWater, weight = userWeight)
                     userDao.updateUserPutInInfo(newPutInInfo)
-                if (_water.value!!.currentWater!! >= _water.value!!.waterGoal!!){
+                if (_water.value!!.currentWater!! >= _user.value!!.userSettingsInfo!!.userGoals.waterGoal!!){
                     val newerWater = WaterInfo(
-                        waterGoal = _water.value!!.waterGoal,
                         waterCompletion = true,
                         currentWater = _water.value!!.currentWater
                     )
                     _water.postValue(newerWater)
                     Log.d("Water check", _water.value.toString())
-                } else if(_water.value!!.currentWater!! < _water.value!!.waterGoal!!){
+                } else if(_water.value!!.currentWater!! < _user.value!!.userSettingsInfo!!.userGoals.waterGoal!!){
                     val newerWater = WaterInfo(
-                        waterGoal = _water.value!!.waterGoal,
                         waterCompletion = true,
                         currentWater = _water.value!!.currentWater
                     )

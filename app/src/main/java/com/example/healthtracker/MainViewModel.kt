@@ -15,7 +15,7 @@ import kotlinx.coroutines.withContext
 
 class MainViewModel(private val application: Application):AndroidViewModel(application) {
     private val auth = AuthImpl.getInstance()
-    private val userDao = MainActivity.getDatabaseInstance(application.applicationContext).dao()
+    private val userDao = MainActivity.getDatabaseInstance().dao()
     private var fromRoomAdapter= RoomToUserMegaInfoAdapter()
     private var toRoomAdapter = UserMegaInfoToRoomAdapter()
 

@@ -18,7 +18,6 @@ class RunningService:Service() {
         when(intent?.action){
             Active.START.toString()-> start()
                 Active.STOP.toString()-> stopSelf()
-
         }
         return super.onStartCommand(intent, flags, startId)
     }

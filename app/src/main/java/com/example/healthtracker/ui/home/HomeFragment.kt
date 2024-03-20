@@ -30,7 +30,6 @@ class HomeFragment : Fragment() {
     private val weightRecyclerAdapter: WeightRecyclerAdapter = WeightRecyclerAdapter()
     private lateinit var speedTracker: RunningSensorListener
     private var stepCount: LiveData<Int> = StepCounterService.steps
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -44,44 +43,65 @@ class HomeFragment : Fragment() {
         lifecycleScope.launch {
             speedTracker = RunningSensorListener(requireContext())
             homeViewModel.feedUser()
-            homeViewModel.syncMetrics()
-
         }
 
         val weightRecyclerVal = WeightRecyclerAdapter()
         weightRecyclerAdapter.updateItems(Weight.weight.toList())
         binding.apply {
             stepCount.observe(viewLifecycleOwner) { steps ->
-                stepsCircularProgressBar.apply {
-//                    setProgressWithAnimation(steps.toFloat())
-                    progressMax = 6000f
-                }
-                calorieCount.text = buildString {
-                    append(getString(R.string.calories))
-                    append(steps)
-                }
-                caloriesProgressBar.apply {
-//                    setProgressWithAnimation(steps.toFloat())
-                    progressMax = 240f
-                }
-                stepcount.apply {
-                    text = buildString {
-                        append(getString(R.string.steps))
-                        append(steps)
+                if (steps == null) {
+                    Log.d("wait for it :)", "i swear")
+                } else {
+                    lifecycleScope.launch {
+                        val user = homeViewModel.user.value
+
+                        stepsCircularProgressBar.apply {
+                            val steppi = user?.userAutomaticInfo?.steps?.stepGoal?.toFloat()
+                            setProgressWithAnimation(steps.toFloat())
+                            steppi?.let {
+                                progressMax = steppi
+                            }?.run {
+                                progressMax=6000F
+                            }
+                        }
+                        stepcount.apply {
+                            text = buildString {
+                                append(getString(R.string.steps))
+                                append(steps)
+                            }
+                        }
+
+                        binding.calorieCount.text = buildString {
+                            append(getString(R.string.calories))
+                            append(steps / 25)
+                        }
+                        binding.caloriesProgressBar.apply {
+                            val calori = user?.userAutomaticInfo?.steps?.calorieGoal?.toFloat()
+                            setProgressWithAnimation((steps / 25).toFloat())
+                            calori?.let {
+                                progressMax = calori
+                            }
+                        }
                     }
                 }
             }
+
             homeViewModel.water.observe(viewLifecycleOwner) {
+                val user = homeViewModel.user.value
                 textView2.text = buildString {
                     if (it != null) {
                         if (it.currentWater != null && it.currentWater != 0) {
+                            Log.d("water isnt null and isnt 0", it.currentWater.toString())
                             append(it.currentWater)
                         } else {
+                            Log.d("water is null", it.currentWater.toString())
                             append(0)
                         }
+                    } else {
+                        Log.d("water is null and isnt 0", it.toString())
                     }
                     append("/")
-                    append(it?.waterGoal ?: 6)
+                    append(user?.userSettingsInfo?.userGoals?.waterGoal ?: 6)
                 }
             }
             plus.setOnClickListener {
@@ -106,8 +126,7 @@ class HomeFragment : Fragment() {
                 }
                 val runDialog = RunningDialogFragment()
                 runDialog.show(
-                    requireActivity().supportFragmentManager,
-                    "cycling dialog"
+                    requireActivity().supportFragmentManager, "cycling dialog"
                 )
             }
             hikingLayout.setOnClickListener {
@@ -123,8 +142,7 @@ class HomeFragment : Fragment() {
                 }
                 val runDialog = RunningDialogFragment()
                 runDialog.show(
-                    requireActivity().supportFragmentManager,
-                    "power walking dialog"
+                    requireActivity().supportFragmentManager, "power walking dialog"
                 )
             }
 
@@ -154,7 +172,7 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                val dao = MainActivity.getDatabaseInstance(requireContext()).dao().getEntireUser()
+                val dao = MainActivity.getDatabaseInstance().dao().getEntireUser()
                 val converter = RoomToUserMegaInfoAdapter()
                 if (dao != null) {
                     homeViewModel.syncToFireBase(converter.adapt(dao))

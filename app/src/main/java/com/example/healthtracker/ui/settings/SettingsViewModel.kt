@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SettingsViewModel(private val application: Application) : AndroidViewModel(application) {
-    private val userDao = MainActivity.getDatabaseInstance(application.applicationContext).dao()
+    private val userDao = MainActivity.getDatabaseInstance().dao()
     private val auth = AuthImpl.getInstance()
     private val roomToUserMegaInfoAdapter = RoomToUserMegaInfoAdapter()
 

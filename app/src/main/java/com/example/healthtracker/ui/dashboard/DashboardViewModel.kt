@@ -15,7 +15,7 @@ import java.lang.Appendable
 import java.util.Date
 
 class DashboardViewModel(private val application: Application) : AndroidViewModel(application) {
-    val userDao= MainActivity.getDatabaseInstance(application).dao()
+    val userDao= MainActivity.getDatabaseInstance().dao()
     private var _userDay = MutableLiveData<UserDays?>()
     val userDay : LiveData<UserDays?> get() = _userDay
     suspend fun feedDay(date:Date){

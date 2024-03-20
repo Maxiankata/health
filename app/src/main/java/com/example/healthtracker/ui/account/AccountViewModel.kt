@@ -15,6 +15,7 @@ import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.ui.bitmapToBase64
+import com.example.healthtracker.ui.home.walking.StepCounterService
 import com.example.healthtracker.ui.isInternetAvailable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,20 +25,21 @@ import kotlin.coroutines.coroutineContext
 
 class AccountViewModel(private val application: Application) : AndroidViewModel(application) {
     private val auth = AuthImpl.getInstance()
-    private val userDao = MainActivity.getDatabaseInstance(application.applicationContext).dao()
+    private val userDao = MainActivity.getDatabaseInstance().dao()
     private val roomToUserMegaInfoAdapter = RoomToUserMegaInfoAdapter()
     suspend fun signOut() {
+        val stepCounterService = StepCounterService()
         viewModelScope.launch {
             auth.signOut()
             withContext(Dispatchers.IO){
                 userDao.dropUser()
+//                stepCounterService.stopSelf()
             }
         }
     }
     suspend fun saveBitmapToDatabase(bitmap: Bitmap) {
         withContext(Dispatchers.IO) {
-
-            val user = userDao.getEntireUser()?.let { roomToUserMegaInfoAdapter.adapt(it) }?.userInfo?.let {
+            userDao.getEntireUser()?.let { roomToUserMegaInfoAdapter.adapt(it) }?.userInfo?.let {
                 val newImageInfo =
                     UserInfo(it.username, it.uid, bitmapToBase64(bitmap), it.mail, it.theme, it.bgImage)
                 it.let {

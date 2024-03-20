@@ -18,9 +18,14 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.room.Room
 import com.example.healthtracker.data.room.UserDB
 import com.example.healthtracker.databinding.ActivityMainBinding
+import com.example.healthtracker.ui.home.walking.AlarmItem
+import com.example.healthtracker.ui.home.walking.AlarmScheduler
+import com.example.healthtracker.ui.home.walking.Alarmer
 import com.example.healthtracker.ui.home.walking.StepCounterService
+import com.example.healthtracker.ui.startStepCounterService
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 class MainActivity : AppCompatActivity() {
 
@@ -40,11 +45,14 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
             )
         )
-        val intent = Intent(this, StepCounterService::class.java)
-        Log.d("intent", intent.toString())
-        startService(intent)
-        Log.d("starting intent", startService(intent).toString())
+//        val intent = Intent(this, StepCounterService::class.java)
+//        startService(intent)
+
         startStepCounterService()
+
+        val item = AlarmItem(LocalDateTime.now(),"lols")
+        val alarmer = Alarmer()
+        alarmer.schedule(item)
         supportActionBar?.hide()
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
@@ -68,15 +76,13 @@ class MainActivity : AppCompatActivity() {
             Log.d("NOTIFICATION CHANNEL BUILT", channel.toString())
         }
     }
-    fun startStepCounterService() {
-        val serviceIntent = Intent(this, StepCounterService::class.java)
-        ContextCompat.startForegroundService(this, serviceIntent)
-        Log.d("starting stepper" ,ContextCompat.startForegroundService(this, serviceIntent)
-            .toString())
-    }
+
+
+
     companion object {
         private lateinit var db: UserDB
-        fun getDatabaseInstance(context: Context): UserDB {
+        fun getDatabaseInstance(): UserDB {
+            val context = MyApplication.getContext()
             if (!::db.isInitialized) {
                 db = Room.databaseBuilder(
                     context.applicationContext, UserDB::class.java, "user-base"

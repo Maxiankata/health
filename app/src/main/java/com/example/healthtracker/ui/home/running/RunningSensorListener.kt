@@ -66,7 +66,7 @@ class RunningSensorListener(private val context: Context) : SensorEventListener,
                     event.values[1],
                     event.values[2],
                 )
-//                Log.d("SpeedTracker", "Acceleration: $linearAcceleration")
+                Log.d("SpeedTracker", "Acceleration: $linearAcceleration")
 
                 lastAccelerationUpdateTime = currentTime
             }

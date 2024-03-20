@@ -3,6 +3,7 @@ package com.example.healthtracker.data.room
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.healthtracker.data.user.UserGoals
 import com.example.healthtracker.data.user.UserAutomaticInfo
 import com.example.healthtracker.data.user.UserDays
 import com.example.healthtracker.data.user.UserInfo
@@ -17,6 +18,6 @@ data class UserData(
     @ColumnInfo(name = "userAutomaticInfo") val userAutomaticInfo: UserAutomaticInfo?,
     @ColumnInfo(name = "userPutInInfo") val userPutInInfo: UserPutInInfo?,
     @ColumnInfo(name = "userFriends") val userFriends: List<UserInfo>?,
-    @ColumnInfo(name = "userDays") val userDays:List<UserDays>?
+    @ColumnInfo(name = "userDays") val userDays:List<UserDays>?,
 )
 

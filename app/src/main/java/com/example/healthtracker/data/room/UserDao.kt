@@ -29,6 +29,8 @@ interface UserDao {
 
     @Query("SELECT userPutInInfo FROM UserData")
     fun getPutInInfo(): UserPutInInfo?
+//    @Query ("SELECT userDays FROM UserData")
+//    suspend fun getUserDays(): List<UserDays>
 
     @Query("UPDATE UserData SET userPutInInfo = :updatedUserPutInInfo")
     fun updateUserPutInInfo(updatedUserPutInInfo: UserPutInInfo)
@@ -41,7 +43,7 @@ interface UserDao {
 
     @Query("UPDATE UserData SET userAutomaticInfo = NULL")
     suspend fun wipeUserAutomaticInfo()
-    @Query("UPDATE UserData SET userAutomaticInfo = NULL")
+    @Query("UPDATE UserData SET userPutInInfo = NULL")
     suspend fun wipeUserPutInInfo()
     @Query ("UPDATE UserData SET userDays= :updatedUserDays")
     suspend fun updateDays(updatedUserDays: List<UserDays>)

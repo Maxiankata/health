@@ -1,5 +1,6 @@
 package com.example.healthtracker.ui.home.walking
 
+import android.app.AlarmManager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -26,6 +27,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDateTime
+import java.util.Calendar
 
 class StepCounterService : Service(), SensorEventListener {
     companion object {
@@ -36,14 +39,17 @@ class StepCounterService : Service(), SensorEventListener {
     private val channelId = "step_counter_channel"
     private var sensorManager: SensorManager? = null
 
-    private val userDao = MainActivity.getDatabaseInstance(this).dao()
+    private val userDao = MainActivity.getDatabaseInstance().dao()
     private val customCoroutineScope = CoroutineScope(Dispatchers.Main)
+//    val alarmManagerHelper : DailyAlarm = DailyAlarm()
 
     private suspend fun getUserSteps() {
         return withContext(Dispatchers.IO) {
-            val userStepsInfo = userDao.getAutomaticInfo()
-            userStepsInfo?.steps?.currentSteps?.let {
-                _steps.postValue(it)
+            userDao.getAutomaticInfo().let {
+                it?.steps?.currentSteps.let {
+                        it1->
+                    _steps.postValue(it1?:0)
+                }
             }
         }
     }
@@ -53,14 +59,15 @@ class StepCounterService : Service(), SensorEventListener {
         withContext(Dispatchers.IO) {
             val steps = _steps.value
             val user = userDao.getEntireUser()
-            user?.userAutomaticInfo?.let {
+            user?.userAutomaticInfo.let {
                 val renewedAutomaticInfo = UserAutomaticInfo(
-                    challengesPassed = it.challengesPassed,
-                    totalSleepHours = it.totalSleepHours,
-                    steps = it.steps?.copy(currentSteps = steps)
+                    challengesPassed = it?.challengesPassed?:0,
+                    totalSleepHours = it?.totalSleepHours?:0.0,
+                    steps = it?.steps?.copy(currentSteps = steps)
                 )
                 userDao.updateUserAutomaticInfo(renewedAutomaticInfo)
             }
+            Log.d("Running updater", "")
         }
     }
 
@@ -70,6 +77,8 @@ class StepCounterService : Service(), SensorEventListener {
         customCoroutineScope.launch {
             getUserSteps()
         }
+        Log.d("Local date", LocalDateTime.now().toString())
+//        alarmManagerHelper.setDailyAlarm()
         handler = Handler(Looper.getMainLooper())
         handler?.post(object : Runnable {
             override fun run() {
@@ -103,13 +112,14 @@ class StepCounterService : Service(), SensorEventListener {
     }
 
     private fun createNotification(): Notification {
-        val notificationIntent = Intent(this, MainActivity::class.java) // Replace with your activity class
+        val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
         val currentSteps = _steps.value ?: 0
         val builder = NotificationCompat.Builder(this, channelId).setSmallIcon(R.drawable.running_icon)
                 .setContentTitle(getString(R.string.total_steps))
                 .setContentText("$currentSteps Steps").setContentIntent(pendingIntent)
                 .setOngoing(true)
+            .setSound(null)
         return builder.build()
     }
 
@@ -129,7 +139,9 @@ class StepCounterService : Service(), SensorEventListener {
             }
         }
     }
-
+    fun nullifySteps(){
+        _steps.postValue(0)
+    }
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
 
     }

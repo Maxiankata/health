@@ -4,6 +4,7 @@ import androidx.room.TypeConverter
 import com.example.healthtracker.data.user.StepsInfo
 import com.example.healthtracker.data.user.UserAutomaticInfo
 import com.example.healthtracker.data.user.UserDays
+import com.example.healthtracker.data.user.UserGoals
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.UserPutInInfo
@@ -55,7 +56,15 @@ class GsonTypeConverter {
     fun toUserPutInInfo(userPutInInfoString: String?): UserPutInInfo? {
         return gson.fromJson(userPutInInfoString, UserPutInInfo::class.java)
     }
+    @TypeConverter
+    fun fromUserGoals(userGoals: UserGoals?): String? {
+        return gson.toJson(userGoals)
+    }
 
+    @TypeConverter
+    fun toUserGoals(userGoalsString: String?): UserGoals? {
+        return gson.fromJson(userGoalsString, UserGoals::class.java)
+    }
     @TypeConverter
     fun fromWaterInfo(waterInfo: WaterInfo?): String? {
         return gson.toJson(waterInfo)
@@ -105,13 +114,5 @@ class GsonTypeConverter {
         val listType = object : TypeToken<List<UserDays>>(){}.type
         return gson.fromJson(userDaysListString,listType)
     }
-//    @TypeConverter
-//    fun fromDate(value: Long?): Date? {
-//        return if (value == null) null else Date(value)
-//    }
-//
-//    @TypeConverter
-//    fun toDate(date: Date?): Long? {
-//        return date?.time
-//    }
+
 }

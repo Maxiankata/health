@@ -15,7 +15,7 @@ import okhttp3.internal.wait
 
 class RegisterViewModel(private val application: Application) : AndroidViewModel(application) {
     private val auth = AuthImpl.getInstance()
-    private val userDao = MainActivity.getDatabaseInstance(application.applicationContext).dao()
+    private val userDao = MainActivity.getDatabaseInstance().dao()
     private var toRoomAdapter= UserMegaInfoToRoomAdapter()
     private var fromRoomAdapter= RoomToUserMegaInfoAdapter()
 
