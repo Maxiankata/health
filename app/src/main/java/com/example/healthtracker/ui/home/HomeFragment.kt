@@ -56,7 +56,7 @@ class HomeFragment : Fragment() {
                         val user = homeViewModel.user.value
 
                         stepsCircularProgressBar.apply {
-                            val steppi = user?.userAutomaticInfo?.steps?.stepGoal?.toFloat()
+                            val steppi = user?.userSettingsInfo?.userGoals?.stepGoal?.toFloat()
                             setProgressWithAnimation(steps.toFloat())
                             steppi?.let {
                                 progressMax = steppi
@@ -76,10 +76,12 @@ class HomeFragment : Fragment() {
                             append(steps / 25)
                         }
                         binding.caloriesProgressBar.apply {
-                            val calori = user?.userAutomaticInfo?.steps?.calorieGoal?.toFloat()
+                            val calori = user?.userSettingsInfo?.userGoals?.calorieGoal?.toFloat()
                             setProgressWithAnimation((steps / 25).toFloat())
                             calori?.let {
                                 progressMax = calori
+                            }?.run{
+                                progressMax=240F
                             }
                         }
                     }

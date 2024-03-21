@@ -73,5 +73,10 @@
     <string name="time_placeholder">00:00:00</string>
     <string name="stop">Stop</string>
     <string name="date">Date:</string>
-
+    <string name="step_goal">Step goal:</string>
+    <string name="calorie_goal">Calorie goal:</string>
+    <string name="water_goal">Water goal:</string>
+    <string name="sleep_goal">Sleep goal:</string>
+    <string name="submit">Submit</string>
+    <string name="are_you_sure">Are you sure?</string>
 </resources>

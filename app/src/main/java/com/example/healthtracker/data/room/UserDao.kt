@@ -18,11 +18,11 @@ interface UserDao {
     fun getEntireUser(): UserData?
     @Query("DELETE FROM UserData")
     fun dropUser()
-    @Query("SELECT userInfo FROM UserData WHERE userId=:userId")
-    fun getBasicInfo(userId: String): UserInfo?
+    @Query("SELECT userInfo FROM UserData")
+    fun getBasicInfo(): UserInfo?
 
-    @Query("SELECT userSettingsInfo FROM UserData WHERE userId=:userId")
-    fun getUserSettings(userId: String): UserSettingsInfo?
+    @Query("SELECT userSettingsInfo FROM UserData ")
+    fun getUserSettings(): UserSettingsInfo?
 
     @Query("SELECT userAutomaticInfo FROM UserData")
     fun getAutomaticInfo(): UserAutomaticInfo?

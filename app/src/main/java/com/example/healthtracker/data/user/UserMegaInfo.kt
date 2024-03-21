@@ -5,6 +5,6 @@ data class UserMegaInfo(
     var userAutomaticInfo: UserAutomaticInfo? = null,
     val userFriends: List<UserInfo>? = listOf(),
     val userPutInInfo: UserPutInInfo? = null,
-    val userSettingsInfo: UserSettingsInfo? = null,
+    val userSettingsInfo: UserSettingsInfo? = UserSettingsInfo(),
     val userDays:List<UserDays>? = null,
 )

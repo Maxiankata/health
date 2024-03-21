@@ -78,14 +78,14 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
                     val userWeight = userDao.getEntireUser()?.userPutInInfo?.weight
                     val newPutInInfo = UserPutInInfo(waterInfo = newWater, weight = userWeight)
                     userDao.updateUserPutInInfo(newPutInInfo)
-                if (_water.value!!.currentWater!! >= _user.value!!.userSettingsInfo!!.userGoals.waterGoal!!){
+                if (_water.value!!.currentWater!! >= _user.value!!.userSettingsInfo!!.userGoals?.waterGoal!!){
                     val newerWater = WaterInfo(
                         waterCompletion = true,
                         currentWater = _water.value!!.currentWater
                     )
                     _water.postValue(newerWater)
                     Log.d("Water check", _water.value.toString())
-                } else if(_water.value!!.currentWater!! < _user.value!!.userSettingsInfo!!.userGoals.waterGoal!!){
+                } else if(_water.value!!.currentWater!! < _user.value!!.userSettingsInfo!!.userGoals?.waterGoal!!){
                     val newerWater = WaterInfo(
                         waterCompletion = true,
                         currentWater = _water.value!!.currentWater

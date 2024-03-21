@@ -15,6 +15,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.example.healthtracker.R
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.databinding.FragmentSettingsBinding
@@ -101,6 +102,10 @@ class SettingsFragment : Fragment() {
             deleteAccount.setOnClickListener {
                 deletionConfirmation()
             }
+            changeGoals.setOnClickListener {
+                val dialog = GoalChangeDialogFragment()
+                dialog.show(requireActivity().supportFragmentManager, "change_goals_dialog")
+            }
         }
     }
 
@@ -134,16 +139,16 @@ class SettingsFragment : Fragment() {
     }
     private fun deletionConfirmation(){
         val builder = AlertDialog.Builder(context)
-        builder.setTitle("Confirmation Dialog")
-            .setMessage("Do you want to proceed with the action?")
-        builder.setPositiveButton("Confirm") { dialogInterface: DialogInterface, i: Int ->
+        builder.setTitle(R.string.are_you_sure)
+            .setMessage(R.string.deletion_confirmation)
+        builder.setPositiveButton(R.string.confirm) { dialogInterface: DialogInterface, i: Int ->
             lifecycleScope.launch {
                 settingsViewModel.deleteUser()
             }
             dialogInterface.dismiss()
 
         }
-        builder.setNegativeButton("Cancel") { dialogInterface: DialogInterface, i: Int ->
+        builder.setNegativeButton(R.string.cancel) { dialogInterface: DialogInterface, i: Int ->
             dialogInterface.dismiss()
         }
         val dialog: AlertDialog = builder.create()
