@@ -23,7 +23,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="60dp"
-        app:layout_constraintBottom_toTopOf="@id/message"
+        app:layout_constraintBottom_toTopOf="@id/challenge_friend"
         >
 
         <ImageView
@@ -49,19 +49,7 @@
         android:textSize="30sp"
         />
 
-    <ImageView
-        android:layout_marginTop="20dp"
 
-        android:id="@+id/message"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/message"
-        app:layout_constraintEnd_toStartOf="@+id/relationship_status"
-        app:layout_constraintStart_toEndOf="@+id/challenge_friend"
-        app:layout_constraintTop_toBottomOf="@+id/user_name"
-
-        />
 
     <ImageView
         android:layout_marginTop="20dp"
@@ -71,18 +59,18 @@
         android:scaleType="centerCrop"
         android:src="@drawable/friend_add"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/message"
+        app:layout_constraintStart_toEndOf="@id/challenge_friend"
         app:layout_constraintTop_toBottomOf="@+id/user_name"
         app:tint="@color/white" />
 
     <ImageView
-        android:layout_marginTop="20dp"
         android:id="@+id/challenge_friend"
         android:layout_width="80dp"
         android:layout_height="80dp"
+        android:layout_marginTop="20dp"
         android:scaleType="centerCrop"
         android:src="@drawable/flag"
-        app:layout_constraintEnd_toStartOf="@id/message"
+        app:layout_constraintEnd_toStartOf="@+id/relationship_status"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/user_name"
         app:tint="@color/white" />

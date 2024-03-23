@@ -12,6 +12,7 @@ import com.example.healthtracker.data.user.UserSettingsInfo
 import com.example.healthtracker.data.user.WaterInfo
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.util.Calendar
 import java.util.Date
 
 class GsonTypeConverter {
@@ -106,13 +107,30 @@ class GsonTypeConverter {
         return gson.fromJson(userInfoListString, listType)
     }
     @TypeConverter
-    fun fromUserDaysList(userDaysList: List<UserDays>?):String?{
+    fun fromChallengesList(challengeList: List<Challenge>?): String? {
+        return gson.toJson(challengeList)
+    }
+
+    @TypeConverter
+    fun toChallengeList(challengeList: String?): List<Challenge>? {
+        val listType = object : TypeToken<List<Challenge>>() {}.type
+        return gson.fromJson(challengeList, listType)
+    }
+    private val type = object : TypeToken<List<UserDays>>() {}.type
+
+    @TypeConverter
+    fun fromString(userDaysListString: String?): List<UserDays>? {
+        return gson.fromJson(userDaysListString, type)
+    }
+
+    @TypeConverter
+    fun toString(userDaysList: List<UserDays>?): String? {
         return gson.toJson(userDaysList)
     }
     @TypeConverter
-    fun toUserDaysList(userDaysListString: String?):List<UserDays>?{
-        val listType = object : TypeToken<List<UserDays>>(){}.type
-        return gson.fromJson(userDaysListString,listType)
-    }
+    fun calendarToJson(calendar: Calendar?): String? = Gson().toJson(calendar)
+
+    @TypeConverter
+    fun jsonToCalendar(json: String?): Calendar? = Gson().fromJson(json, Calendar::class.java)
 
 }

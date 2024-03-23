@@ -159,7 +159,8 @@ class FriendsDialogFragment : DialogFragment() {
         friendListAdapter.apply {
             itemClickListener = object : FriendListAdapter.ItemClickListener<UserInfo> {
                 override fun onItemClicked(item: UserInfo, itemPosition: Int) {
-                    item.uid?.let { Log.d("uid", it) }
+                    item.uid?.let {
+                        Log.d("uid", it) }
                     findNavController().navigate(
                         R.id.action_navigation_notifications_to_friendAccountFragment,
                         bundleOf("uid" to item.uid)

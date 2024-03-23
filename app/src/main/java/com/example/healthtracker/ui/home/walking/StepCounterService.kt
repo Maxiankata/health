@@ -1,6 +1,5 @@
 package com.example.healthtracker.ui.home.walking
 
-import android.app.AlarmManager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -27,7 +26,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.LocalDateTime
+import java.text.SimpleDateFormat
 import java.util.Calendar
 
 class StepCounterService : Service(), SensorEventListener {
@@ -41,7 +40,6 @@ class StepCounterService : Service(), SensorEventListener {
 
     private val userDao = MainActivity.getDatabaseInstance().dao()
     private val customCoroutineScope = CoroutineScope(Dispatchers.Main)
-//    val alarmManagerHelper : DailyAlarm = DailyAlarm()
 
     private suspend fun getUserSteps() {
         return withContext(Dispatchers.IO) {
@@ -77,8 +75,10 @@ class StepCounterService : Service(), SensorEventListener {
         customCoroutineScope.launch {
             getUserSteps()
         }
-        Log.d("Local date", LocalDateTime.now().toString())
-//        alarmManagerHelper.setDailyAlarm()
+        val calendar = Calendar.getInstance()
+        val sdf = SimpleDateFormat("dd/MM/yyyy")
+        var currentDate: String? = sdf.format(calendar.time)
+        Log.d("sdf", currentDate.toString())
         handler = Handler(Looper.getMainLooper())
         handler?.post(object : Runnable {
             override fun run() {

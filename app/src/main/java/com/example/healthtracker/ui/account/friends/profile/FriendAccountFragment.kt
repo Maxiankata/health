@@ -2,6 +2,7 @@ package com.example.healthtracker.ui.account.friends.profile
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,10 +15,11 @@ import androidx.lifecycle.lifecycleScope
 import com.example.healthtracker.R
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.databinding.FragmentFriendAccountBinding
+import com.example.healthtracker.ui.account.friends.ChallengeBuilderDialogFragment
 import com.example.healthtracker.ui.base64ToBitmap
 import com.example.healthtracker.ui.account.friends.popup.FriendListViewModel
 import com.example.healthtracker.ui.hideBottomNav
-import com.example.healthtracker.ui.setRoundedCorners
+import com.example.healthtracker.ui.home.running.RunningDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -59,6 +61,7 @@ class FriendAccountFragment : Fragment() {
             userName.apply {
                 text = user.username
             }
+
             friendListViewModel.friendsList.observe(viewLifecycleOwner) {
                 if (it != null) {
                     if (it.contains(user)) {
@@ -97,7 +100,13 @@ class FriendAccountFragment : Fragment() {
             }
             challengeFriend.apply {
                 setOnClickListener {
-                    sendNotification(getString(R.string.close), getString(R.string.new_friend))
+                    val bundle = Bundle().apply {
+                        putString("uid", arguments?.getString("uid"))
+                    }
+                    val dialogFragment = ChallengeBuilderDialogFragment()
+                    Log.d("bundle sent to dialog", bundle.toString())
+                    dialogFragment.arguments = bundle
+                    dialogFragment.show(parentFragmentManager, "MyDialogFragment")
                 }
             }
         }

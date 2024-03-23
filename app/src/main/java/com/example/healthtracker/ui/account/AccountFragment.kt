@@ -1,33 +1,26 @@
 package com.example.healthtracker.ui.account
 
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.healthtracker.CropActivity
 import com.example.healthtracker.R
-import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.databinding.FragmentAccountBinding
 import com.example.healthtracker.ui.account.friends.popup.FriendsDialogFragment
 import com.example.healthtracker.ui.base64ToBitmap
 import com.example.healthtracker.ui.login.LoginActivity
 import com.example.healthtracker.ui.navigateToActivity
 import com.example.healthtracker.ui.showBottomNav
-import com.example.healthtracker.ui.showLoading
-import com.example.healthtracker.ui.showMainLoading
 import com.example.healthtracker.ui.uriToBitmap
 import kotlinx.coroutines.launch
-import kotlin.math.log
 
 class AccountFragment : Fragment() {
 
@@ -49,16 +42,13 @@ class AccountFragment : Fragment() {
         val dialog = FriendsDialogFragment()
         lifecycleScope.launch {
             val user = accountViewModel.getWholeUser()
-            Log.d("USER TAKEN", user?.userInfo.toString())
             val photo = user?.userInfo?.image
-            if (photo != null && photo != "") {
-                binding.profilePhoto.setImageBitmap(base64ToBitmap(photo))
-                binding.profilePhoto.setBackgroundResource(R.drawable.circle_background)
-
-            } else {
+            if (photo.isNullOrBlank()) {
                 binding.profilePhoto.setImageResource(R.drawable.profile_photo_placeholder)
                 binding.profilePhoto.setBackgroundResource(R.drawable.circle_background)
-
+            } else {
+                binding.profilePhoto.setImageBitmap(base64ToBitmap(photo))
+                binding.profilePhoto.setBackgroundResource(R.drawable.circle_background)
             }
             val userName = user?.userInfo?.username
             binding.username.text = userName

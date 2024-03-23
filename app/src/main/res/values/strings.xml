@@ -79,4 +79,16 @@
     <string name="sleep_goal">Sleep goal:</string>
     <string name="submit">Submit</string>
     <string name="are_you_sure">Are you sure?</string>
+    <string name="challenge_duration">Challenge Duration</string>
+    <string name="challenge_type">Challenge Type</string>
+    <string name="mode">Mode</string>
+    <string name="challenge">Challenge</string>
+    <string name="invalid_duration_format">Invalid Duration Format</string>
+    <string-array name="activities">
+        <item>Walking</item>
+        <item>Power Walking</item>
+        <item>Running</item>
+        <item>Cycling</item>
+        <item>Hiking</item>
+    </string-array>
 </resources>

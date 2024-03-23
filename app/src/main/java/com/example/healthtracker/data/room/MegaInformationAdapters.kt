@@ -7,7 +7,7 @@ interface Adapter<T, K> {
 }
 class UserMegaInfoToRoomAdapter : Adapter<UserMegaInfo,UserData>{
     override fun adapt(t: UserMegaInfo): UserData? {
-        return t.userInfo.uid?.let { UserData(it,t.userInfo,t.userSettingsInfo,t.userAutomaticInfo,t.userPutInInfo,t.userFriends, t.userDays) }
+        return t.userInfo.uid?.let { UserData(it,t.userInfo,t.userSettingsInfo,t.userAutomaticInfo,t.userPutInInfo,t.userFriends, t.userDays, t.challenges) }
     }
 
 }

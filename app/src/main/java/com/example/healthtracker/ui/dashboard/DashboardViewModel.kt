@@ -1,6 +1,7 @@
 package com.example.healthtracker.ui.dashboard
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,7 +12,9 @@ import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.WaterInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.joda.time.DateTime
 import java.lang.Appendable
+import java.time.LocalDateTime
 import java.util.Date
 
 class DashboardViewModel(private val application: Application) : AndroidViewModel(application) {
@@ -22,9 +25,12 @@ class DashboardViewModel(private val application: Application) : AndroidViewMode
         withContext(Dispatchers.IO) {
             val user = userDao.getEntireUser()
             for (item in user?.userDays!!) {
-                if (date == item.dateTime) {
+                Log.d("Date to search", date.toString())
+//                Log.d("Date found", item.dateTime.toString())
+
+//                if (date == item.dateTime) {
                     _userDay.postValue(item)
-                }
+//                }
             }
         }
     }

@@ -45,6 +45,7 @@ android {
 
 dependencies {
     implementation ("androidx.room:room-runtime:2.6.1")
+    implementation("com.google.firebase:protolite-well-known-types:18.0.0")
     annotationProcessor ("androidx.room:room-compiler:2.6.1")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
@@ -69,6 +70,7 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation("androidx.datastore:datastore-preferences-rxjava2:1.0.0")
     implementation ("androidx.work:work-runtime-ktx:2.7.0")
+    implementation("net.danlew:android.joda:2.12.7")
 
     // optional - RxJava3 support
     implementation("androidx.datastore:datastore-preferences-rxjava3:1.0.0")

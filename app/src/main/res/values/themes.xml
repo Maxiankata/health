@@ -25,5 +25,8 @@
 
     <style name="Theme.HealthTracker.AppBarOverlay"
         parent="ThemeOverlay.AppCompat.ActionBar" />
+    <style name="MySpinnerStyle" parent="Widget.AppCompat.Spinner">
+        <item name="android:popupBackground">@color/transparent</item>
+    </style>
     <style name="Theme.MyApplication.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

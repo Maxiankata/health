@@ -34,10 +34,10 @@ class FriendListAdapter() : RecyclerView.Adapter<FriendListAdapter.FriendListVie
 
 
         fun bind(userInfo: UserInfo) {
-            if (userInfo.image != null && userInfo.image != "") {
-                Glide.with(image).load(Base64.decode(userInfo.image, Base64.DEFAULT)).into(image)
-            }else{
+            if (userInfo.image.isNullOrEmpty()) {
                 Glide.with(image).load(R.drawable.profile_icon).into(image)
+            }else{
+                Glide.with(image).load(Base64.decode(userInfo.image, Base64.DEFAULT)).into(image)
             }
             image.setBackgroundResource(R.drawable.circle_background)
             name.text = userInfo.username
@@ -66,7 +66,7 @@ class FriendListAdapter() : RecyclerView.Adapter<FriendListAdapter.FriendListVie
                         setImageResource(R.drawable.flag)
                         setOnClickListener {
                             Log.d("clicked challenge", "clicked challenge")
-
+                            //TODO() figure out how to send a bundle from here to challenge dialog :skull:
                         }
                     }
                 }

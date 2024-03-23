@@ -3,6 +3,9 @@ package com.example.healthtracker.data.room
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
+import com.example.healthtracker.data.Challenge
+import com.example.healthtracker.data.GsonTypeConverter
 import com.example.healthtracker.data.user.UserGoals
 import com.example.healthtracker.data.user.UserAutomaticInfo
 import com.example.healthtracker.data.user.UserDays
@@ -18,6 +21,10 @@ data class UserData(
     @ColumnInfo(name = "userAutomaticInfo") val userAutomaticInfo: UserAutomaticInfo?,
     @ColumnInfo(name = "userPutInInfo") val userPutInInfo: UserPutInInfo?,
     @ColumnInfo(name = "userFriends") val userFriends: List<UserInfo>?,
-    @ColumnInfo(name = "userDays") val userDays:List<UserDays>?,
+    @ColumnInfo(name = "userDays")
+    @TypeConverters(GsonTypeConverter::class)
+    val userDays:List<UserDays>?,
+    @ColumnInfo(name = "challenges") val challenges:List<Challenge>?
+
 )
 

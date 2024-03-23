@@ -29,7 +29,9 @@
     <fragment
         android:id="@+id/friendAccountFragment"
         android:name="com.example.healthtracker.ui.account.friends.profile.FriendAccountFragment"
-        android:label="FriendAccountFragment" />
+        android:label="FriendAccountFragment" >
+
+    </fragment>
     <dialog
         android:id="@+id/friendsDialogFragment"
         android:name="com.example.healthtracker.ui.account.friends.popup.FriendsDialogFragment"
@@ -43,5 +45,7 @@
         android:id="@+id/settingsFragment"
         android:name="com.example.healthtracker.ui.settings.SettingsFragment"
         android:label="SettingsFragment" />
+
+
 
 </navigation>

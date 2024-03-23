@@ -59,9 +59,8 @@ class HomeFragment : Fragment() {
                             val steppi = user?.userSettingsInfo?.userGoals?.stepGoal?.toFloat()
                             setProgressWithAnimation(steps.toFloat())
                             steppi?.let {
+                                Log.d("steppi isnt null", steppi.toString())
                                 progressMax = steppi
-                            }?.run {
-                                progressMax=6000F
                             }
                         }
                         stepcount.apply {
@@ -79,9 +78,8 @@ class HomeFragment : Fragment() {
                             val calori = user?.userSettingsInfo?.userGoals?.calorieGoal?.toFloat()
                             setProgressWithAnimation((steps / 25).toFloat())
                             calori?.let {
+                                Log.d("calori isnt null", calori.toString())
                                 progressMax = calori
-                            }?.run{
-                                progressMax=240F
                             }
                         }
                     }

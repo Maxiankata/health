@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.example.healthtracker.data.Challenge
 import com.example.healthtracker.data.user.UserAutomaticInfo
 import com.example.healthtracker.data.user.UserDays
 import com.example.healthtracker.data.user.UserInfo
@@ -49,4 +50,6 @@ interface UserDao {
     suspend fun updateDays(updatedUserDays: List<UserDays>)
     @Query ("UPDATE UserData SET userFriends = :updatedUserFriends")
     suspend fun addFriend(updatedUserFriends:List<UserInfo>)
+    @Query("UPDATE UserData SET challenges = :updatedChallenges")
+    suspend fun updateChallenges(updatedChallenges: List<Challenge>)
 }

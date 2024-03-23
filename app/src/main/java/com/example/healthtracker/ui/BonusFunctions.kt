@@ -36,9 +36,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.DataSnapshot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.joda.time.DateTime
 import java.io.ByteArrayOutputStream
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.time.LocalDateTime
+import java.util.Calendar
 import java.util.Date
 
 fun navigateToActivity(currentActivity: Activity, targetActivityClass: Class<*>) {
@@ -130,7 +133,8 @@ fun UserMegaInfo.toUserData(): UserData {
         userFriends = this.userFriends,
         userPutInInfo = this.userPutInInfo,
         userSettingsInfo = this.userSettingsInfo,
-        userDays = this.userDays
+        userDays = this.userDays,
+        challenges = this.challenges
     )
 }
 
@@ -181,8 +185,8 @@ fun DataSnapshot.toWaterInfo(): WaterInfo {
 
 fun DataSnapshot.toUserSettingsInfo(): UserSettingsInfo {
     return UserSettingsInfo(
-        language = child("language").getValue(String::class.java) ?: "",
-        units = child("units").getValue(String::class.java) ?: "",
+        language = child("language").getValue(String::class.java) ?: "english",
+        units = child("units").getValue(String::class.java) ?: "kg",
         userGoals = child("userGoals").getValue(UserGoals::class.java)?: UserGoals()
     )
 }
@@ -190,7 +194,7 @@ fun DataSnapshot.toUserSettingsInfo(): UserSettingsInfo {
 @RequiresApi(Build.VERSION_CODES.O)
 fun DataSnapshot.toUserDays(): UserDays {
     return UserDays(
-        dateTime = child("dateTime").getValue(Date::class.java)!!,
+//        dateTime = child("dateTime").getValue(Calendar::class.java),
         putInInfo = child("userPutInInfo").toUserPutInInfo(),
         automaticInfo = child("userAutomaticInfo").toUserAutomaticInfo()
     )
