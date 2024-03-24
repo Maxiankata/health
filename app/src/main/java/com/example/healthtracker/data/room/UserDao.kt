@@ -46,6 +46,8 @@ interface UserDao {
     suspend fun wipeUserAutomaticInfo()
     @Query("UPDATE UserData SET userPutInInfo = NULL")
     suspend fun wipeUserPutInInfo()
+    @Query("UPDATE UserData SET challenges = NULL")
+    suspend fun wipeChallenges()
     @Query ("UPDATE UserData SET userDays= :updatedUserDays")
     suspend fun updateDays(updatedUserDays: List<UserDays>)
     @Query ("UPDATE UserData SET userFriends = :updatedUserFriends")

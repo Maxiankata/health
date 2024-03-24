@@ -9,20 +9,17 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.example.healthtracker.AuthImpl
 import com.example.healthtracker.MainActivity
+import com.example.healthtracker.MyApplication
 import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
 import com.example.healthtracker.data.room.UserMegaInfoToRoomAdapter
-import com.example.healthtracker.data.user.UserGoals
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.UserPutInInfo
-import com.example.healthtracker.data.user.UserSettingsInfo
 import com.example.healthtracker.data.user.WaterInfo
 import com.example.healthtracker.ui.home.running.RunningSensorListener
 import com.example.healthtracker.ui.home.walking.StepCounterService
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
@@ -53,6 +50,19 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
         }
     }
 
+    suspend fun checkForChallenges() {
+        if (isInternetAvailable(MyApplication.getContext())) {
+            withContext(Dispatchers.IO) {
+                auth.fetchOwnChallenges()?.let {
+                    userDao.updateChallenges(it)
+                    Log.d("userChallenges", userDao.getEntireUser()?.challenges.toString())
+                }?.run {
+                    Log.d("no challenges", "no challenges")
+                }
+            }
+        }
+    }
+
     suspend fun getUser(): UserMegaInfo? {
         return withContext(Dispatchers.IO) {
             val user = userDao.getEntireUser()
@@ -70,22 +80,22 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
     suspend fun waterIncrement(incrementation: Int) {
         withContext(Dispatchers.IO) {
             if (_water.value != null) {
-                    val newWater = WaterInfo(
-                        waterCompletion = _water.value!!.waterCompletion,
-                        currentWater = _water.value!!.currentWater?.plus(incrementation)
-                    )
-                    _water.postValue(newWater)
-                    val userWeight = userDao.getEntireUser()?.userPutInInfo?.weight
-                    val newPutInInfo = UserPutInInfo(waterInfo = newWater, weight = userWeight)
-                    userDao.updateUserPutInInfo(newPutInInfo)
-                if (_water.value!!.currentWater!! >= _user.value!!.userSettingsInfo!!.userGoals?.waterGoal!!){
+                val newWater = WaterInfo(
+                    waterCompletion = _water.value!!.waterCompletion,
+                    currentWater = _water.value!!.currentWater?.plus(incrementation)
+                )
+                _water.postValue(newWater)
+                val userWeight = userDao.getEntireUser()?.userPutInInfo?.weight
+                val newPutInInfo = UserPutInInfo(waterInfo = newWater, weight = userWeight)
+                userDao.updateUserPutInInfo(newPutInInfo)
+                if (_water.value!!.currentWater!! >= _user.value!!.userSettingsInfo!!.userGoals?.waterGoal!!) {
                     val newerWater = WaterInfo(
                         waterCompletion = true,
                         currentWater = _water.value!!.currentWater
                     )
                     _water.postValue(newerWater)
                     Log.d("Water check", _water.value.toString())
-                } else if(_water.value!!.currentWater!! < _user.value!!.userSettingsInfo!!.userGoals?.waterGoal!!){
+                } else if (_water.value!!.currentWater!! < _user.value!!.userSettingsInfo!!.userGoals?.waterGoal!!) {
                     val newerWater = WaterInfo(
                         waterCompletion = true,
                         currentWater = _water.value!!.currentWater

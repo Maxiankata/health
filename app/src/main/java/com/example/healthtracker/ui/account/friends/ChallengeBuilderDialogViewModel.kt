@@ -19,7 +19,7 @@ class ChallengeBuilderDialogViewModel(private val application: MyApplication) : 
             Log.d("Challenge recieved", userId)
             Log.d("Challenge recieved", challenge.toString())
             val renewedChallengesList = mutableListOf<Challenge>()
-            val previousChallenges = authImpl.fetchChallenges()
+            val previousChallenges = authImpl.fetchChallenges(userId)
             if (previousChallenges != null) {
                 for (item in previousChallenges){
                     Log.d("challenge in list", item.toString())
@@ -27,14 +27,14 @@ class ChallengeBuilderDialogViewModel(private val application: MyApplication) : 
                 }
                 renewedChallengesList.add(challenge)
                 Log.d("Challenges werent null, adding new challenge", renewedChallengesList.toString())
-                authImpl.setChallenges(renewedChallengesList)
+                authImpl.setChallenges(renewedChallengesList, userId)
                 withContext(Dispatchers.IO){
                     userDao.updateChallenges(renewedChallengesList)
                 }
             }else{
                 renewedChallengesList.add(challenge)
                 Log.d("Challenges were null, adding new challenge", renewedChallengesList.toString())
-                authImpl.setChallenges(renewedChallengesList)
+                authImpl.setChallenges(renewedChallengesList, userId)
                 withContext(Dispatchers.IO){
                     userDao.updateChallenges(renewedChallengesList)
                 }

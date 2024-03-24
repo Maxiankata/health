@@ -1,6 +1,7 @@
 package com.example.healthtracker.ui
 
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
@@ -40,6 +41,8 @@ import org.joda.time.DateTime
 import java.io.ByteArrayOutputStream
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.time.Duration
 import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Date
@@ -138,6 +141,7 @@ fun UserMegaInfo.toUserData(): UserData {
     )
 }
 
+
 @RequiresApi(Build.VERSION_CODES.O)
 fun DataSnapshot.toUserMegaInfo(): UserMegaInfo {
     return UserMegaInfo(
@@ -194,9 +198,9 @@ fun DataSnapshot.toUserSettingsInfo(): UserSettingsInfo {
 @RequiresApi(Build.VERSION_CODES.O)
 fun DataSnapshot.toUserDays(): UserDays {
     return UserDays(
-//        dateTime = child("dateTime").getValue(Calendar::class.java),
         putInInfo = child("userPutInInfo").toUserPutInInfo(),
-        automaticInfo = child("userAutomaticInfo").toUserAutomaticInfo()
+        automaticInfo = child("userAutomaticInfo").toUserAutomaticInfo(),
+        dateTime = child("dateTime").getValue(String::class.java)!!
     )
 }
 fun DataSnapshot.toUserGoals(): UserGoals{
@@ -252,4 +256,39 @@ fun startStepCounterService() {
         "starting stepper", ContextCompat.startForegroundService(MyApplication.getContext(), serviceIntent)
             .toString()
     )
+}
+fun durationToString(duration: Duration): String {
+    val hours = duration.toHours()
+    val minutes = duration.toMinutes() % 60
+    val seconds = duration.seconds % 60
+    return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+}
+fun stringToDuration(str: String): Duration? {
+    val parts = str.split(":")
+    if (parts.size != 3) {
+        return null
+    }
+    val hours = parts[0].toLongOrNull() ?: return null
+    val minutes = parts[1].toLongOrNull() ?: return null
+    val seconds = parts[2].toLongOrNull() ?: return null
+    return Duration.ofHours(hours).plusMinutes(minutes).plusSeconds(seconds)
+}
+@SuppressLint("SimpleDateFormat")
+fun calendarToString(calendar: Calendar): String {
+    val dateFormat = SimpleDateFormat("dd/MM/yyyy")
+    return dateFormat.format(calendar.time)
+}
+@SuppressLint("SimpleDateFormat")
+fun stringToCalendar(dateStr: String): Calendar? {
+    val dateFormat = SimpleDateFormat("dd/MM/yyyy")
+    try {
+        val date: Date = dateFormat.parse(dateStr) ?: return null
+        val calendar = Calendar.getInstance()
+        calendar.time = date
+        return calendar
+    } catch (e: Exception) {
+        // Handle parse exceptions if any
+        e.printStackTrace()
+    }
+    return null
 }

@@ -20,8 +20,9 @@ interface AuthInterface {
     suspend fun addFriend(userId: String)
     suspend fun resetPassword(email: String):Boolean
     suspend fun fetchUserFriends(): List<UserInfo>?
-    suspend fun fetchChallenges():List<Challenge>?
-    suspend fun setChallenges(challenges: List<Challenge>)
+    suspend fun fetchChallenges(userId: String):List<Challenge>?
+    suspend fun fetchOwnChallenges():List<Challenge>?
+    suspend fun setChallenges(challenges: List<Challenge>, userId: String)
     suspend fun removeFriend(userId: String, userFriendList: List<UserInfo>)
     suspend fun fetchAllUsersInfo(): MutableList<UserInfo>
     suspend fun saveBitmapToDatabase(bitmap: Bitmap)

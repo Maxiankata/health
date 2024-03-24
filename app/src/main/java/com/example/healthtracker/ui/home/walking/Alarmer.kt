@@ -14,6 +14,7 @@ import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
 import com.example.healthtracker.data.user.UserAutomaticInfo
 import com.example.healthtracker.data.user.UserDays
 import com.example.healthtracker.data.user.UserPutInInfo
+import com.example.healthtracker.ui.calendarToString
 import com.example.healthtracker.ui.startStepCounterService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,8 +32,8 @@ class Alarmer:AlarmScheduler {
     override fun schedule(item: AlarmItem) {
         val intent = Intent(context, AlarmRecieverer::class.java)
         val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, 21)
-        calendar.set(Calendar.MINUTE, 44)
+        calendar.set(Calendar.HOUR_OF_DAY, 11)
+        calendar.set(Calendar.MINUTE, 37)
         calendar.set(Calendar.SECOND, 0)
         val currentTime = System.currentTimeMillis()
         if (calendar.timeInMillis < currentTime) {
@@ -70,12 +71,9 @@ class AlarmRecieverer:BroadcastReceiver(){
             val userAutomaticInfo = userDao.getAutomaticInfo()
             val userChallenges = userDao.getEntireUser()?.challenges as ArrayList<Challenge>
             val userDays = userDao.getEntireUser()?.userDays as ArrayList<UserDays>
-            val dateTimeNow = DateTime.now()
-//            val formatter = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm")
-//            val dateToBeSent = formatter.parseDateTime(dateTimeNow.toString())
-//            Log.d("date formatted", dateToBeSent.toString())
-            val day = UserDays( userPutInInfo, userAutomaticInfo,userChallenges
-//                Calendar.getInstance()
+            val sendToday = calendarToString(Calendar.getInstance())
+            val day = UserDays( userPutInInfo, userAutomaticInfo,userChallenges,
+                sendToday
             )
             userDays.add(day)
             userDao.updateDays(userDays)
@@ -85,6 +83,7 @@ class AlarmRecieverer:BroadcastReceiver(){
             Log.d("Updated days from base", userDao.getEntireUser()!!.userDays.toString())
             userDao.wipeUserAutomaticInfo()
             userDao.wipeUserPutInInfo()
+            userDao.wipeChallenges()
             userDao.updateUserAutomaticInfo(UserAutomaticInfo())
             userDao.updateUserPutInInfo(UserPutInInfo())
             stepCounterService.nullifySteps()

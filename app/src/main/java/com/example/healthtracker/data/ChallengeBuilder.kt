@@ -3,9 +3,9 @@ package com.example.healthtracker.data
 import java.time.Duration
 
 data class Challenge(
-    val assigner:String?,
+    val assigner:String,
     val challengeType: ChallengeType,
-    val challengeDuration: Duration,
+    val challengeDuration: String,
     val challengeCompletion: Boolean
 )
 

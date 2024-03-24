@@ -43,6 +43,7 @@ class HomeFragment : Fragment() {
         lifecycleScope.launch {
             speedTracker = RunningSensorListener(requireContext())
             homeViewModel.feedUser()
+            homeViewModel.checkForChallenges()
         }
 
         val weightRecyclerVal = WeightRecyclerAdapter()

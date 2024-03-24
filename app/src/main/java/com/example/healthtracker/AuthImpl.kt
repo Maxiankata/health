@@ -206,8 +206,7 @@ class AuthImpl : AuthInterface {
         }
 
     }
-
-    override suspend fun fetchChallenges(): List<Challenge>? {
+    override suspend fun fetchOwnChallenges(): List<Challenge>? {
         return withContext(Dispatchers.IO) {
             val challengesRef =
                 Firebase.database.getReference("user/${Firebase.auth.currentUser!!.uid}/challenges")
@@ -220,8 +219,7 @@ class AuthImpl : AuthInterface {
                         ChallengeType::class.java
                     )
                     val challengeDuration =
-                        challengeSnapshot.child("challengeDuration").getValue(Long::class.java)
-                            ?.let { Duration.ofSeconds(it) }
+                        challengeSnapshot.child("challengeDuration").getValue(String::class.java)
                     val challengeCompletion =
                         challengeSnapshot.child("challengeCompletion").getValue(Boolean::class.java)
                     if (assigner != null && challengeType != null && challengeDuration != null && challengeCompletion != null) {
@@ -245,8 +243,45 @@ class AuthImpl : AuthInterface {
         }
     }
 
-    override suspend fun setChallenges(challenges: List<Challenge>) {
-        Firebase.database.reference.child("user/${Firebase.auth.currentUser?.uid}/challenges")
+    override suspend fun fetchChallenges(userId: String): List<Challenge>? {
+        return withContext(Dispatchers.IO) {
+            val challengesRef =
+                Firebase.database.getReference("user/${userId}/challenges")
+            try {
+                val dataSnapshot = challengesRef.get().await()
+                val challengeList = mutableListOf<Challenge>()
+                for (challengeSnapshot in dataSnapshot.children) {
+                    val assigner = challengeSnapshot.child("assigner").getValue(String::class.java)
+                    val challengeType = challengeSnapshot.child("challengeType").getValue(
+                        ChallengeType::class.java
+                    )
+                    val challengeDuration =
+                        challengeSnapshot.child("challengeDuration").getValue(String::class.java)
+                    val challengeCompletion =
+                        challengeSnapshot.child("challengeCompletion").getValue(Boolean::class.java)
+                    if (assigner != null && challengeType != null && challengeDuration != null && challengeCompletion != null) {
+                        val challenge = Challenge(
+                            assigner,
+                            challengeType,
+                            challengeDuration,
+                            challengeCompletion
+                        )
+                        challengeList.add(challenge)
+                        Log.d("Adding challenge", challenge.toString())
+                    } else {
+                        Log.e("Fetch Challenges", "Invalid data for challenge: $challengeSnapshot")
+                    }
+                }
+                challengeList
+            } catch (e: Exception) {
+                Log.e("Fetch Challenges", "Error fetching challenges", e)
+                null
+            }
+        }
+    }
+
+    override suspend fun setChallenges(challenges: List<Challenge>, userId: String) {
+        Firebase.database.reference.child("user/${userId}/challenges")
             .setValue(challenges)
     }
     override suspend fun resetPassword(email: String): Boolean {

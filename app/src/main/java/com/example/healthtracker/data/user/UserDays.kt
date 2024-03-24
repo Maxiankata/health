@@ -10,7 +10,6 @@ import java.util.Date
 data class UserDays(
     val putInInfo: UserPutInInfo?=null,
     val automaticInfo: UserAutomaticInfo?=null,
-    val challenges:List<Challenge>?=null
-//    @TypeConverters(CalendarTypeConverter::class)
-//    val dateTime: Calendar?= Calendar.getInstance(),
+    val challenges:List<Challenge>?=null,
+    val dateTime: String,
 )

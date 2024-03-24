@@ -19,6 +19,7 @@ import com.example.healthtracker.data.ChallengeType
 import com.example.healthtracker.data.SpinnerItem
 import com.example.healthtracker.databinding.ThirdBuilderDialogBinding
 import com.example.healthtracker.ui.account.friends.profile.ChallengeSpinnerAdapter
+import com.example.healthtracker.ui.durationToString
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.format.DateTimeParseException
@@ -82,24 +83,23 @@ class ChallengeBuilderDialogFragment : DialogFragment() {
                 val hours = editTextHours.text.toString().toIntOrNull() ?: 0
                 val minutes = editTextMinutes.text.toString().toIntOrNull() ?: 0
                 val seconds = editTextSeconds.text.toString().toIntOrNull() ?: 0
-                val durationText = "PT${hours}H${minutes}M${seconds}S"
-                Log.d("DurationText", durationText)
+                val duration = Duration.ofHours(hours.toLong()).plusMinutes(minutes.toLong()).plusSeconds(seconds.toLong())
+                val stringDuration = durationToString(duration)
                 if (challengeTypeSpinner.selectedItem == null || (editTextHours.text.toString()
                         .isBlank() && editTextMinutes.text.toString()
                         .isEmpty() && editTextSeconds.text.toString().isEmpty())
                 ) {
-                    Log.d("DurationText is null", durationText)
+                    Log.d("DurationText is null", duration.toString())
                     Toast.makeText(
                         MyApplication.getContext(), R.string.empty_field, Toast.LENGTH_SHORT
                     ).show()
                 } else {
-                    Log.d("DurationText isnt null", durationText)
+                    Log.d("DurationText isnt null", stringDuration)
                     Toast.makeText(MyApplication.getContext(), "both are fine", Toast.LENGTH_SHORT)
                         .show()
                     val selectedItem = challengeTypeSpinner.selectedItem as SpinnerItem
                     val challengeTypeId = selectedItem.itemId
                     try {
-                        val duration = Duration.parse(durationText)
                         val activityType: ChallengeType = when (challengeTypeId) {
                             1 -> ChallengeType.RUNNING
                             2 -> ChallengeType.CYCLING
@@ -111,9 +111,9 @@ class ChallengeBuilderDialogFragment : DialogFragment() {
                         }
                         val challenge = Challenge(
                             challengeCompletion = false,
-                            challengeDuration = duration,
+                            challengeDuration = stringDuration,
                             challengeType = activityType,
-                            assigner = assigner
+                            assigner = assigner!!
                         )
                         lifecycleScope.launch {
                             challengeBuilderDialogViewModel.sendChallenge(userId, challenge)
