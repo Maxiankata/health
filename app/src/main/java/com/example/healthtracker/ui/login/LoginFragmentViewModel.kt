@@ -6,17 +6,22 @@ import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getString
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.healthtracker.AuthImpl
 import com.example.healthtracker.MainActivity
+import com.example.healthtracker.MyApplication
+import com.example.healthtracker.R
 import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
 import com.example.healthtracker.data.room.UserMegaInfoToRoomAdapter
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 class LoginFragmentViewModel(private val application: Application) : AndroidViewModel(application) {
@@ -24,28 +29,53 @@ class LoginFragmentViewModel(private val application: Application) : AndroidView
     private val userDao = MainActivity.getDatabaseInstance().dao()
     private val toRoomAdapter = UserMegaInfoToRoomAdapter()
     private val fromRoomAdapter = RoomToUserMegaInfoAdapter()
+    private val _state = MutableLiveData<State>()
+    val state: LiveData<State>
+        get() = _state
+
+    fun logIn(email: String, password: String, isInternetAvailable: Boolean) {
+        viewModelScope.launch {
+            if (!isInternetAvailable) {
+                _state.postValue(State.Notify("no wifi"))
+                return@launch
+            }
+            if (email.isEmpty()||password.isEmpty()){
+                _state.postValue(State.Notify(getString(MyApplication.getContext(),R.string.empty_field)))
+                return@launch
+            }
 
 
-    suspend fun logIn(email: String, password: String): Boolean {
-        return auth.logIn(email, password)
+            try {
+                auth.logIn(email, password)
+            } catch (e: Exception) {
+                _state.postValue(State.Notify(e.message ?: "cant login lul"))
+                return@launch
+            }
+
+            getUser()
+            _state.postValue(State.LoggedIn(true))
+        }
     }
 
     suspend fun getUser() {
         Log.d("running getUser() in login", "")
-
         auth.getEntireUser().collect {
             Log.d("login collector ", it.toString())
             if (it != null) {
                 Log.d("user from firebase", it.toString())
                 withContext(Dispatchers.IO) {
                     toRoomAdapter.adapt(it)?.let { it1 ->
-                        userDao.saveUser(it1)
+                        async {
+                            userDao.saveUser(it1)
+
+                        }.await()
                         Log.d("user from dao", userDao.getEntireUser().toString())
                     }
                 }
             }
         }
     }
+
     private val permissions = arrayOf(
         Manifest.permission.FOREGROUND_SERVICE,
         Manifest.permission.POST_NOTIFICATIONS,
@@ -91,8 +121,9 @@ class LoginFragmentViewModel(private val application: Application) : AndroidView
         }
         return allPermissionsGranted
     }
+
     sealed interface State {
-        data class LoggedIn(val flag: Boolean): State
-        data class Notify(val message: String): State
+        data class LoggedIn(val flag: Boolean) : State
+        data class Notify(val message: String) : State
     }
 }

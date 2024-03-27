@@ -11,17 +11,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.healthtracker.MainActivity
 import com.example.healthtracker.R
-import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
 import com.example.healthtracker.databinding.FragmentHomeBinding
+import com.example.healthtracker.ui.formatDurationFromLong
 import com.example.healthtracker.ui.home.running.RunningDialogFragment
 import com.example.healthtracker.ui.home.running.RunningSensorListener
 import com.example.healthtracker.ui.home.walking.StepCounterService
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class HomeFragment : Fragment() {
 
@@ -31,6 +28,7 @@ class HomeFragment : Fragment() {
     private val homeViewModel: HomeViewModel by activityViewModels()
     private lateinit var speedTracker: RunningSensorListener
     private var stepCount: LiveData<Int> = StepCounterService.steps
+    private var sleepDuration: LiveData<Long> = StepCounterService.sleepDuration
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -46,6 +44,7 @@ class HomeFragment : Fragment() {
             homeViewModel.feedUser()
             homeViewModel.checkForChallenges()
         }
+        homeViewModel.syncToFireBase()
         binding.apply {
             stepCount.observe(viewLifecycleOwner) { steps ->
                 if (steps == null) {
@@ -84,9 +83,14 @@ class HomeFragment : Fragment() {
                     }
                 }
             }
-
+            sleepDuration.observe(viewLifecycleOwner){
+                Log.d("sleep has changed", it.toString())
+                sleepLogger.text= buildString {
+                    append("You have slept for ${formatDurationFromLong(it)} hours :)")
+                }
+            }
             homeViewModel.water.observe(viewLifecycleOwner) {
-                homeViewModel.user.observe(viewLifecycleOwner) {user->
+                homeViewModel.user.observe(viewLifecycleOwner) { user ->
                     textView2.text = buildString {
                         if (it != null) {
                             if (it.currentWater != null && it.currentWater != 0) {
@@ -120,25 +124,16 @@ class HomeFragment : Fragment() {
                 runDialog.show(requireActivity().supportFragmentManager, "running dialog")
             }
             cyclingLayout.setOnClickListener {
-                lifecycleScope.launch {
-                    homeViewModel.switchActivity(UserActivityStates.CYCLING)
-                }
                 val runDialog = RunningDialogFragment()
                 runDialog.show(
                     requireActivity().supportFragmentManager, "cycling dialog"
                 )
             }
             joggingLayout.setOnClickListener {
-                lifecycleScope.launch {
-                    homeViewModel.switchActivity(UserActivityStates.JOGGING)
-                }
                 val runDialog = RunningDialogFragment()
                 runDialog.show(requireActivity().supportFragmentManager, "hiking dialog")
             }
             powerWalkingLayout.setOnClickListener {
-                lifecycleScope.launch {
-                    homeViewModel.switchActivity(UserActivityStates.POWER_WALKING)
-                }
                 val runDialog = RunningDialogFragment()
                 runDialog.show(
                     requireActivity().supportFragmentManager, "power walking dialog"
@@ -162,7 +157,7 @@ class HomeFragment : Fragment() {
                         super.onScrollStateChanged(recyclerView, newState)
                         if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                             if (isScrolling) {
-                                try{
+                                try {
                                     lifecycleScope.launch {
                                         var middleItem =
                                             (layoutManager.findFirstCompletelyVisibleItemPosition() + layoutManager.findLastCompletelyVisibleItemPosition()) / 2
@@ -177,7 +172,7 @@ class HomeFragment : Fragment() {
                                             weightRecyclerAdapterer.updateMiddleItemSize(middleItem)
                                         }
                                     }
-                                }catch (e:Exception){
+                                } catch (e: Exception) {
                                     lifecycleScope.launch {
                                         var middlePosition =
                                             (layoutManager.findFirstVisibleItemPosition() + layoutManager.findLastVisibleItemPosition()) / 2
@@ -210,25 +205,27 @@ class HomeFragment : Fragment() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
 
                         super.onScrolled(recyclerView, dx, dy)
-                    isScrolling = true
-                }
+                        isScrolling = true
+                    }
 
-                        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState)
-                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        if (isScrolling) {
-                            try{
-                                val middleItem = (layoutManager.findFirstCompletelyVisibleItemPosition() + layoutManager.findLastCompletelyVisibleItemPosition()) / 2
-                                Log.d("middle item lookout", middleItem.toString())
-                                weightRecyclerAdapterer.updateMiddleItemSize(middleItem)
-                            }catch (e:Exception){
-                                val middlePosition = (layoutManager.findFirstVisibleItemPosition() + layoutManager.findLastVisibleItemPosition()) / 2
-                                weightRecyclerAdapterer.updateMiddleItemSize(middlePosition)
+                    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                        super.onScrollStateChanged(recyclerView, newState)
+                        if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                            if (isScrolling) {
+                                try {
+                                    val middleItem =
+                                        (layoutManager.findFirstCompletelyVisibleItemPosition() + layoutManager.findLastCompletelyVisibleItemPosition()) / 2
+                                    Log.d("middle item lookout", middleItem.toString())
+                                    weightRecyclerAdapterer.updateMiddleItemSize(middleItem)
+                                } catch (e: Exception) {
+                                    val middlePosition =
+                                        (layoutManager.findFirstVisibleItemPosition() + layoutManager.findLastVisibleItemPosition()) / 2
+                                    weightRecyclerAdapterer.updateMiddleItemSize(middlePosition)
+                                }
+                                isScrolling = false
                             }
-                            isScrolling = false
                         }
                     }
-                }
 
 
                 })
@@ -237,21 +234,7 @@ class HomeFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                val dao = MainActivity.getDatabaseInstance().dao().getEntireUser()
-                val converter = RoomToUserMegaInfoAdapter()
-                if (dao != null) {
-                    homeViewModel.syncToFireBase(converter.adapt(dao))
-                }
-            }
-        }
         super.onDestroyView()
         _binding = null
     }
-
-    fun findMid() {
-
-    }
-
 }

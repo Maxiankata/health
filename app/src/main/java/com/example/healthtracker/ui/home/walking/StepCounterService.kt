@@ -24,8 +24,10 @@ import com.example.healthtracker.R
 import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
 import com.example.healthtracker.data.user.UserAutomaticInfo
 import com.example.healthtracker.data.user.UserMegaInfo
+import com.example.healthtracker.ui.formatDurationFromLong
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -35,6 +37,11 @@ class StepCounterService : Service(), SensorEventListener {
     companion object {
         private val _steps = MutableLiveData<Int>()
         val steps: LiveData<Int> get() = _steps
+
+        private val _calories = MutableLiveData<Int>()
+        val calories : LiveData<Int>get() = _calories
+        private var _sleepDuration = MutableLiveData<Long>()
+        val sleepDuration : LiveData<Long> get() = _sleepDuration
     }
 
     private var lastSensorEventTime: Long = 0
@@ -42,13 +49,14 @@ class StepCounterService : Service(), SensorEventListener {
     private var sleepStartTime: Long = 0
     private var sleepStopTime: Long = 0
 
-    private var sleepDuration: Long = 0
 
-    private val idleThresholdMillis = 2 * 60 * 60 * 1000
+    private val idleThresholdMillis = 2 * 60 * 60 * 3600
 
     private val channelId = "step_counter_channel"
     private var sensorManager: SensorManager? = null
-
+    init {
+        _sleepDuration.postValue(0)
+    }
 
     private val userDao = MainActivity.getDatabaseInstance().dao()
     private val customCoroutineScope = CoroutineScope(Dispatchers.Main)
@@ -56,41 +64,47 @@ class StepCounterService : Service(), SensorEventListener {
     private fun getUser(): Flow<UserMegaInfo?> = flow {
         val user = withContext(Dispatchers.IO) {
             userDao.getEntireUser()
+
         }
         emit(user?.let { roomToUserMegaInfoAdapter.adapt(it) })
         Log.d("emitted user", roomToUserMegaInfoAdapter.adapt(user!!).toString())
     }
+
     private suspend fun getUserSteps() {
-        return withContext(Dispatchers.IO) {
-            getUser().collect { user ->
-                user?.let {
-                    Log.d(
-                        "steps from dao lul xd",
-                        it.userAutomaticInfo?.steps?.currentSteps.toString()
-                    )
-                    it.userAutomaticInfo?.steps?.currentSteps.let { it1 ->
-                        Log.d("current steps from dao in service", it1.toString())
-                        _steps.postValue(it1)
-                    }
-                }?.run {
-                    Log.i("null", "user is null for the time being $user")
+        getUser().collect { user ->
+            user?.let {
+                Log.d(
+                    "steps from dao lul xd", it.userAutomaticInfo?.steps?.currentSteps.toString()
+                )
+                it.userAutomaticInfo?.steps?.currentSteps.let { it1 ->
+                    Log.d("current steps from dao in service", it1.toString())
+                    _steps.postValue(it1)
                 }
+                it.userAutomaticInfo?.steps?.currentCalories.let { it1 ->
+                    Log.d("current calories from dao in service", it1.toString())
+                    _calories.postValue(it1)
+                }
+            }?.run {
+                Log.i("null", "user is null for the time being $user")
             }
         }
     }
 
-    private var handler: Handler? = null
+    var handler: Handler? = null
     suspend fun updateUserAutomaticInfo() {
         withContext(Dispatchers.IO) {
-            val steps = _steps.value
-            val user = userDao.getEntireUser()
+            val user = async { userDao.getEntireUser() }.await()
             user?.userAutomaticInfo.let {
                 val renewedAutomaticInfo = UserAutomaticInfo(
                     challengesPassed = it?.challengesPassed ?: 0,
                     totalSleepHours = it?.totalSleepHours,
-                    steps = it?.steps?.copy(currentSteps = steps)
+                    steps = it?.steps?.copy(
+                        currentSteps = _steps.value,
+                        currentCalories = _calories.value
+                    )
                 )
                 userDao.updateUserAutomaticInfo(renewedAutomaticInfo)
+                Log.d("updating auto", userDao.getAutomaticInfo().toString())
             }
 //            Log.d("Running updater", "")
         }
@@ -116,7 +130,6 @@ class StepCounterService : Service(), SensorEventListener {
     }
 
 
-
     private fun checkForSleep() {
 //        Log.d("Checking for sleep", "")
         val currentTime = System.currentTimeMillis()
@@ -133,12 +146,24 @@ class StepCounterService : Service(), SensorEventListener {
         sleepStartTime = lastSensorEventTime
     }
 
-    private suspend fun stopSleepTracking() {
+    private fun stopSleepTracking() {
         isSleeping = false
         sleepStopTime = System.currentTimeMillis()
-        sleepDuration = sleepStopTime - sleepStartTime
-        Log.d("Sleep duration", formatDuration(sleepDuration))
-//        userDao.updateUserSettings()
+        _sleepDuration.postValue(sleepStopTime - sleepStartTime)
+        Log.d("Sleep duration", formatDurationFromLong(_sleepDuration.value!!))
+        customCoroutineScope.launch {
+            withContext(Dispatchers.IO){
+                val userPutInInfo = async {
+                    userDao.getPutInInfo()
+                }.await()
+                userPutInInfo?.sleepDuration = formatDurationFromLong(_sleepDuration.value!!)
+                userPutInInfo?.let {
+                    Log.d("logging sleep", "")
+                    userDao.updateUserPutInInfo(it)
+                    Log.d("sleep logged", userDao.getPutInInfo().toString())
+                }
+            }
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -146,16 +171,6 @@ class StepCounterService : Service(), SensorEventListener {
         registerStepSensor()
         return START_STICKY
     }
-
-    private fun formatDuration(milliseconds: Long): String {
-        val totalSeconds = milliseconds / 1000
-        val hours = totalSeconds / 3600
-        val minutes = (totalSeconds % 3600) / 60
-        val seconds = totalSeconds % 60
-
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds)
-    }
-
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.steps)
@@ -179,8 +194,7 @@ class StepCounterService : Service(), SensorEventListener {
             NotificationCompat.Builder(this, channelId).setSmallIcon(R.drawable.running_icon)
                 .setContentTitle(getString(R.string.total_steps))
                 .setContentText("$currentSteps Steps").setContentIntent(pendingIntent)
-                .setOngoing(true)
-                .setSound(null)
+                .setOngoing(true).setSound(null)
         return builder.build()
     }
 
@@ -224,6 +238,7 @@ class StepCounterService : Service(), SensorEventListener {
 
     override fun onDestroy() {
         super.onDestroy()
+        handler?.removeCallbacksAndMessages(null)
         sensorManager?.unregisterListener(this)
     }
 

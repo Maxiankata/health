@@ -28,9 +28,9 @@ class Alarmer:AlarmScheduler {
     override fun schedule(item: AlarmItem) {
         val intent = Intent(context, AlarmRecieverer::class.java)
         val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, 22)
-        calendar.set(Calendar.MINUTE, 9)
-        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 4)
+        calendar.set(Calendar.SECOND, 30)
         val currentTime = System.currentTimeMillis()
         if (calendar.timeInMillis < currentTime) {
             calendar.add(Calendar.DAY_OF_MONTH, 1)
@@ -85,6 +85,7 @@ class AlarmRecieverer:BroadcastReceiver(){
             userDao.updateUserPutInInfo(UserPutInInfo())
             stepCounterService.nullifySteps()
             stepCounterService.stopSelf()
+            stepCounterService.handler?.removeCallbacksAndMessages(null)
             startStepCounterService()
             Log.d("wiped days from base", userDao.getEntireUser()!!.userAutomaticInfo.toString())
 

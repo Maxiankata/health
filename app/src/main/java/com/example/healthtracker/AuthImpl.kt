@@ -2,6 +2,7 @@ package com.example.healthtracker
 
 import android.graphics.Bitmap
 import android.util.Log
+import com.example.healthtracker.data.user.UserDays
 import com.example.healthtracker.ui.account.friends.challenges.Challenge
 import com.example.healthtracker.ui.account.friends.challenges.ChallengeType
 import com.example.healthtracker.data.user.UserInfo
@@ -149,7 +150,7 @@ class AuthImpl : AuthInterface {
             .setValue(megaInfo.userPutInInfo)
         Firebase.database.reference.child("user/${Firebase.auth.currentUser?.uid}/userSettingsInfo")
             .setValue(megaInfo.userSettingsInfo)
-        Firebase.database.reference.child("user/${Firebase.auth.currentUser?.uid}/userUserDays")
+        Firebase.database.reference.child("user/${Firebase.auth.currentUser?.uid}/userDays")
             .setValue(megaInfo.userDays)
     }
 

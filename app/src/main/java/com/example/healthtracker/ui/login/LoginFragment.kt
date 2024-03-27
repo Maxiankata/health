@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.map
 import androidx.navigation.findNavController
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.R
@@ -19,6 +20,7 @@ import com.example.healthtracker.ui.hideLoading
 import com.example.healthtracker.ui.isInternetAvailable
 import com.example.healthtracker.ui.showLoading
 import kotlinx.coroutines.launch
+import com.example.healthtracker.data.user.LoginUiMapper
 
 
 class LoginFragment : Fragment() {
@@ -44,54 +46,21 @@ class LoginFragment : Fragment() {
                     findNavController().navigate(R.id.action_login_to_register)
                 }
             }
+            loginFragmentViewModel.state.map { LoginUiMapper.map(it) }.observe(viewLifecycleOwner) {
+                showLog(it.message)
+                if(it.shouldNavigate) {
+                    requireActivity().hideLoading()
+                    val intent =
+                        Intent(context, MainActivity::class.java)
+                    startActivity(intent)
+                    activity?.finish()
+                }
+            }
             loginFragmentViewModel.requestPermissionsUntilGranted(this@LoginFragment)
             signInButton.apply {
                 setOnClickListener {
                     requireActivity().showLoading()
-                    lifecycleScope.launch {
-                        try {
-                            if (loginFragmentViewModel.logIn(
-                                    usernameInput.text.toString(),
-                                    passwordInput.text.toString()
-                                )
-                            ) {
-                                    loginFragmentViewModel.getUser().also {
-                                        Log.d("also ", "also block")
-                                        requireActivity().hideLoading()
-                                        val intent =
-                                            Intent(context, MainActivity::class.java)
-                                        startActivity(intent)
-                                        activity?.finish()
-                                }
-                            } else if (isInternetAvailable(context)) {
-                                Toast.makeText(
-                                    context,
-                                    R.string.login_issue,
-                                    Toast.LENGTH_SHORT,
-                                ).show().also {
-                                    requireActivity().hideLoading()
-                                }
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    R.string.no_internet,
-                                    Toast.LENGTH_SHORT
-                                ).show().also {
-                                    requireActivity().hideLoading()
-                                }
-                            }
-                        } catch (e: Exception) {
-                            Log.d("empty", "$e")
-                            Toast.makeText(
-                                context,
-                                getString(R.string.empty_field),
-                                Toast.LENGTH_SHORT,
-                            ).show().also {
-                                findViewById<RelativeLayout>(R.id.loadingPanel).visibility =
-                                    View.GONE
-                            }
-                        }
-                    }
+                    loginFragmentViewModel.logIn(email = usernameInput.text.toString(), passwordInput.text.toString(), isInternetAvailable(context))
                 }
             }
             forgotPassword.apply {
@@ -102,7 +71,11 @@ class LoginFragment : Fragment() {
             }
         }
     }
-
+    private fun showLog(message: String?) {
+        message?.let {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+        }
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

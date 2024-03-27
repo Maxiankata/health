@@ -39,9 +39,9 @@ class AccountViewModel(private val application: Application) : AndroidViewModel(
                 Log.d("syn", "sync")
 
                 stepCounterService.stopSelf()
+                stepCounterService.handler?.removeCallbacksAndMessages(null)
                 Log.d("syn", "sync")
 
-                startStepCounterService()
 
             }
         }

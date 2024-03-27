@@ -9,6 +9,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.healthtracker.AuthImpl
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.MyApplication
@@ -17,9 +18,9 @@ import com.example.healthtracker.data.room.UserMegaInfoToRoomAdapter
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.UserPutInInfo
 import com.example.healthtracker.data.user.WaterInfo
-import com.example.healthtracker.ui.home.running.RunningSensorListener
-import com.example.healthtracker.ui.home.walking.StepCounterService
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
@@ -72,10 +73,17 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
         }
     }
 
-    suspend fun syncToFireBase(userMegaInfo: UserMegaInfo) {
-        auth.sync(userMegaInfo)
+    fun syncToFireBase() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val user =
+                async {
+                    userDao.getEntireUser()
+                }.await()
+                auth.sync(roomToUserMegaInfoAdapter.adapt(user!!))
+            }
+        }
     }
-
 
     suspend fun waterIncrement(incrementation: Int) {
         withContext(Dispatchers.IO) {
@@ -105,17 +113,6 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
                 }
             }
         }
-    }
-
-    suspend fun switchActivity(userActivityStates: UserActivityStates) {
-        when (userActivityStates) {
-            UserActivityStates.WALKING -> _currentService.value = StepCounterService()
-            UserActivityStates.RUNNING -> _currentService.value = RunningSensorListener(application)
-            UserActivityStates.CYCLING -> Log.d("cycling", "")
-            UserActivityStates.JOGGING -> Log.d("hiking", "")
-            UserActivityStates.POWER_WALKING -> Log.d("power walking", "")
-        }
-
     }
 
     fun isInternetAvailable(context: Context): Boolean {

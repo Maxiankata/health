@@ -19,28 +19,17 @@ class MainViewModel(private val application: Application):AndroidViewModel(appli
     private var fromRoomAdapter= RoomToUserMegaInfoAdapter()
     private var toRoomAdapter = UserMegaInfoToRoomAdapter()
 
-    suspend fun syncCloud(){
+    fun syncCloud(){
         viewModelScope.launch {
             withContext(Dispatchers.IO){
                 val user = userDao.getEntireUser()
                 user?.let {
                     fromRoomAdapter.adapt(it)
                 }?.let {
-                    auth.sync(it)
+//                    auth.sync(it)
 
                 }
             }
-        }
-    }
-    suspend fun leftWindow(userAutomaticInfo: UserAutomaticInfo){
-        withContext(Dispatchers.IO){
-            userDao.updateUserAutomaticInfo(userAutomaticInfo)
-            syncCloud()
-        }
-    }
-    suspend fun joinedWindow(userAutomaticInfo: UserAutomaticInfo){
-        withContext(Dispatchers.IO){
-            userDao.updateUserAutomaticInfo(userAutomaticInfo)
         }
     }
 }

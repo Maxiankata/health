@@ -3,7 +3,6 @@ package com.example.healthtracker
 import android.app.Application
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.healthtracker.ui.home.walking.StepCounterService
 
 class MyApplication : Application() {
     override fun onCreate() {

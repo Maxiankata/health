@@ -262,7 +262,14 @@ fun startStepCounterService() {
             .toString()
     )
 }
+fun formatDurationFromLong(milliseconds: Long): String {
+    val totalSeconds = milliseconds / 1000
+    val hours = totalSeconds / 3600
+    val minutes = (totalSeconds % 3600) / 60
+    val seconds = totalSeconds % 60
 
+    return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+}
 fun durationToString(duration: Duration): String {
     val hours = duration.toHours()
     val minutes = duration.toMinutes() % 60
