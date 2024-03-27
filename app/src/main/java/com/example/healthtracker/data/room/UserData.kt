@@ -4,9 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.example.healthtracker.data.Challenge
+import com.example.healthtracker.ui.account.friends.challenges.Challenge
 import com.example.healthtracker.data.GsonTypeConverter
-import com.example.healthtracker.data.user.UserGoals
 import com.example.healthtracker.data.user.UserAutomaticInfo
 import com.example.healthtracker.data.user.UserDays
 import com.example.healthtracker.data.user.UserInfo

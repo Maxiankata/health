@@ -1,6 +1,4 @@
-package com.example.healthtracker.data
-
-import java.time.Duration
+package com.example.healthtracker.ui.account.friends.challenges
 
 data class Challenge(
     val assigner:String,
@@ -8,19 +6,11 @@ data class Challenge(
     val challengeDuration: String,
     val challengeCompletion: Boolean
 )
-
-interface ChallengeBuilder {
-    fun buildChallenge(challenge: Challenge)
-}
-enum class DurationType{
-    MINUTES,
-    STEPS
-}
 enum class ChallengeType {
     WALKING,
     CYCLING,
     RUNNING,
-    HIKING,
+    JOGGING,
     POWER_WALKING,
 
 }

@@ -1,4 +1,4 @@
-package com.example.healthtracker.ui.account.friends
+package com.example.healthtracker.ui.account.friends.challenges
 
 import android.annotation.SuppressLint
 import android.graphics.Color
@@ -14,8 +14,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import com.example.healthtracker.MyApplication
 import com.example.healthtracker.R
-import com.example.healthtracker.data.Challenge
-import com.example.healthtracker.data.ChallengeType
 import com.example.healthtracker.data.SpinnerItem
 import com.example.healthtracker.databinding.ThirdBuilderDialogBinding
 import com.example.healthtracker.ui.account.friends.profile.ChallengeSpinnerAdapter
@@ -59,7 +57,7 @@ class ChallengeBuilderDialogFragment : DialogFragment() {
             val items = listOf(
                 SpinnerItem(getString(R.string.running), R.drawable.running_icon, 1),
                 SpinnerItem(getString(R.string.cycling), R.drawable.cycling_icon, 2),
-                SpinnerItem(getString(R.string.hiking), R.drawable.hiking_icon, 3),
+                SpinnerItem(getString(R.string.jogging), R.drawable.jogging_icon, 3),
                 SpinnerItem(getString(R.string.power_walking), R.drawable.power_walking_icon, 4),
 
                 )
@@ -103,7 +101,7 @@ class ChallengeBuilderDialogFragment : DialogFragment() {
                         val activityType: ChallengeType = when (challengeTypeId) {
                             1 -> ChallengeType.RUNNING
                             2 -> ChallengeType.CYCLING
-                            3 -> ChallengeType.HIKING
+                            3 -> ChallengeType.JOGGING
                             4 -> ChallengeType.POWER_WALKING
                             else -> {
                                 ChallengeType.WALKING

@@ -55,7 +55,7 @@
     <string name="no_friends">Your friends list is empty! Add friends to see them here.</string>
     <string name="running">Running</string>
     <string name="cycling">Cycling</string>
-    <string name="hiking">Hiking</string>
+    <string name="jogging">Jogging</string>
     <string name="power_walking">Power\nWalking</string>
     <string name="no_internet">Inaccessibility to the internet</string>
     <string name="under_zero">You can\'t drink negative water</string>
@@ -84,6 +84,19 @@
     <string name="mode">Mode</string>
     <string name="challenge">Challenge</string>
     <string name="invalid_duration_format">Invalid Duration Format</string>
+    <string name="daily_challenges">Today\'s Challenges</string>
+    <string name="type">Type</string>
+    <string name="duration">Duration</string>
+    <string name="by">By</string>
+    <string name="status">Status</string>
+    <string name="complete">complete</string>
+    <string name="incomplete">incomplete</string>
+    <string name="empty_challenges">No new challenges for today</string>
+    <string name="accept">Accept</string>
+    <string name="decline">Decline</string>
+    <string name="challenges_passed">Challenges passed:</string>
+    <string name="permissions_needed">The permissions requested are needed for the app to function.</string>
+    <string name="kg">kg</string>
     <string-array name="activities">
         <item>Walking</item>
         <item>Power Walking</item>

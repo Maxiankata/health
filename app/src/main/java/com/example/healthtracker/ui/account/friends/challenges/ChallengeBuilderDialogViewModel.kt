@@ -1,4 +1,4 @@
-package com.example.healthtracker.ui.account.friends
+package com.example.healthtracker.ui.account.friends.challenges
 
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.healthtracker.AuthImpl
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.MyApplication
-import com.example.healthtracker.data.Challenge
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -14,10 +13,8 @@ import kotlinx.coroutines.withContext
 class ChallengeBuilderDialogViewModel(private val application: MyApplication) : AndroidViewModel(application) {
     private val userDao = MainActivity.getDatabaseInstance().dao()
     private val authImpl = AuthImpl.getInstance()
-    suspend fun sendChallenge(userId:String, challenge:Challenge) {
+    suspend fun sendChallenge(userId:String, challenge: Challenge) {
         viewModelScope.launch {
-            Log.d("Challenge recieved", userId)
-            Log.d("Challenge recieved", challenge.toString())
             val renewedChallengesList = mutableListOf<Challenge>()
             val previousChallenges = authImpl.fetchChallenges(userId)
             if (previousChallenges != null) {

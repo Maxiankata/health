@@ -48,6 +48,7 @@ class RunningSensorListener(private val context: Context) : SensorEventListener,
             LocationManager.GPS_PROVIDER, 0, 0f, this
         )
     }
+
     val gravitationalAcceleration = 9.8f
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type == Sensor.TYPE_ACCELEROMETER) {
@@ -66,7 +67,7 @@ class RunningSensorListener(private val context: Context) : SensorEventListener,
                     event.values[1],
                     event.values[2],
                 )
-                Log.d("SpeedTracker", "Acceleration: $linearAcceleration")
+//                Log.d("SpeedTracker", "Acceleration: $linearAcceleration")
 
                 lastAccelerationUpdateTime = currentTime
             }
@@ -74,9 +75,10 @@ class RunningSensorListener(private val context: Context) : SensorEventListener,
     }
 
     private fun calculateLinearAcceleration(x: Float, y: Float, z: Float): Float {
-        val totalAcceleration = sqrt((x * x + y * y + z * z).toDouble()).toFloat()
-        val linearAcceleration = totalAcceleration - gravitationalAcceleration
-        return maxOf(0f, linearAcceleration) // Ensure the result is non-negative
+        val totalAcceleration = sqrt((x * x + y*y+ z * z).toDouble()).toFloat()
+//        Log.d("values", "${x}, ${y}, ${z}")
+        val linearAcceleration = totalAcceleration
+        return maxOf(0f, linearAcceleration)
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {

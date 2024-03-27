@@ -10,10 +10,10 @@ import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.UserPutInInfo
 import com.example.healthtracker.data.user.UserSettingsInfo
 import com.example.healthtracker.data.user.WaterInfo
+import com.example.healthtracker.ui.account.friends.challenges.Challenge
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.util.Calendar
-import java.util.Date
 
 class GsonTypeConverter {
 

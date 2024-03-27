@@ -112,7 +112,7 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
             UserActivityStates.WALKING -> _currentService.value = StepCounterService()
             UserActivityStates.RUNNING -> _currentService.value = RunningSensorListener(application)
             UserActivityStates.CYCLING -> Log.d("cycling", "")
-            UserActivityStates.HIKING -> Log.d("hiking", "")
+            UserActivityStates.JOGGING -> Log.d("hiking", "")
             UserActivityStates.POWER_WALKING -> Log.d("power walking", "")
         }
 

@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.healthtracker.MyApplication
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.FragmentDashboardBinding
+import com.example.healthtracker.ui.calendarToString
 import com.example.healthtracker.ui.showBottomNav
 import kotlinx.coroutines.launch
 import org.joda.time.DateTime
@@ -35,43 +36,47 @@ class DashboardFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
-
-
             calendar.setOnDateChangeListener { view, year, month, dayOfMonth ->
-
-                Log.d("Calendar clicked", "Lul"
-
-
-                )
                 val selectedDate = Calendar.getInstance()
                 selectedDate.set(year,month,dayOfMonth)
-                Log.d("Selected date", selectedDate.toString())
-                val daate = java.time.LocalDateTime.now()
-                val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                val formattedDate = dateFormat.format(selectedDate.time)
-                Toast.makeText(requireContext(), "Selected date: $formattedDate", Toast.LENGTH_SHORT).show()
+                val daySelection = calendarToString(selectedDate)
+                Log.d("Selected date", daySelection)
+                Toast.makeText(requireContext(), "Selected date: $daySelection", Toast.LENGTH_SHORT).show()
                 lifecycleScope.launch {
-                    dashboardViewModel.feedDay(selectedDate.time)
+                    dashboardViewModel.feedDay(daySelection)
                 }
                 dashboardViewModel.userDay.observe(viewLifecycleOwner){
+                    Log.d("Userday", it.toString())
                     date.apply {
                         text = buildString {
-                            append(R.string.date)
-//                            append(it?.dateTime)
+                            append(it?.dateTime)
                         }
                     }
                     stepsTaken.apply {
                         text = buildString {
                             append(getString(R.string.steps))
-                            append(it?.automaticInfo?.steps?:0)
+                            append(it?.automaticInfo?.steps?.currentSteps?:0)
                         }
                     }
                     caloriesBurned.apply {
                         text = buildString {
                             append(getString(R.string.calories))
-//                            append(it?.automaticInfo??:0)
+                            append(it?.automaticInfo?.steps?.currentCalories?:0)
                         }
                     }
+                    challengesPassed.apply {
+                        text = buildString {
+                            append(getString(R.string.challenges_passed))
+                            append(it?.challenges?.size?:0)
+                        }
+                    }
+                    recordedWeight.apply {
+                        text = buildString {
+                            append(getString(R.string.daily_weight))
+                            append(it?.putInInfo?.weight)
+                        }
+                    }
+
                 }
             }
 

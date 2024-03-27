@@ -1,11 +1,6 @@
 package com.example.healthtracker.data.user
 
-import androidx.room.TypeConverters
-import com.example.healthtracker.CalendarTypeConverter
-import com.example.healthtracker.data.Challenge
-import com.google.type.DateTime
-import java.util.Calendar
-import java.util.Date
+import com.example.healthtracker.ui.account.friends.challenges.Challenge
 
 data class UserDays(
     val putInInfo: UserPutInInfo?=null,

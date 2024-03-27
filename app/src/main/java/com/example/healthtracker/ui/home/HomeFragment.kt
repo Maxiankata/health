@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.R
 import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
@@ -18,6 +19,7 @@ import com.example.healthtracker.ui.home.running.RunningDialogFragment
 import com.example.healthtracker.ui.home.running.RunningSensorListener
 import com.example.healthtracker.ui.home.walking.StepCounterService
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -27,7 +29,6 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val homeViewModel: HomeViewModel by activityViewModels()
-    private val weightRecyclerAdapter: WeightRecyclerAdapter = WeightRecyclerAdapter()
     private lateinit var speedTracker: RunningSensorListener
     private var stepCount: LiveData<Int> = StepCounterService.steps
     override fun onCreateView(
@@ -45,42 +46,39 @@ class HomeFragment : Fragment() {
             homeViewModel.feedUser()
             homeViewModel.checkForChallenges()
         }
-
-        val weightRecyclerVal = WeightRecyclerAdapter()
-        weightRecyclerAdapter.updateItems(Weight.weight.toList())
         binding.apply {
             stepCount.observe(viewLifecycleOwner) { steps ->
                 if (steps == null) {
                     Log.d("wait for it :)", "i swear")
                 } else {
                     lifecycleScope.launch {
-                        val user = homeViewModel.user.value
-
-                        stepsCircularProgressBar.apply {
-                            val steppi = user?.userSettingsInfo?.userGoals?.stepGoal?.toFloat()
-                            setProgressWithAnimation(steps.toFloat())
-                            steppi?.let {
-                                Log.d("steppi isnt null", steppi.toString())
-                                progressMax = steppi
+                        homeViewModel.user.observe(viewLifecycleOwner) {
+                            val user = it
+                            stepsCircularProgressBar.apply {
+                                val steppi = user?.userSettingsInfo?.userGoals?.stepGoal?.toFloat()
+                                setProgressWithAnimation(steps.toFloat())
+                                steppi?.let {
+                                    progressMax = steppi
+                                }
                             }
-                        }
-                        stepcount.apply {
-                            text = buildString {
-                                append(getString(R.string.steps))
-                                append(steps)
+                            stepcount.apply {
+                                text = buildString {
+                                    append(getString(R.string.steps))
+                                    append(steps)
+                                }
                             }
-                        }
 
-                        binding.calorieCount.text = buildString {
-                            append(getString(R.string.calories))
-                            append(steps / 25)
-                        }
-                        binding.caloriesProgressBar.apply {
-                            val calori = user?.userSettingsInfo?.userGoals?.calorieGoal?.toFloat()
-                            setProgressWithAnimation((steps / 25).toFloat())
-                            calori?.let {
-                                Log.d("calori isnt null", calori.toString())
-                                progressMax = calori
+                            binding.calorieCount.text = buildString {
+                                append(getString(R.string.calories))
+                                append(steps / 25)
+                            }
+                            binding.caloriesProgressBar.apply {
+                                val calori =
+                                    user?.userSettingsInfo?.userGoals?.calorieGoal?.toFloat()
+                                setProgressWithAnimation((steps / 25).toFloat())
+                                calori?.let {
+                                    progressMax = calori
+                                }
                             }
                         }
                     }
@@ -88,21 +86,22 @@ class HomeFragment : Fragment() {
             }
 
             homeViewModel.water.observe(viewLifecycleOwner) {
-                val user = homeViewModel.user.value
-                textView2.text = buildString {
-                    if (it != null) {
-                        if (it.currentWater != null && it.currentWater != 0) {
-                            Log.d("water isnt null and isnt 0", it.currentWater.toString())
-                            append(it.currentWater)
+                homeViewModel.user.observe(viewLifecycleOwner) {user->
+                    textView2.text = buildString {
+                        if (it != null) {
+                            if (it.currentWater != null && it.currentWater != 0) {
+                                Log.d("water isnt null and isnt 0", it.currentWater.toString())
+                                append(it.currentWater)
+                            } else {
+                                Log.d("water is null", it.currentWater.toString())
+                                append(0)
+                            }
                         } else {
-                            Log.d("water is null", it.currentWater.toString())
-                            append(0)
+                            Log.d("water is null and isnt 0", it.toString())
                         }
-                    } else {
-                        Log.d("water is null and isnt 0", it.toString())
+                        append("/")
+                        append(user?.userSettingsInfo?.userGoals?.waterGoal ?: 6)
                     }
-                    append("/")
-                    append(user?.userSettingsInfo?.userGoals?.waterGoal ?: 6)
                 }
             }
             plus.setOnClickListener {
@@ -117,7 +116,6 @@ class HomeFragment : Fragment() {
             }
 
             runLayout.setOnClickListener {
-
                 val runDialog = RunningDialogFragment()
                 runDialog.show(requireActivity().supportFragmentManager, "running dialog")
             }
@@ -130,9 +128,9 @@ class HomeFragment : Fragment() {
                     requireActivity().supportFragmentManager, "cycling dialog"
                 )
             }
-            hikingLayout.setOnClickListener {
+            joggingLayout.setOnClickListener {
                 lifecycleScope.launch {
-                    homeViewModel.switchActivity(UserActivityStates.HIKING)
+                    homeViewModel.switchActivity(UserActivityStates.JOGGING)
                 }
                 val runDialog = RunningDialogFragment()
                 runDialog.show(requireActivity().supportFragmentManager, "hiking dialog")
@@ -148,24 +146,92 @@ class HomeFragment : Fragment() {
             }
 
             weightRecycler.apply {
-
+                val weightRecyclerAdapterer = WeightRecyclerAdapter(Weight.weight.toMutableList())
+                adapter = weightRecyclerAdapterer
                 layoutManager = LinearLayoutManager(context)
-                val fakeLayoutManager = this.layoutManager as LinearLayoutManager
-                scaleImage.setOnClickListener {
-                    val middleItem =
-                        weightRecyclerAdapter.getItem((fakeLayoutManager.findFirstVisibleItemPosition() + fakeLayoutManager.findLastVisibleItemPosition()) / 2)
-                    Log.d("Middle Item", middleItem)
-                }
+                val layoutManager = this.layoutManager as LinearLayoutManager
+                var isScrolling = false
+                weightRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+
+                        super.onScrolled(recyclerView, dx, dy)
+                        isScrolling = true
+                    }
+
+                    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                        super.onScrollStateChanged(recyclerView, newState)
+                        if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                            if (isScrolling) {
+                                try{
+                                    lifecycleScope.launch {
+                                        var middleItem =
+                                            (layoutManager.findFirstCompletelyVisibleItemPosition() + layoutManager.findLastCompletelyVisibleItemPosition()) / 2
+                                        Log.d("middle item lookout", middleItem.toString())
+                                        if (middleItem == -1) {
+                                            delay(100)
+                                            middleItem =
+                                                (layoutManager.findFirstVisibleItemPosition() + layoutManager.findLastVisibleItemPosition()) / 2
+                                            weightRecyclerAdapterer.updateMiddleItemSize(middleItem)
+
+                                        } else {
+                                            weightRecyclerAdapterer.updateMiddleItemSize(middleItem)
+                                        }
+                                    }
+                                }catch (e:Exception){
+                                    lifecycleScope.launch {
+                                        var middlePosition =
+                                            (layoutManager.findFirstVisibleItemPosition() + layoutManager.findLastVisibleItemPosition()) / 2
+                                        Log.d("middle item lookout", middlePosition.toString())
+                                        if (middlePosition == -1) {
+                                            delay(100)
+                                            middlePosition =
+                                                (layoutManager.findFirstVisibleItemPosition() + layoutManager.findLastVisibleItemPosition()) / 2
+
+                                        }
+                                        weightRecyclerAdapterer.updateMiddleItemSize(middlePosition)
+                                    }
+                                }
+                                isScrolling = false
+                            }
+                        }
+                    }
+
+
+                })
             }
             secondWeightRecycler.apply {
-                adapter = weightRecyclerVal
+                val weightRecyclerAdapterer =
+                    WeightRecyclerAdapter(Weight.subWeight.toMutableList())
+                adapter = weightRecyclerAdapterer
                 layoutManager = LinearLayoutManager(context)
-                val fakeLayoutManager = this.layoutManager as LinearLayoutManager
-                scaleImage.setOnClickListener {
-                    val middleItem =
-                        weightRecyclerAdapter.getItem((fakeLayoutManager.findFirstVisibleItemPosition() + fakeLayoutManager.findLastVisibleItemPosition()) / 2)
-                    Log.d("Middle Item", middleItem)
+                val layoutManager = this.layoutManager as LinearLayoutManager
+                var isScrolling = false
+                secondWeightRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+
+                        super.onScrolled(recyclerView, dx, dy)
+                    isScrolling = true
                 }
+
+                        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                        if (isScrolling) {
+                            try{
+                                val middleItem = (layoutManager.findFirstCompletelyVisibleItemPosition() + layoutManager.findLastCompletelyVisibleItemPosition()) / 2
+                                Log.d("middle item lookout", middleItem.toString())
+                                weightRecyclerAdapterer.updateMiddleItemSize(middleItem)
+                            }catch (e:Exception){
+                                val middlePosition = (layoutManager.findFirstVisibleItemPosition() + layoutManager.findLastVisibleItemPosition()) / 2
+                                weightRecyclerAdapterer.updateMiddleItemSize(middlePosition)
+                            }
+                            isScrolling = false
+                        }
+                    }
+                }
+
+
+                })
             }
         }
     }

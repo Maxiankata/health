@@ -1,5 +1,6 @@
 package com.example.healthtracker.ui.login.register
 
+import android.Manifest
 import android.app.Application
 import android.content.Context
 import android.util.Log
@@ -9,6 +10,8 @@ import com.example.healthtracker.MainActivity
 import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
 import com.example.healthtracker.data.room.UserMegaInfoToRoomAdapter
 import com.example.healthtracker.data.user.UserMegaInfo
+import com.example.healthtracker.ui.login.LoginActivity
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.internal.wait
@@ -18,10 +21,10 @@ class RegisterViewModel(private val application: Application) : AndroidViewModel
     private val userDao = MainActivity.getDatabaseInstance().dao()
     private var toRoomAdapter= UserMegaInfoToRoomAdapter()
     private var fromRoomAdapter= RoomToUserMegaInfoAdapter()
-
     suspend fun register(email: String, password: String, name: String){
         auth.createAcc(email, password, name)
         auth.logIn(email,password)
+
     }
     suspend fun getUser() {
         auth.getEntireUser().collect {

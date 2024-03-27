@@ -10,7 +10,6 @@ class TimeHelper(context: Context) {
 
     private var sharedPreferences : SharedPreferences = context.getSharedPreferences(PREFERENCES,Context.MODE_PRIVATE)
     private var dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
-
     private var timeCounting = false
     private var startTime : Date? = null
     private var stopTime : Date? = null

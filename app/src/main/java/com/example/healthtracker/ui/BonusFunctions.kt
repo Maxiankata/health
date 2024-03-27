@@ -1,11 +1,13 @@
 package com.example.healthtracker.ui
 
+import android.Manifest
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
@@ -18,6 +20,8 @@ import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.RelativeLayout
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import com.example.healthtracker.MyApplication
@@ -37,13 +41,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.DataSnapshot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.joda.time.DateTime
 import java.io.ByteArrayOutputStream
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.time.Duration
-import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Date
 
@@ -168,7 +170,7 @@ fun DataSnapshot.toUserInfo(): UserInfo {
 fun DataSnapshot.toUserAutomaticInfo(): UserAutomaticInfo {
     return UserAutomaticInfo(
         steps = child("steps").toStepsInfo(),
-        totalSleepHours = child("totalSleepHours").getValue(Double::class.java),
+        totalSleepHours = child("totalSleepHours").getValue(String::class.java),
         challengesPassed = child("challengesPassed").getValue(Int::class.java)
     )
 }
@@ -191,7 +193,7 @@ fun DataSnapshot.toUserSettingsInfo(): UserSettingsInfo {
     return UserSettingsInfo(
         language = child("language").getValue(String::class.java) ?: "english",
         units = child("units").getValue(String::class.java) ?: "kg",
-        userGoals = child("userGoals").getValue(UserGoals::class.java)?: UserGoals()
+        userGoals = child("userGoals").getValue(UserGoals::class.java) ?: UserGoals()
     )
 }
 
@@ -203,7 +205,8 @@ fun DataSnapshot.toUserDays(): UserDays {
         dateTime = child("dateTime").getValue(String::class.java)!!
     )
 }
-fun DataSnapshot.toUserGoals(): UserGoals{
+
+fun DataSnapshot.toUserGoals(): UserGoals {
     return UserGoals(
         stepGoal = child("stepGoal").getValue(Int::class.java),
         waterGoal = child("waterGoal").getValue(Int::class.java),
@@ -249,20 +252,24 @@ fun isInternetAvailable(context: Context): Boolean {
             (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
                     networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
 }
+
 fun startStepCounterService() {
     val serviceIntent = Intent(MyApplication.getContext(), StepCounterService::class.java)
     ContextCompat.startForegroundService(MyApplication.getContext(), serviceIntent)
     Log.d(
-        "starting stepper", ContextCompat.startForegroundService(MyApplication.getContext(), serviceIntent)
+        "starting stepper",
+        ContextCompat.startForegroundService(MyApplication.getContext(), serviceIntent)
             .toString()
     )
 }
+
 fun durationToString(duration: Duration): String {
     val hours = duration.toHours()
     val minutes = duration.toMinutes() % 60
     val seconds = duration.seconds % 60
     return String.format("%02d:%02d:%02d", hours, minutes, seconds)
 }
+
 fun stringToDuration(str: String): Duration? {
     val parts = str.split(":")
     if (parts.size != 3) {
@@ -273,11 +280,13 @@ fun stringToDuration(str: String): Duration? {
     val seconds = parts[2].toLongOrNull() ?: return null
     return Duration.ofHours(hours).plusMinutes(minutes).plusSeconds(seconds)
 }
+
 @SuppressLint("SimpleDateFormat")
 fun calendarToString(calendar: Calendar): String {
     val dateFormat = SimpleDateFormat("dd/MM/yyyy")
     return dateFormat.format(calendar.time)
 }
+
 @SuppressLint("SimpleDateFormat")
 fun stringToCalendar(dateStr: String): Calendar? {
     val dateFormat = SimpleDateFormat("dd/MM/yyyy")
@@ -287,8 +296,10 @@ fun stringToCalendar(dateStr: String): Calendar? {
         calendar.time = date
         return calendar
     } catch (e: Exception) {
-        // Handle parse exceptions if any
         e.printStackTrace()
     }
     return null
 }
+
+
+

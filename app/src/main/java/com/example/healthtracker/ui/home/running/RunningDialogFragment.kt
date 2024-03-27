@@ -1,6 +1,5 @@
 package com.example.healthtracker.ui.home.running
 
-import android.app.Application
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -8,9 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import com.example.healthtracker.MyApplication
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.RunningDialogBinding
+import com.example.healthtracker.ui.durationToString
+import java.time.Duration
 import java.util.Date
 import java.util.Timer
 import java.util.TimerTask
@@ -39,35 +42,43 @@ class RunningDialogFragment : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         timeHelper = TimeHelper(requireContext())
         binding.apply {
-            val inputTime = timerInput.text.toString().trim()
-            if (inputTime.isNotEmpty()) {
-                val (hours, minutes, seconds) = inputTime.split(":").map { it.trim().toLongOrNull() ?: 0 }
-                val durationMillis = (hours * 3600 + minutes * 60 + seconds) * 1000
-                timer.apply {
-                setProgressWithAnimation(durationMillis.toFloat())
-                progressMax = durationMillis.toFloat()
+            editTextSeconds.visibility = GONE
+            editTextMinutes.visibility = GONE
+            editTextHours.visibility = GONE
+            start.setOnClickListener {
+                val hours = editTextHours.text.toString().toIntOrNull() ?: 0
+                val minutes = editTextMinutes.text.toString().toIntOrNull() ?: 0
+                val seconds = editTextSeconds.text.toString().toIntOrNull() ?: 0
+                val duration = Duration.ofHours(hours.toLong()).plusMinutes(minutes.toLong())
+                    .plusSeconds(seconds.toLong())
+                val stringDuration = durationToString(duration)
+                if ((editTextHours.text.toString()
+                        .isBlank() && editTextMinutes.text.toString()
+                        .isEmpty() && editTextSeconds.text.toString().isEmpty())
+                ) {
+                    Log.d("DurationText is null", duration.toString())
+                    Toast.makeText(
+                        MyApplication.getContext(), R.string.empty_field, Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
-
             start.setOnClickListener {
-                Intent(requireContext(),RunningService::class.java).also {
+                Intent(requireContext(), RunningService::class.java).also {
                     Log.d("Starting service", "Service start")
-                    it.action=RunningService.Active.START.toString()
+                    it.action = RunningService.Active.START.toString()
                     requireContext().startService(it)
                 }
                 startStopAction()
             }
             cancel.setOnClickListener {
-                Intent(requireContext(),RunningService::class.java).also {
+                Intent(requireContext(), RunningService::class.java).also {
                     Log.d("Stopping service", "Service Stop")
-                    it.action=RunningService.Active.STOP.toString()
+                    it.action = RunningService.Active.STOP.toString()
                     requireContext().startService(it)
                 }
                 dismiss()
             }
-            timerInput.apply {
-                visibility = GONE
-            }
+
             if (timeHelper.timerCounting()) {
                 startTimer()
             } else {

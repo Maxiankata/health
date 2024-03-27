@@ -15,82 +15,65 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.healthtracker.R
 import com.example.healthtracker.data.user.UserInfo
 
-class WeightRecyclerAdapter:RecyclerView.Adapter<WeightRecyclerAdapter.WeightViewHolder>() {
-    private val items = mutableListOf<Int>()
+class WeightRecyclerAdapter(private val numbers:MutableList<Int>):RecyclerView.Adapter<WeightRecyclerAdapter.WeightViewHolder>() {
+    private var middleItemPosition = -1
 
     inner class WeightViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        private val text = view.findViewById<TextView>(R.id.weight)
+        private val text = view.findViewById<TextView>(R.id.weight_text)
+        fun bind(item: Int, isMiddleItem: Boolean, position: Int) {
+            text.text = item.toString()
+            text.textSize = if (isMiddleItem) 25f else 20f
+            var recyclerView: RecyclerView? = null
+            var parentView: View? = itemView
+            while (parentView != null) {
+                if (parentView is RecyclerView) {
+                    recyclerView = parentView
+                    break
+                }
+                parentView = if (parentView.parent is View) {
+                    parentView.parent as View
+                } else {
+                    null
+                }
+            }
+            val translationY = if (isMiddleItem && recyclerView != null) {
+                recyclerView.height / 2 - text.height / 2
+            } else {
+                0
+            }
+            val animator = ObjectAnimator.ofPropertyValuesHolder(
+                text,
+                PropertyValuesHolder.ofFloat("textSize", if (isMiddleItem) 30f else 25f),
+                PropertyValuesHolder.ofFloat("translationY", translationY.toFloat())
+            )
+            animator.duration = 500
+            animator.interpolator = AccelerateDecelerateInterpolator()
+            animator.start()
+        }
 
-//        init {
-//            // attach a focus change listener to the root view
-//            view.setOnFocusChangeListener { _, hasFocus ->
-//                if (hasFocus) {
-//                    animateScale(view, 1.2f) // scale up when gaining focus
-//                    Log.d("Has focus", text.toString())
-//                } else {
-//                    Log.d("NO HAS FOCUS", text.toString())
-//                    animateScale(view, 1.0f) // revert to normal size when losing focus
-//                }
-//            }
-//        }
 
-        fun bind(double: Any) {
-            text.text = double.toString()
+    }
+    fun updateMiddleItemSize(middlePosition: Int) {
+        if (middlePosition != middleItemPosition) {
+            if (middleItemPosition != -1) {
+                val previousMiddleItem = numbers[middleItemPosition]
+                notifyItemChanged(middleItemPosition, previousMiddleItem)
+            }
+            middleItemPosition = middlePosition
+            notifyItemChanged(middleItemPosition, numbers[middleItemPosition])
         }
     }
-
-
-    private fun animateScale(view: View, scale: Float) {
-        val scaleAnimator = ObjectAnimator.ofPropertyValuesHolder(
-            view,
-            PropertyValuesHolder.ofFloat(View.SCALE_X, scale),
-            PropertyValuesHolder.ofFloat(View.SCALE_Y, scale)
-        )
-        scaleAnimator.duration = 300 // adjust the duration
-        scaleAnimator.interpolator = AccelerateDecelerateInterpolator()
-        scaleAnimator.start()
-    }
-//    what the hell have i written here
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WeightViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.weigh_card,parent,false)
         return WeightViewHolder(view)
     }
-
-    override fun getItemCount() = items.size
-    @SuppressLint("NotifyDataSetChanged")
-    fun updateItems(newItems: List<Int>) {
-        items.clear()
-        items.addAll(newItems)
-        Log.d("items", items.toString())
-        notifyDataSetChanged()
-    }
+    override fun getItemCount() = numbers.size
     public fun getItem(position:Int):String{
-        return items[position].toString()
+        return numbers[position].toString()
     }
     override fun onBindViewHolder(holder: WeightViewHolder, position: Int) {
-        holder.bind(items[position])
-//        val recyclerView = holder.itemView as? RecyclerView
-//        val layoutManager = recyclerView?.layoutManager
-//        //val recyclerView is null, fix
-//        if (layoutManager is LinearLayoutManager) {
-//            val firstVisiblePosition = layoutManager.findFirstVisibleItemPosition()
-//            val lastVisiblePosition = layoutManager.findLastVisibleItemPosition()
-//
-//            if (position in firstVisiblePosition..lastVisiblePosition) {
-//                val middlePosition = (lastVisiblePosition - firstVisiblePosition) / 2 + firstVisiblePosition
-//
-//                if (position == middlePosition) {
-//                    Log.d("middle position", getItem(position))
-//                    holder.itemView.requestFocus()
-//                }else{
-//                    Log.d("not middle position", getItem(position))
-//                }
-//            }
-//        }else{
-//            Log.d("Layout manager is not linear layout manager", layoutManager.toString())
-//        }
-
+        val item = numbers[position]
+        holder.bind(item, position == middleItemPosition, position)
     }
 
 }

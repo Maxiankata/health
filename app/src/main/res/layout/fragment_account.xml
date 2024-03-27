@@ -20,7 +20,17 @@
         android:src="@drawable/settings"
         android:layout_gravity="end"
         app:tint="@color/input_grey"
+        />
+    <ImageView
+        android:id="@+id/challenge_dialog_opener"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:layout_constraintTop_toTopOf="@+id/settings"
+        app:layout_constraintEnd_toStartOf="@id/settings"
+        android:layout_marginEnd="10dp"
+        app:tint="@color/input_grey"
 
+        android:src="@drawable/flag"
         />
 <!--    TODO() ADD BACKGROUND IMAGE PICKING MAYBE :)-->
 

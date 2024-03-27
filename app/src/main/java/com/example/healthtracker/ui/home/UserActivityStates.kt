@@ -4,6 +4,6 @@ enum class UserActivityStates {
     WALKING,
     RUNNING,
     CYCLING,
-    HIKING,
+    JOGGING,
     POWER_WALKING,
 }

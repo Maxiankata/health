@@ -21,16 +21,15 @@ class DashboardViewModel(private val application: Application) : AndroidViewMode
     val userDao= MainActivity.getDatabaseInstance().dao()
     private var _userDay = MutableLiveData<UserDays?>()
     val userDay : LiveData<UserDays?> get() = _userDay
-    suspend fun feedDay(date:Date){
+    suspend fun feedDay(string:String){
         withContext(Dispatchers.IO) {
             val user = userDao.getEntireUser()
             for (item in user?.userDays!!) {
-                Log.d("Date to search", date.toString())
-//                Log.d("Date found", item.dateTime.toString())
-
-//                if (date == item.dateTime) {
+                Log.d("Date to search", string)
+                Log.d("Date found", item.dateTime)
+                if (string == item.dateTime) {
                     _userDay.postValue(item)
-//                }
+                }
             }
         }
     }

@@ -2,8 +2,8 @@ package com.example.healthtracker
 
 import android.graphics.Bitmap
 import android.util.Log
-import com.example.healthtracker.data.Challenge
-import com.example.healthtracker.data.ChallengeType
+import com.example.healthtracker.ui.account.friends.challenges.Challenge
+import com.example.healthtracker.ui.account.friends.challenges.ChallengeType
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.ui.bitmapToBase64
@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import java.time.Duration
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -155,12 +154,18 @@ class AuthImpl : AuthInterface {
     }
 
     override suspend fun getEntireUser(): Flow<UserMegaInfo?> = flow {
+        Log.d("getEntireUser", "getEntireUser")
         Firebase.auth.currentUser?.uid?.let { uid ->
+            Log.d("getEntireUser", "uid is not null")
             val user = Firebase.database.getReference("user/$uid").get().await()
+            Log.d("getEntireUser", "before emit")
             emit(user.toUserMegaInfo())
         }
     }
 
+    override suspend fun clearChallenges() {
+        Firebase.database.reference.child("user/${Firebase.auth.currentUser?.uid}/challenges").setValue(null)
+    }
 
     override suspend fun getCurrentUser(): UserMegaInfo? {
         return try {
@@ -208,9 +213,8 @@ class AuthImpl : AuthInterface {
     }
     override suspend fun fetchOwnChallenges(): List<Challenge>? {
         return withContext(Dispatchers.IO) {
-            val challengesRef =
-                Firebase.database.getReference("user/${Firebase.auth.currentUser!!.uid}/challenges")
             try {
+                val challengesRef = Firebase.database.getReference("user/${Firebase.auth.currentUser!!.uid}/challenges")
                 val dataSnapshot = challengesRef.get().await()
                 val challengeList = mutableListOf<Challenge>()
                 for (challengeSnapshot in dataSnapshot.children) {

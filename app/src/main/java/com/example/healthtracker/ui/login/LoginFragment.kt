@@ -1,7 +1,5 @@
 package com.example.healthtracker.ui.login
 
-import android.content.ContentValues.TAG
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -40,27 +38,30 @@ class LoginFragment : Fragment() {
         requireActivity().hideLoading()
         binding.apply {
 
+
             registerButton.apply {
                 setOnClickListener {
                     findNavController().navigate(R.id.action_login_to_register)
                 }
             }
+            loginFragmentViewModel.requestPermissionsUntilGranted(this@LoginFragment)
             signInButton.apply {
                 setOnClickListener {
                     requireActivity().showLoading()
                     lifecycleScope.launch {
                         try {
                             if (loginFragmentViewModel.logIn(
-                                    usernameInput.text.toString(), passwordInput.text.toString()
+                                    usernameInput.text.toString(),
+                                    passwordInput.text.toString()
                                 )
                             ) {
-                                lifecycleScope.launch {
                                     loginFragmentViewModel.getUser().also {
+                                        Log.d("also ", "also block")
                                         requireActivity().hideLoading()
-                                        val intent = Intent(context, MainActivity::class.java)
+                                        val intent =
+                                            Intent(context, MainActivity::class.java)
                                         startActivity(intent)
                                         activity?.finish()
-                                    }
                                 }
                             } else if (isInternetAvailable(context)) {
                                 Toast.makeText(
@@ -86,11 +87,11 @@ class LoginFragment : Fragment() {
                                 getString(R.string.empty_field),
                                 Toast.LENGTH_SHORT,
                             ).show().also {
-                                findViewById<RelativeLayout>(R.id.loadingPanel).visibility = View.GONE
+                                findViewById<RelativeLayout>(R.id.loadingPanel).visibility =
+                                    View.GONE
                             }
                         }
                     }
-
                 }
             }
             forgotPassword.apply {

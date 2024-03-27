@@ -15,11 +15,10 @@ import androidx.lifecycle.lifecycleScope
 import com.example.healthtracker.R
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.databinding.FragmentFriendAccountBinding
-import com.example.healthtracker.ui.account.friends.ChallengeBuilderDialogFragment
+import com.example.healthtracker.ui.account.friends.challenges.ChallengeBuilderDialogFragment
 import com.example.healthtracker.ui.base64ToBitmap
 import com.example.healthtracker.ui.account.friends.popup.FriendListViewModel
 import com.example.healthtracker.ui.hideBottomNav
-import com.example.healthtracker.ui.home.running.RunningDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking

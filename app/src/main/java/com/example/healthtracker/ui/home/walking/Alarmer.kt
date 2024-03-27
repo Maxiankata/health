@@ -9,7 +9,7 @@ import android.util.Log
 import com.example.healthtracker.AuthImpl
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.MyApplication
-import com.example.healthtracker.data.Challenge
+import com.example.healthtracker.ui.account.friends.challenges.Challenge
 import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
 import com.example.healthtracker.data.user.UserAutomaticInfo
 import com.example.healthtracker.data.user.UserDays
@@ -19,12 +19,8 @@ import com.example.healthtracker.ui.startStepCounterService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.util.Calendar
-import java.util.Date
 
 class Alarmer:AlarmScheduler {
     val context = MyApplication.getContext()
@@ -32,8 +28,8 @@ class Alarmer:AlarmScheduler {
     override fun schedule(item: AlarmItem) {
         val intent = Intent(context, AlarmRecieverer::class.java)
         val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, 11)
-        calendar.set(Calendar.MINUTE, 37)
+        calendar.set(Calendar.HOUR_OF_DAY, 22)
+        calendar.set(Calendar.MINUTE, 9)
         calendar.set(Calendar.SECOND, 0)
         val currentTime = System.currentTimeMillis()
         if (calendar.timeInMillis < currentTime) {
@@ -79,6 +75,7 @@ class AlarmRecieverer:BroadcastReceiver(){
             userDao.updateDays(userDays)
             val syncer = roomToUserMegaInfoAdapter.adapt(userDao.getEntireUser()!!)
             authImpl.sync(syncer)
+            authImpl.clearChallenges()
             Log.d("Updated days from val", userDays.toString())
             Log.d("Updated days from base", userDao.getEntireUser()!!.userDays.toString())
             userDao.wipeUserAutomaticInfo()

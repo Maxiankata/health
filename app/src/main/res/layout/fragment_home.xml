@@ -220,28 +220,47 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/weight_recycler"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="50dp"
+                android:layout_width="50dp"
+                android:layout_height="45dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/second_weight_recycler"
                 app:layout_constraintStart_toEndOf="@+id/textView"
                 app:layout_constraintTop_toTopOf="parent">
 
             </androidx.recyclerview.widget.RecyclerView>
-
+            <TextView
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/second_weight_recycler"
+                app:layout_constraintStart_toEndOf="@id/weight_recycler"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:textSize="30sp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="."
+                />
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/second_weight_recycler"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="50dp"
+                android:layout_height="45dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/weight_recycler"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/units"
                 >
 
             </androidx.recyclerview.widget.RecyclerView>
 
+            <TextView
+                android:id="@+id/units"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/kg"
+                android:layout_marginEnd="5dp"
+                android:textSize="30sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <GridLayout
@@ -254,7 +273,57 @@
             android:rowCount="2"
             android:useDefaultMargins="true"
             >
+            <LinearLayout
+                android:id="@+id/power_walking_layout"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_marginEnd="8dp"
+                android:backgroundTint="@color/light_green"
+                android:background="@drawable/rounded_background"
+                android:gravity="center"
+                android:orientation="horizontal"
+                >
 
+                <ImageView
+                    android:padding="5dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/power_walking_icon"
+                    app:tint="@color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/power_walking"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/jogging_layout"
+                android:layout_height="0dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_marginEnd="8dp"
+                android:backgroundTint="@color/light_green"
+                android:background="@drawable/rounded_background"
+                android:gravity="center"
+                android:orientation="horizontal"
+                >
+
+                <ImageView
+                    android:padding="5dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/jogging_icon"
+                    app:tint="@color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/jogging"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+            </LinearLayout>
             <LinearLayout
                 android:id="@+id/run_layout"
                 android:layout_height="0dp"
@@ -293,6 +362,7 @@
                 >
 
                 <ImageView
+                    android:padding="3dp"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:src="@drawable/cycling_icon"
@@ -305,56 +375,9 @@
                     android:textColor="@color/white"
                     android:textSize="20sp" />
             </LinearLayout>
-            <LinearLayout
-                android:id="@+id/hiking_layout"
-                android:layout_height="0dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_marginEnd="8dp"
-                android:backgroundTint="@color/light_green"
-                android:background="@drawable/rounded_background"
-                android:gravity="center"
-                android:orientation="horizontal"
-                >
 
-                <ImageView
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:src="@drawable/hiking_icon"
-                    app:tint="@color/white" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/hiking"
-                    android:textColor="@color/white"
-                    android:textSize="20sp" />
-            </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/power_walking_layout"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_marginEnd="8dp"
-                android:backgroundTint="@color/light_green"
-                android:background="@drawable/rounded_background"
-                android:gravity="center"
-                android:orientation="horizontal"
-                >
-
-            <ImageView
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:src="@drawable/power_walking_icon"
-                app:tint="@color/white" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/power_walking"
-                android:textColor="@color/white"
-                android:textSize="20sp" />
-            </LinearLayout>
 
         </GridLayout>
     </LinearLayout>

@@ -18,8 +18,6 @@ class MyApplication : Application() {
             return context
         }
     }
-
-
     private fun applyDarkTheme() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
     }

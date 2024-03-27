@@ -1,6 +1,6 @@
 package com.example.healthtracker.data.user
 
-import com.example.healthtracker.data.Challenge
+import com.example.healthtracker.ui.account.friends.challenges.Challenge
 
 data class UserMegaInfo(
     var userInfo: UserInfo,
@@ -9,5 +9,5 @@ data class UserMegaInfo(
     val userPutInInfo: UserPutInInfo? = null,
     val userSettingsInfo: UserSettingsInfo? = UserSettingsInfo(),
     val userDays:List<UserDays>? = null,
-    val challenges:List<Challenge>?=null
+    val challenges:List<Challenge>? = listOf()
 )

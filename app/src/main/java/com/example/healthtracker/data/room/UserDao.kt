@@ -4,12 +4,13 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.healthtracker.data.Challenge
+import com.example.healthtracker.ui.account.friends.challenges.Challenge
 import com.example.healthtracker.data.user.UserAutomaticInfo
 import com.example.healthtracker.data.user.UserDays
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.data.user.UserPutInInfo
 import com.example.healthtracker.data.user.UserSettingsInfo
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDao {
@@ -17,6 +18,10 @@ interface UserDao {
     fun saveUser(userMegaInfoEntity: UserData)
     @Query("SELECT * FROM UserData")
     fun getEntireUser(): UserData?
+
+    @Query("SELECT * FROM UserData")
+    fun getEntireUserFlow(): Flow<UserData?>
+
     @Query("DELETE FROM UserData")
     fun dropUser()
     @Query("SELECT userInfo FROM UserData")
