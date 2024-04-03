@@ -77,9 +77,9 @@ class AccountFragment : Fragment() {
                 )
             }
             statistics.setOnClickListener {
-                lifecycleScope.launch {
-                    accountViewModel.sync()
-                }
+                findNavController().navigate(
+                    R.id.action_navigation_notifications_to_statisticsFragment
+                )
             }
             signOutButton.setOnClickListener {
                     accountViewModel.signOut()

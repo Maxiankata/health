@@ -47,12 +47,24 @@ class DashboardFragment : Fragment() {
                             text = buildString {
                                 append(getString(R.string.steps))
                                 append(it.automaticInfo?.steps?.currentSteps ?: 0)
+                                append("/")
+                                append(it.automaticInfo?.steps?.stepsGoal)
                             }
                         }
                         caloriesBurned.apply {
                             text = buildString {
                                 append(getString(R.string.calories))
                                 append(it.automaticInfo?.steps?.currentCalories ?: 0)
+                                append("/")
+                                append(it.automaticInfo?.steps?.caloriesGoal)
+                            }
+                        }
+                        waterGoal.apply {
+                            text = buildString {
+                                append(getString(R.string.water))
+                                append(it.putInInfo?.waterInfo?.currentWater ?: 0)
+                                append("/")
+                                append(it.putInInfo?.waterInfo?.waterGoal)
                             }
                         }
                         challengesPassed.apply {

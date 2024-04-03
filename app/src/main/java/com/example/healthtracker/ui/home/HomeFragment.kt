@@ -45,7 +45,6 @@ class HomeFragment : Fragment() {
             homeViewModel.feedUser()
             homeViewModel.checkForChallenges()
         }
-//        homeViewModel.syncToFireBase()
         binding.apply {
             stepCount.observe(viewLifecycleOwner) { steps ->
                 if (steps == null) {
@@ -102,15 +101,18 @@ class HomeFragment : Fragment() {
                         append("/")
                         append(user?.userSettingsInfo?.userGoals?.waterGoal ?: 6)
                     }
-//                    val weight: Double = user?.userPutInInfo?.weight!!
-//                    val integer: Int = weight.toInt()
-//                    val decimal: Int = ((weight- integer)*10).toInt()
-//                    if (integer<weightRecyclerAdapterer.itemCount) {
-//                        weightRecycler.scrollToPosition(integer)
-//                    }else{
-//                        weightRecycler.scrollToPosition(0)
-//                    }
-//                    secondWeightRecycler.scrollToPosition(decimal)
+                    if (user != null) {
+                        if (user.userPutInInfo?.weight!=0.0&&user.userPutInInfo?.weight!=null) {
+                            scrollToDouble(user.userPutInInfo.weight!!)
+                        }else{
+                            homeViewModel.getYesterdayWeight()
+                            homeViewModel.weight.observe(viewLifecycleOwner){
+                                if (it != null) {
+                                    scrollToDouble(it)
+                                }
+                            }
+                        }
+                    }
                     if (user != null) {
                         if (user.userSettingsInfo?.units.toString()==getString(R.string.kg)){
                             weightRecyclerAdapterer= WeightRecyclerAdapter(Weight.weight.toMutableList())
@@ -256,5 +258,16 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+    fun scrollToDouble(weighte:Double){
+        val weight: Double = weighte
+        val integer: Int = weight.toInt()
+        val decimal: Int = ((weight - integer) * 10).toInt()
+        if (integer < weightRecyclerAdapterer.itemCount) {
+            binding.weightRecycler.scrollToPosition(integer)
+        } else {
+            binding.weightRecycler.scrollToPosition(0)
+        }
+        binding.secondWeightRecycler.scrollToPosition(decimal)
     }
 }

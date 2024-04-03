@@ -28,8 +28,6 @@ import com.example.healthtracker.ui.formatDurationFromLong
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Calendar
@@ -40,11 +38,11 @@ class StepCounterService : Service(), SensorEventListener {
         val steps: LiveData<Int> get() = _steps
 
         private val _calories = MutableLiveData<Int>()
-        val calories : LiveData<Int>get() = _calories
+        val calories: LiveData<Int> get() = _calories
         private var _sleepDuration = MutableLiveData<Long>()
-        val sleepDuration : LiveData<Long> get() = _sleepDuration
+        val sleepDuration: LiveData<Long> get() = _sleepDuration
 
-        var stepIntent:Intent? = null
+        var stepIntent: Intent? = null
     }
 
     private var lastSensorEventTime: Long = 0
@@ -54,33 +52,33 @@ class StepCounterService : Service(), SensorEventListener {
     val currentTimeMillis = System.currentTimeMillis()
     val calendar = Calendar.getInstance()
 
-    private val idleThresholdMillis =
-        60 * 1000
+    private val idleThresholdMillis = 2 * 60 * 60 * 1000
 
     private val channelId = "step_counter_channel"
     private var sensorManager: SensorManager? = null
+
     init {
         _sleepDuration.postValue(0)
         calendar.timeInMillis = currentTimeMillis
-        calendar.set(Calendar.MINUTE,42)
-        calendar.set(Calendar.SECOND,0)
+        calendar.set(Calendar.MINUTE, 42)
+        calendar.set(Calendar.SECOND, 0)
         calendar.set(Calendar.HOUR_OF_DAY, 8)
     }
 
     private val userDao = MainActivity.getDatabaseInstance().dao()
     private val customCoroutineScope = CoroutineScope(Dispatchers.Main)
     private val roomToUserMegaInfoAdapter = RoomToUserMegaInfoAdapter()
-    private fun getUser(callback:(UserMegaInfo?)->Unit) {
+    private fun getUser(callback: (UserMegaInfo?) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             userDao.getEntireUser()?.let {
                 callback(roomToUserMegaInfoAdapter.adapt(it))
-                Log.d("emitted user", roomToUserMegaInfoAdapter.adapt(it).userDays.toString())
-            }?:callback(null)
+                Log.d("emitted user", roomToUserMegaInfoAdapter.adapt(it).userAutomaticInfo.toString())
+            } ?: callback(null)
         }
     }
 
     private fun getUserSteps() {
-        getUser{ user ->
+        getUser { user ->
             user?.let {
                 it.userAutomaticInfo?.steps?.currentSteps.let { it1 ->
                     _steps.postValue(it1)
@@ -132,7 +130,7 @@ class StepCounterService : Service(), SensorEventListener {
 
     private fun checkForSleep() {
         val eightPMMillis = calendar.timeInMillis
-        if ( System.currentTimeMillis() - lastSensorEventTime >= idleThresholdMillis && !isSleeping&&System.currentTimeMillis()>=eightPMMillis) {
+        if (System.currentTimeMillis() - lastSensorEventTime >= idleThresholdMillis && !isSleeping && System.currentTimeMillis() >= eightPMMillis) {
             startSleepTracking()
         }
     }
@@ -147,7 +145,7 @@ class StepCounterService : Service(), SensorEventListener {
         sleepStopTime = System.currentTimeMillis()
         _sleepDuration.postValue(sleepStopTime - sleepStartTime)
         customCoroutineScope.launch {
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
                 val userPutInInfo = async {
                     userDao.getPutInInfo()
                 }.await()
@@ -164,6 +162,7 @@ class StepCounterService : Service(), SensorEventListener {
         registerStepSensor()
         return START_STICKY
     }
+
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.steps)
@@ -204,13 +203,13 @@ class StepCounterService : Service(), SensorEventListener {
             _steps.value?.plus(1).let {
                 _steps.postValue(it)
                 if (it != null) {
-                    _calories.postValue(it/25)
+                    _calories.postValue(it / 25)
                 }
                 updateNotification()
             }
             lastSensorEventTime = System.currentTimeMillis()
             if (isSleeping) {
-                    stopSleepTracking()
+                stopSleepTracking()
             }
         }
     }

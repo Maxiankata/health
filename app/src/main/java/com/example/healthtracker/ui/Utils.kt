@@ -188,7 +188,8 @@ fun DataSnapshot.toUserPutInInfo(): UserPutInInfo {
 fun DataSnapshot.toWaterInfo(): WaterInfo {
     return WaterInfo(
         currentWater = child("currentWater").getValue(Int::class.java) ?: 0,
-        waterCompletion = child("waterCompletion").getValue(Boolean::class.java) ?: false
+        waterCompletion = child("waterCompletion").getValue(Boolean::class.java) ?: false,
+        waterGoal = child("waterGoal").getValue(Int::class.java)?:6
     )
 }
 
@@ -200,18 +201,10 @@ fun DataSnapshot.toUserSettingsInfo(): UserSettingsInfo {
     )
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 fun DataSnapshot.toUserDays(): UserDays {
-    Log.d(
-        "user in converter", UserDays(
-            putInInfo = child("userPutInInfo").toUserPutInInfo(),
-            automaticInfo = child("userAutomaticInfo").toUserAutomaticInfo(),
-            dateTime = child("dateTime").getValue(String::class.java)!!
-        ).toString()
-    )
     return UserDays(
-        putInInfo = child("userPutInInfo").toUserPutInInfo(),
-        automaticInfo = child("userAutomaticInfo").toUserAutomaticInfo(),
+        putInInfo = child("putInInfo").toUserPutInInfo(),
+        automaticInfo = child("automaticInfo").toUserAutomaticInfo(),
         dateTime = child("dateTime").getValue(String::class.java)!!
     )
 
@@ -228,10 +221,10 @@ fun DataSnapshot.toUserGoals(): UserGoals {
 
 fun DataSnapshot.toStepsInfo(): StepsInfo {
     return StepsInfo(
-        totalSteps = child("totalSteps").getValue(Int::class.java),
-        totalCalories = child("totalCalories").getValue(Int::class.java),
         currentSteps = child("currentSteps").getValue(Int::class.java),
-        currentCalories = child("currentCalories").getValue(Int::class.java)
+        currentCalories  = child("currentCalories").getValue(Int::class.java),
+        stepsGoal = child("stepsGoal").getValue(Int::class.java),
+        caloriesGoal = child("caloriesGoal").getValue(Int::class.java)
     )
 }
 

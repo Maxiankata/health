@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.healthtracker.AuthImpl
 import com.example.healthtracker.MainActivity
+import com.example.healthtracker.MyApplication
 import com.example.healthtracker.R
 import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
 import com.example.healthtracker.data.user.UserInfo
@@ -16,8 +17,11 @@ import com.example.healthtracker.ui.bitmapToBase64
 import com.example.healthtracker.ui.isInternetAvailable
 import com.example.healthtracker.ui.stopStepCounterService
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import java.util.Calendar
 
 class AccountViewModel(private val application: Application) : AndroidViewModel(application) {
     private val auth = AuthImpl.getInstance()
@@ -25,7 +29,7 @@ class AccountViewModel(private val application: Application) : AndroidViewModel(
     private val roomToUserMegaInfoAdapter = RoomToUserMegaInfoAdapter()
     fun signOut() {
         viewModelScope.launch {
-            sync()
+                sync()
             withContext(Dispatchers.IO) {
                 userDao.dropUser()
                 auth.signOut()
@@ -43,10 +47,19 @@ class AccountViewModel(private val application: Application) : AndroidViewModel(
         }
     }
 
-    fun sync() {
+    private fun sync() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                auth.sync(roomToUserMegaInfoAdapter.adapt(userDao.getEntireUser()!!))
+                val syncer = async { userDao.getEntireUser() }.await()
+                if (syncer != null) {
+                    auth.sync(roomToUserMegaInfoAdapter.adapt(syncer), syncer.userInfo.uid!!)
+                } else {
+                    Toast.makeText(
+                        MyApplication.getContext(),
+                        "user from base was null",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }
@@ -54,8 +67,8 @@ class AccountViewModel(private val application: Application) : AndroidViewModel(
     fun saveBitmapToDatabase(bitmap: Bitmap) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                userDao.getEntireUser()
-                    ?.let { roomToUserMegaInfoAdapter.adapt(it) }?.userInfo?.let {
+                userDao.getBasicInfo()
+                    ?.let {
                         val newImageInfo =
                             UserInfo(
                                 it.username,
