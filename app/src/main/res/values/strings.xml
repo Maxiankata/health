@@ -61,7 +61,7 @@
     <string name="under_zero">You can\'t drink negative water</string>
     <string name="reached_water_goal">You reached your daily water goal!</string>
     <string name="background_theme">Account Background Theme</string>
-    <string name="change_language">Change Language</string>
+    <string name="change_language_and_units">Change Language or Units</string>
     <string name="change_unit_system">Change Unit System</string>
     <string name="delete_account">Delete Account</string>
     <string name="change_goal">Change Goals</string>
@@ -97,6 +97,11 @@
     <string name="challenges_passed">Challenges passed:</string>
     <string name="permissions_needed">The permissions requested are needed for the app to function.</string>
     <string name="kg">kg</string>
+    <string name="apply">Apply changes</string>
+    <string name="language">Language</string>
+    <string name="units">Units</string>
+    <string name="lbs">lbs</string>
+    <string name="today_steps">Today\'s steps:</string>
     <string-array name="activities">
         <item>Walking</item>
         <item>Power Walking</item>

@@ -2,7 +2,7 @@ package com.example.healthtracker.data.user
 
 data class UserPutInInfo(
     var waterInfo: WaterInfo? = WaterInfo(),
-    val weight: Double? = 0.0,
+    var weight: Double? = 0.0,
     var sleepDuration:String?=""
 )
 

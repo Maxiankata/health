@@ -14,8 +14,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import com.example.healthtracker.MyApplication
 import com.example.healthtracker.R
-import com.example.healthtracker.data.SpinnerItem
-import com.example.healthtracker.databinding.ThirdBuilderDialogBinding
+import com.example.healthtracker.databinding.ChallengeBuilderDialogBinding
 import com.example.healthtracker.ui.account.friends.profile.ChallengeSpinnerAdapter
 import com.example.healthtracker.ui.durationToString
 import kotlinx.coroutines.launch
@@ -23,18 +22,18 @@ import java.time.Duration
 import java.time.format.DateTimeParseException
 
 class ChallengeBuilderDialogFragment : DialogFragment() {
-    private var _binding: ThirdBuilderDialogBinding? = null
+    private var _binding: ChallengeBuilderDialogBinding? = null
     private val binding get() = _binding!!
     private val challengeBuilderDialogViewModel = ChallengeBuilderDialogViewModel(MyApplication())
     private lateinit var userId: String
-    private var assigner:String? = ""
+    private var assigner: String? = ""
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         userId = arguments?.getString("uid")!!
         Log.d("bundle recieved by dialog", userId.toString())
 
-        _binding = ThirdBuilderDialogBinding.inflate(inflater, container, false)
+        _binding = ChallengeBuilderDialogBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -81,7 +80,8 @@ class ChallengeBuilderDialogFragment : DialogFragment() {
                 val hours = editTextHours.text.toString().toIntOrNull() ?: 0
                 val minutes = editTextMinutes.text.toString().toIntOrNull() ?: 0
                 val seconds = editTextSeconds.text.toString().toIntOrNull() ?: 0
-                val duration = Duration.ofHours(hours.toLong()).plusMinutes(minutes.toLong()).plusSeconds(seconds.toLong())
+                val duration = Duration.ofHours(hours.toLong()).plusMinutes(minutes.toLong())
+                    .plusSeconds(seconds.toLong())
                 val stringDuration = durationToString(duration)
                 if (challengeTypeSpinner.selectedItem == null || (editTextHours.text.toString()
                         .isBlank() && editTextMinutes.text.toString()

@@ -1,29 +1,23 @@
-package com.example.healthtracker.ui.settings
+package com.example.healthtracker.ui.account.settings.goals
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import com.example.healthtracker.MyApplication
 import com.example.healthtracker.R
 import com.example.healthtracker.data.user.UserGoals
-import com.example.healthtracker.databinding.FragmentSettingsBinding
 import com.example.healthtracker.databinding.GoalChangeDialogBinding
-import com.example.healthtracker.databinding.PopupFriendsBinding
 import kotlinx.coroutines.launch
 
 class GoalChangeDialogFragment:DialogFragment() {
     private var _binding: GoalChangeDialogBinding? = null
     private val binding get() = _binding!!
-    private val goalChangeDialogViewModel =GoalChangeDialogViewModel(MyApplication())
+    private val goalChangeDialogViewModel = GoalChangeDialogViewModel(MyApplication())
     var userGoals: LiveData<UserGoals?> = GoalChangeDialogViewModel.userGoals
     override fun onCreateView(
         inflater: LayoutInflater,

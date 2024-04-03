@@ -1,4 +1,4 @@
-package com.example.healthtracker.data
+package com.example.healthtracker.ui.account.friends.challenges
 
 data class SpinnerItem(
     val text:String,

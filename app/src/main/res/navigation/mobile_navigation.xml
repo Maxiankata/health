@@ -43,7 +43,7 @@
     </dialog>
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.example.healthtracker.ui.settings.SettingsFragment"
+        android:name="com.example.healthtracker.ui.account.settings.SettingsFragment"
         android:label="SettingsFragment" />
 
 

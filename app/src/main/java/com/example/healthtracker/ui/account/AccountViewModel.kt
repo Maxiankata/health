@@ -13,9 +13,8 @@ import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.ui.bitmapToBase64
-import com.example.healthtracker.ui.home.walking.StepCounterService
 import com.example.healthtracker.ui.isInternetAvailable
-import com.example.healthtracker.ui.startStepCounterService
+import com.example.healthtracker.ui.stopStepCounterService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -25,68 +24,65 @@ class AccountViewModel(private val application: Application) : AndroidViewModel(
     private val userDao = MainActivity.getDatabaseInstance().dao()
     private val roomToUserMegaInfoAdapter = RoomToUserMegaInfoAdapter()
     fun signOut() {
-        val stepCounterService = StepCounterService()
         viewModelScope.launch {
-            Log.d("syn", "sync")
             sync()
             withContext(Dispatchers.IO) {
-                Log.d("syn", "sync")
                 userDao.dropUser()
-                Log.d("syn", "sync")
                 auth.signOut()
+                stopStepCounterService()
                 Log.d("syn", "sync")
-                stepCounterService.nullifySteps()
-                Log.d("syn", "sync")
-
-                stepCounterService.stopSelf()
-                stepCounterService.handler?.removeCallbacksAndMessages(null)
-                Log.d("syn", "sync")
-
-
-            }
-        }
-    }
-    suspend fun sync(){
-        withContext(Dispatchers.IO){
-            val user = userDao.getEntireUser()
-            val userer = roomToUserMegaInfoAdapter.adapt(user!!)
-            Log.d("Userer", userer.toString())
-            viewModelScope.launch {
-                auth.sync(userer)
-                Log.d("synced user", auth.getEntireUser().toString())
             }
         }
     }
 
-    suspend fun saveBitmapToDatabase(bitmap: Bitmap) {
-        withContext(Dispatchers.IO) {
-            userDao.getEntireUser()?.let { roomToUserMegaInfoAdapter.adapt(it) }?.userInfo?.let {
-                val newImageInfo =
-                    UserInfo(
-                        it.username,
-                        it.uid,
-                        bitmapToBase64(bitmap),
-                        it.mail,
-                        it.theme,
-                        it.bgImage
-                    )
-                it.let {
-                    userDao.updateImage(
-                        newImageInfo
-                    )
-                }
-                val image = bitmapToBase64(bitmap)
-                Log.d("SAVED IMAGE TO LOCAL", image)
-                if (isInternetAvailable(application.applicationContext)) {
-                    auth.saveBitmapToDatabase(bitmap)
-                    Log.d("SAVED IMAGE TO NETWORK", image)
-                } else {
-                    Toast.makeText(
-                        application.applicationContext,
-                        R.string.no_internet,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+    fun getDays() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                Log.d("userdays in account", userDao.getEntireUser()?.userDays.toString())
+            }
+        }
+    }
+
+    fun sync() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                auth.sync(roomToUserMegaInfoAdapter.adapt(userDao.getEntireUser()!!))
+            }
+        }
+    }
+
+    fun saveBitmapToDatabase(bitmap: Bitmap) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                userDao.getEntireUser()
+                    ?.let { roomToUserMegaInfoAdapter.adapt(it) }?.userInfo?.let {
+                        val newImageInfo =
+                            UserInfo(
+                                it.username,
+                                it.uid,
+                                bitmapToBase64(bitmap),
+                                it.mail,
+                                it.theme,
+                                it.bgImage
+                            )
+                        it.let {
+                            userDao.updateImage(
+                                newImageInfo
+                            )
+                        }
+                        val image = bitmapToBase64(bitmap)
+                        Log.d("SAVED IMAGE TO LOCAL", image)
+                        if (isInternetAvailable(application.applicationContext)) {
+                            auth.saveBitmapToDatabase(bitmap)
+                            Log.d("SAVED IMAGE TO NETWORK", image)
+                        } else {
+                            Toast.makeText(
+                                application.applicationContext,
+                                R.string.no_internet,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
             }
         }
     }

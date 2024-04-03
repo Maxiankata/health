@@ -1,10 +1,7 @@
 package com.example.healthtracker.ui.home
 
 import android.app.Application
-import android.content.Context
 import android.hardware.SensorEventListener
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -18,6 +15,7 @@ import com.example.healthtracker.data.room.UserMegaInfoToRoomAdapter
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.UserPutInInfo
 import com.example.healthtracker.data.user.WaterInfo
+import com.example.healthtracker.ui.isInternetAvailable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -44,7 +42,6 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
         withContext(Dispatchers.IO) {
             val user = userDao.getEntireUser()?.let { roomToUserMegaInfoAdapter.adapt(it) }
             _water.postValue(user?.userPutInInfo?.waterInfo)
-            Log.d("water col", _water.value.toString())
             runBlocking {
                 _user.postValue(user)
             }
@@ -56,19 +53,21 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
             withContext(Dispatchers.IO) {
                 auth.fetchOwnChallenges()?.let {
                     userDao.updateChallenges(it)
-                    Log.d("userChallenges", userDao.getEntireUser()?.challenges.toString())
-                }?.run {
-                    Log.d("no challenges", "no challenges")
                 }
             }
         }
     }
 
-    suspend fun getUser(): UserMegaInfo? {
-        return withContext(Dispatchers.IO) {
-            val user = userDao.getEntireUser()
-            user?.let {
-                roomToUserMegaInfoAdapter.adapt(it)
+    fun updatePutInInfo(weight: Double) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val userPutIn = async {
+                    userDao.getPutInInfo()
+                }.await()
+                if (userPutIn != null) {
+                    userPutIn.weight = weight
+                    userDao.updateUserPutInInfo(userPutIn)
+                }
             }
         }
     }
@@ -76,8 +75,7 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
     fun syncToFireBase() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val user =
-                async {
+                val user = async {
                     userDao.getEntireUser()
                 }.await()
                 auth.sync(roomToUserMegaInfoAdapter.adapt(user!!))
@@ -85,45 +83,42 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
         }
     }
 
-    suspend fun waterIncrement(incrementation: Int) {
-        withContext(Dispatchers.IO) {
-            if (_water.value != null) {
-                val newWater = WaterInfo(
-                    waterCompletion = _water.value!!.waterCompletion,
-                    currentWater = _water.value!!.currentWater?.plus(incrementation)
-                )
-                _water.postValue(newWater)
-                val userWeight = userDao.getEntireUser()?.userPutInInfo?.weight
-                val newPutInInfo = UserPutInInfo(waterInfo = newWater, weight = userWeight)
-                userDao.updateUserPutInInfo(newPutInInfo)
-                if (_water.value!!.currentWater!! >= _user.value!!.userSettingsInfo!!.userGoals?.waterGoal!!) {
-                    val newerWater = WaterInfo(
-                        waterCompletion = true,
-                        currentWater = _water.value!!.currentWater
-                    )
-                    _water.postValue(newerWater)
-                    Log.d("Water check", _water.value.toString())
-                } else if (_water.value!!.currentWater!! < _user.value!!.userSettingsInfo!!.userGoals?.waterGoal!!) {
-                    val newerWater = WaterInfo(
-                        waterCompletion = true,
-                        currentWater = _water.value!!.currentWater
-                    )
-                    _water.postValue(newerWater)
-                    Log.d("Water check", _water.value.toString())
+    fun waterIncrement(incrementation: Int) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val goal = _user.value?.userSettingsInfo?.userGoals?.waterGoal
+                goal?.let {
+                    if (_water.value != null) {
+                        if (!(water.value!!.currentWater == 0 && incrementation == -1))
+                            if (_water.value!!.currentWater!!.plus(incrementation) >= goal) {
+                                val newerWater = WaterInfo(
+                                    waterCompletion = true,
+                                    currentWater = _water.value!!.currentWater?.plus(incrementation)
+                                )
+                                _water.postValue(newerWater)
+                                val userWeight = userDao.getEntireUser()?.userPutInInfo?.weight
+                                val newPutInInfo =
+                                    UserPutInInfo(waterInfo = newerWater, weight = userWeight)
+                                userDao.updateUserPutInInfo(newPutInInfo)
+                                Log.d("Water check", _water.value.toString())
+
+                            } else if (_water.value!!.currentWater!!.plus(incrementation) < goal) {
+                                val newerWater = WaterInfo(
+                                    waterCompletion = false,
+                                    currentWater = _water.value!!.currentWater?.plus(incrementation)
+                                )
+                                _water.postValue(newerWater)
+                                val userWeight = userDao.getEntireUser()?.userPutInInfo?.weight
+                                val newPutInInfo =
+                                    UserPutInInfo(waterInfo = newerWater, weight = userWeight)
+                                userDao.updateUserPutInInfo(newPutInInfo)
+                                Log.d("Water check", _water.value.toString())
+
+                            }
+                    }
                 }
             }
         }
     }
 
-    fun isInternetAvailable(context: Context): Boolean {
-        val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-        val network = connectivityManager.activeNetwork
-        val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
-
-        return networkCapabilities != null && (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || networkCapabilities.hasTransport(
-            NetworkCapabilities.TRANSPORT_CELLULAR
-        ))
-    }
 }

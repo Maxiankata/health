@@ -1,7 +1,6 @@
 package com.example.healthtracker.ui.account.friends.popup
 
 import android.annotation.SuppressLint
-import android.app.Application
 import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,21 +8,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.AndroidViewModel
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.healthtracker.R
 import com.example.healthtracker.data.user.UserInfo
-import com.example.healthtracker.ui.setRoundedCorners
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
-class FriendListAdapter() : RecyclerView.Adapter<FriendListAdapter.FriendListViewHolder>() {
+class FriendListAdapter : RecyclerView.Adapter<FriendListAdapter.FriendListViewHolder>() {
     private var items = ArrayList<UserInfo>()
     var itemClickListener: ItemClickListener<UserInfo>? = null
-    private val friendListViewModel= FriendListViewModel()
+    private val friendListViewModel = FriendListViewModel()
 
     inner class FriendListViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.friend_name)
@@ -36,7 +32,7 @@ class FriendListAdapter() : RecyclerView.Adapter<FriendListAdapter.FriendListVie
         fun bind(userInfo: UserInfo) {
             if (userInfo.image.isNullOrEmpty()) {
                 Glide.with(image).load(R.drawable.profile_icon).into(image)
-            }else{
+            } else {
                 Glide.with(image).load(Base64.decode(userInfo.image, Base64.DEFAULT)).into(image)
             }
             image.setBackgroundResource(R.drawable.circle_background)
@@ -47,7 +43,7 @@ class FriendListAdapter() : RecyclerView.Adapter<FriendListAdapter.FriendListVie
                     userInfo, adapterPosition
                 )
             }
-            friendListViewModel.searchState.observeForever{
+            friendListViewModel.searchState.observeForever {
                 if (it) {
                     cardButton.apply {
                         setImageResource(R.drawable.friend_add)

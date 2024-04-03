@@ -35,8 +35,6 @@ interface UserDao {
 
     @Query("SELECT userPutInInfo FROM UserData")
     fun getPutInInfo(): UserPutInInfo?
-//    @Query ("SELECT userDays FROM UserData")
-//    suspend fun getUserDays(): List<UserDays>
 
     @Query("UPDATE UserData SET userPutInInfo = :updatedUserPutInInfo")
     fun updateUserPutInInfo(updatedUserPutInInfo: UserPutInInfo)

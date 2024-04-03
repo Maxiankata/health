@@ -36,6 +36,7 @@ class HomeFragment : Fragment() {
         return binding.root
 
     }
+    var weightRecyclerAdapterer= WeightRecyclerAdapter(Weight.weight.toMutableList())
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -44,7 +45,7 @@ class HomeFragment : Fragment() {
             homeViewModel.feedUser()
             homeViewModel.checkForChallenges()
         }
-        homeViewModel.syncToFireBase()
+//        homeViewModel.syncToFireBase()
         binding.apply {
             stepCount.observe(viewLifecycleOwner) { steps ->
                 if (steps == null) {
@@ -83,9 +84,8 @@ class HomeFragment : Fragment() {
                     }
                 }
             }
-            sleepDuration.observe(viewLifecycleOwner){
-                Log.d("sleep has changed", it.toString())
-                sleepLogger.text= buildString {
+            sleepDuration.observe(viewLifecycleOwner) {
+                sleepLogger.text = buildString {
                     append("You have slept for ${formatDurationFromLong(it)} hours :)")
                 }
             }
@@ -94,17 +94,31 @@ class HomeFragment : Fragment() {
                     textView2.text = buildString {
                         if (it != null) {
                             if (it.currentWater != null && it.currentWater != 0) {
-                                Log.d("water isnt null and isnt 0", it.currentWater.toString())
                                 append(it.currentWater)
                             } else {
-                                Log.d("water is null", it.currentWater.toString())
                                 append(0)
                             }
-                        } else {
-                            Log.d("water is null and isnt 0", it.toString())
                         }
                         append("/")
                         append(user?.userSettingsInfo?.userGoals?.waterGoal ?: 6)
+                    }
+//                    val weight: Double = user?.userPutInInfo?.weight!!
+//                    val integer: Int = weight.toInt()
+//                    val decimal: Int = ((weight- integer)*10).toInt()
+//                    if (integer<weightRecyclerAdapterer.itemCount) {
+//                        weightRecycler.scrollToPosition(integer)
+//                    }else{
+//                        weightRecycler.scrollToPosition(0)
+//                    }
+//                    secondWeightRecycler.scrollToPosition(decimal)
+                    if (user != null) {
+                        if (user.userSettingsInfo?.units.toString()==getString(R.string.kg)){
+                            weightRecyclerAdapterer= WeightRecyclerAdapter(Weight.weight.toMutableList())
+                            units.text = getString(R.string.kg)
+                        }else if (user.userSettingsInfo?.units.toString()==getString(R.string.lbs)){
+                            weightRecyclerAdapterer= WeightRecyclerAdapter(Weight.eagleBeerWeight.toMutableList())
+                            units.text = getString(R.string.lbs)
+                        }
                     }
                 }
             }
@@ -120,35 +134,29 @@ class HomeFragment : Fragment() {
             }
 
             runLayout.setOnClickListener {
-                val runDialog = RunningDialogFragment()
-                runDialog.show(requireActivity().supportFragmentManager, "running dialog")
+                RunningDialogFragment().show(requireActivity().supportFragmentManager, "running dialog")
             }
             cyclingLayout.setOnClickListener {
-                val runDialog = RunningDialogFragment()
-                runDialog.show(
+                RunningDialogFragment().show(
                     requireActivity().supportFragmentManager, "cycling dialog"
                 )
             }
             joggingLayout.setOnClickListener {
-                val runDialog = RunningDialogFragment()
-                runDialog.show(requireActivity().supportFragmentManager, "hiking dialog")
+                RunningDialogFragment().show(requireActivity().supportFragmentManager, "hiking dialog")
             }
             powerWalkingLayout.setOnClickListener {
-                val runDialog = RunningDialogFragment()
-                runDialog.show(
-                    requireActivity().supportFragmentManager, "power walking dialog"
-                )
+                RunningDialogFragment().show(requireActivity().supportFragmentManager, "hiking dialog")
+
             }
+            var mainUnits: Int = 0
 
             weightRecycler.apply {
-                val weightRecyclerAdapterer = WeightRecyclerAdapter(Weight.weight.toMutableList())
                 adapter = weightRecyclerAdapterer
                 layoutManager = LinearLayoutManager(context)
                 val layoutManager = this.layoutManager as LinearLayoutManager
                 var isScrolling = false
                 weightRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-
                         super.onScrolled(recyclerView, dx, dy)
                         isScrolling = true
                     }
@@ -161,29 +169,31 @@ class HomeFragment : Fragment() {
                                     lifecycleScope.launch {
                                         var middleItem =
                                             (layoutManager.findFirstCompletelyVisibleItemPosition() + layoutManager.findLastCompletelyVisibleItemPosition()) / 2
-                                        Log.d("middle item lookout", middleItem.toString())
+
+
                                         if (middleItem == -1) {
                                             delay(100)
                                             middleItem =
                                                 (layoutManager.findFirstVisibleItemPosition() + layoutManager.findLastVisibleItemPosition()) / 2
                                             weightRecyclerAdapterer.updateMiddleItemSize(middleItem)
-
-                                        } else {
-                                            weightRecyclerAdapterer.updateMiddleItemSize(middleItem)
+                                            mainUnits = middleItem
                                         }
+                                        weightRecyclerAdapterer.updateMiddleItemSize(middleItem)
+                                        mainUnits = middleItem
                                     }
                                 } catch (e: Exception) {
                                     lifecycleScope.launch {
                                         var middlePosition =
                                             (layoutManager.findFirstVisibleItemPosition() + layoutManager.findLastVisibleItemPosition()) / 2
-                                        Log.d("middle item lookout", middlePosition.toString())
                                         if (middlePosition == -1) {
                                             delay(100)
                                             middlePosition =
                                                 (layoutManager.findFirstVisibleItemPosition() + layoutManager.findLastVisibleItemPosition()) / 2
+                                            mainUnits = middlePosition
 
                                         }
                                         weightRecyclerAdapterer.updateMiddleItemSize(middlePosition)
+                                        mainUnits = middlePosition
                                     }
                                 }
                                 isScrolling = false
@@ -194,10 +204,11 @@ class HomeFragment : Fragment() {
 
                 })
             }
+            var subUnits: Int = 0
             secondWeightRecycler.apply {
-                val weightRecyclerAdapterer =
+                val secondWeightRecyclerAdapter =
                     WeightRecyclerAdapter(Weight.subWeight.toMutableList())
-                adapter = weightRecyclerAdapterer
+                adapter = secondWeightRecyclerAdapter
                 layoutManager = LinearLayoutManager(context)
                 val layoutManager = this.layoutManager as LinearLayoutManager
                 var isScrolling = false
@@ -216,11 +227,13 @@ class HomeFragment : Fragment() {
                                     val middleItem =
                                         (layoutManager.findFirstCompletelyVisibleItemPosition() + layoutManager.findLastCompletelyVisibleItemPosition()) / 2
                                     Log.d("middle item lookout", middleItem.toString())
-                                    weightRecyclerAdapterer.updateMiddleItemSize(middleItem)
+                                    secondWeightRecyclerAdapter.updateMiddleItemSize(middleItem)
+                                    subUnits = middleItem
                                 } catch (e: Exception) {
                                     val middlePosition =
                                         (layoutManager.findFirstVisibleItemPosition() + layoutManager.findLastVisibleItemPosition()) / 2
-                                    weightRecyclerAdapterer.updateMiddleItemSize(middlePosition)
+                                    secondWeightRecyclerAdapter.updateMiddleItemSize(middlePosition)
+                                    subUnits = middlePosition
                                 }
                                 isScrolling = false
                             }
@@ -229,6 +242,13 @@ class HomeFragment : Fragment() {
 
 
                 })
+            }
+            applyChanges.setOnClickListener {
+                if (mainUnits != 0 || subUnits != 0) {
+                    val weight: Double = mainUnits + (subUnits.toDouble() / 10)
+                    Log.d("current selected weight is", weight.toString())
+                    homeViewModel.updatePutInInfo(weight)
+                }
             }
         }
     }

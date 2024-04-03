@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Calendar
 
 class StepCounterService : Service(), SensorEventListener {
     companion object {
@@ -42,50 +43,51 @@ class StepCounterService : Service(), SensorEventListener {
         val calories : LiveData<Int>get() = _calories
         private var _sleepDuration = MutableLiveData<Long>()
         val sleepDuration : LiveData<Long> get() = _sleepDuration
+
+        var stepIntent:Intent? = null
     }
 
     private var lastSensorEventTime: Long = 0
     private var isSleeping = false
     private var sleepStartTime: Long = 0
     private var sleepStopTime: Long = 0
+    val currentTimeMillis = System.currentTimeMillis()
+    val calendar = Calendar.getInstance()
 
-
-    private val idleThresholdMillis = 2 * 60 * 60 * 3600
+    private val idleThresholdMillis =
+        60 * 1000
 
     private val channelId = "step_counter_channel"
     private var sensorManager: SensorManager? = null
     init {
         _sleepDuration.postValue(0)
+        calendar.timeInMillis = currentTimeMillis
+        calendar.set(Calendar.MINUTE,42)
+        calendar.set(Calendar.SECOND,0)
+        calendar.set(Calendar.HOUR_OF_DAY, 8)
     }
 
     private val userDao = MainActivity.getDatabaseInstance().dao()
     private val customCoroutineScope = CoroutineScope(Dispatchers.Main)
     private val roomToUserMegaInfoAdapter = RoomToUserMegaInfoAdapter()
-    private fun getUser(): Flow<UserMegaInfo?> = flow {
-        val user = withContext(Dispatchers.IO) {
-            userDao.getEntireUser()
-
+    private fun getUser(callback:(UserMegaInfo?)->Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            userDao.getEntireUser()?.let {
+                callback(roomToUserMegaInfoAdapter.adapt(it))
+                Log.d("emitted user", roomToUserMegaInfoAdapter.adapt(it).userDays.toString())
+            }?:callback(null)
         }
-        emit(user?.let { roomToUserMegaInfoAdapter.adapt(it) })
-        Log.d("emitted user", roomToUserMegaInfoAdapter.adapt(user!!).toString())
     }
 
-    private suspend fun getUserSteps() {
-        getUser().collect { user ->
+    private fun getUserSteps() {
+        getUser{ user ->
             user?.let {
-                Log.d(
-                    "steps from dao lul xd", it.userAutomaticInfo?.steps?.currentSteps.toString()
-                )
                 it.userAutomaticInfo?.steps?.currentSteps.let { it1 ->
-                    Log.d("current steps from dao in service", it1.toString())
                     _steps.postValue(it1)
                 }
                 it.userAutomaticInfo?.steps?.currentCalories.let { it1 ->
-                    Log.d("current calories from dao in service", it1.toString())
                     _calories.postValue(it1)
                 }
-            }?.run {
-                Log.i("null", "user is null for the time being $user")
             }
         }
     }
@@ -104,9 +106,7 @@ class StepCounterService : Service(), SensorEventListener {
                     )
                 )
                 userDao.updateUserAutomaticInfo(renewedAutomaticInfo)
-                Log.d("updating auto", userDao.getAutomaticInfo().toString())
             }
-//            Log.d("Running updater", "")
         }
     }
 
@@ -131,18 +131,14 @@ class StepCounterService : Service(), SensorEventListener {
 
 
     private fun checkForSleep() {
-//        Log.d("Checking for sleep", "")
-        val currentTime = System.currentTimeMillis()
-//        Log.d("calculating", "${currentTime - lastSensorEventTime}")
-        if (currentTime - lastSensorEventTime >= idleThresholdMillis && !isSleeping) {
-            Log.d("sleep", "im a sleepyhead man, i sleep man, i start sleeping man")
+        val eightPMMillis = calendar.timeInMillis
+        if ( System.currentTimeMillis() - lastSensorEventTime >= idleThresholdMillis && !isSleeping&&System.currentTimeMillis()>=eightPMMillis) {
             startSleepTracking()
         }
     }
 
     private fun startSleepTracking() {
         isSleeping = true
-        Log.d("Sleeping start", "")
         sleepStartTime = lastSensorEventTime
     }
 
@@ -150,7 +146,6 @@ class StepCounterService : Service(), SensorEventListener {
         isSleeping = false
         sleepStopTime = System.currentTimeMillis()
         _sleepDuration.postValue(sleepStopTime - sleepStartTime)
-        Log.d("Sleep duration", formatDurationFromLong(_sleepDuration.value!!))
         customCoroutineScope.launch {
             withContext(Dispatchers.IO){
                 val userPutInInfo = async {
@@ -158,9 +153,7 @@ class StepCounterService : Service(), SensorEventListener {
                 }.await()
                 userPutInInfo?.sleepDuration = formatDurationFromLong(_sleepDuration.value!!)
                 userPutInInfo?.let {
-                    Log.d("logging sleep", "")
                     userDao.updateUserPutInInfo(it)
-                    Log.d("sleep logged", userDao.getPutInInfo().toString())
                 }
             }
         }
@@ -192,8 +185,8 @@ class StepCounterService : Service(), SensorEventListener {
         val currentSteps = _steps.value ?: 0
         val builder =
             NotificationCompat.Builder(this, channelId).setSmallIcon(R.drawable.running_icon)
-                .setContentTitle(getString(R.string.total_steps))
-                .setContentText("$currentSteps Steps").setContentIntent(pendingIntent)
+                .setContentTitle(getString(R.string.today_steps))
+                .setContentText("$currentSteps").setContentIntent(pendingIntent)
                 .setOngoing(true).setSound(null)
         return builder.build()
     }
@@ -210,14 +203,14 @@ class StepCounterService : Service(), SensorEventListener {
         if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
             _steps.value?.plus(1).let {
                 _steps.postValue(it)
+                if (it != null) {
+                    _calories.postValue(it/25)
+                }
                 updateNotification()
             }
-            Log.d("stepper changed", "stepper gap")
             lastSensorEventTime = System.currentTimeMillis()
             if (isSleeping) {
-                customCoroutineScope.launch {
                     stopSleepTracking()
-                }
             }
         }
     }
@@ -238,8 +231,10 @@ class StepCounterService : Service(), SensorEventListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        handler?.removeCallbacksAndMessages(null)
+        this@StepCounterService.handler?.removeCallbacksAndMessages(null)
+        this@StepCounterService.nullifySteps()
         sensorManager?.unregisterListener(this)
+        this@StepCounterService.stopSelf()
     }
 
     override fun onBind(intent: Intent?): IBinder? {

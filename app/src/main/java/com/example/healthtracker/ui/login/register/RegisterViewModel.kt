@@ -39,4 +39,7 @@ class RegisterViewModel(private val application: Application) : AndroidViewModel
             }
         }
     }
+    sealed interface State {
+        
+    }
 }

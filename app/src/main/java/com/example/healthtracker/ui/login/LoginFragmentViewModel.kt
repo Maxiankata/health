@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Application
 import android.content.pm.PackageManager
 import android.util.Log
+import android.view.View
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getString
@@ -34,42 +35,43 @@ class LoginFragmentViewModel(private val application: Application) : AndroidView
         get() = _state
 
     fun logIn(email: String, password: String, isInternetAvailable: Boolean) {
+        _state.value = State.Loading(View.VISIBLE)
+        if (!isInternetAvailable) {
+            _state.value = State.Notify("no wifi")
+            return
+        }
+        if (email.isEmpty()||password.isEmpty()){
+            _state.postValue(State.Notify(getString(MyApplication.getContext(),R.string.empty_field)))
+            return
+        }
         viewModelScope.launch {
-            if (!isInternetAvailable) {
-                _state.postValue(State.Notify("no wifi"))
-                return@launch
-            }
-            if (email.isEmpty()||password.isEmpty()){
-                _state.postValue(State.Notify(getString(MyApplication.getContext(),R.string.empty_field)))
-                return@launch
-            }
-
-
             try {
-                auth.logIn(email, password)
+                if(auth.logIn(email, password)){
+                    getUser()
+                    _state.postValue(State.LoggedIn(true))
+                }else{
+                    Log.d("state", "loading visibilit")
+                    _state.postValue(State.Notify(getString(MyApplication.getContext(), R.string.invalid_password)))
+                }
             } catch (e: Exception) {
                 _state.postValue(State.Notify(e.message ?: "cant login lul"))
-                return@launch
             }
-
-            getUser()
-            _state.postValue(State.LoggedIn(true))
         }
     }
 
     suspend fun getUser() {
         Log.d("running getUser() in login", "")
         auth.getEntireUser().collect {
-            Log.d("login collector ", it.toString())
+            Log.d("login collector ", it?.userDays.toString())
             if (it != null) {
-                Log.d("user from firebase", it.toString())
+                Log.d("user from firebase", it.userDays.toString())
                 withContext(Dispatchers.IO) {
                     toRoomAdapter.adapt(it)?.let { it1 ->
                         async {
                             userDao.saveUser(it1)
 
                         }.await()
-                        Log.d("user from dao", userDao.getEntireUser().toString())
+                        Log.d("user from dao", userDao.getEntireUser()?.userDays.toString())
                     }
                 }
             }
@@ -124,6 +126,8 @@ class LoginFragmentViewModel(private val application: Application) : AndroidView
 
     sealed interface State {
         data class LoggedIn(val flag: Boolean) : State
-        data class Notify(val message: String) : State
+        data class Notify(val message: String, val visibility: Int = View.GONE) : State
+
+        data class Loading(val loadingVisibility: Int): State
     }
 }

@@ -1,4 +1,4 @@
-package com.example.healthtracker.ui.settings
+package com.example.healthtracker.ui.account.settings.goals
 
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData

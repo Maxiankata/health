@@ -1,4 +1,4 @@
-package com.example.healthtracker.ui.settings
+package com.example.healthtracker.ui.account.settings
 
 import android.app.AlertDialog
 import android.app.Application

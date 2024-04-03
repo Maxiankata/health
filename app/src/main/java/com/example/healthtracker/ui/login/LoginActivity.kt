@@ -34,10 +34,8 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-
         lifecycleScope.launch {
             if (loginActivityViewModel.checkCurrentUser()) {
-                Log.d("running through login activity", loginActivityViewModel.checkCurrentUser().toString())
                 intent = Intent(applicationContext,MainActivity::class.java)
                 startActivity(intent)
                 finish()

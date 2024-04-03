@@ -1,4 +1,4 @@
-package com.example.healthtracker.ui.settings
+package com.example.healthtracker.ui.account.settings
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -17,9 +17,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.healthtracker.R
 import com.example.healthtracker.data.user.UserInfo
-import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.databinding.FragmentSettingsBinding
 import com.example.healthtracker.databinding.RgbPickerDialogBinding
+import com.example.healthtracker.ui.account.settings.goals.GoalChangeDialogFragment
 import com.example.healthtracker.ui.hideBottomNav
 import kotlinx.coroutines.launch
 
@@ -105,6 +105,11 @@ class SettingsFragment : Fragment() {
             changeGoals.setOnClickListener {
                 val dialog = GoalChangeDialogFragment()
                 dialog.show(requireActivity().supportFragmentManager, "change_goals_dialog")
+            }
+            changeLanguage.setOnClickListener {
+
+                val dialog = LanguageChangeDialogFragment()
+                dialog.show(requireActivity().supportFragmentManager, "change_language_dialog")
             }
         }
     }

@@ -45,11 +45,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
             )
         )
-//        val intent = Intent(this, StepCounterService::class.java)
-//        startService(intent)
-
         startStepCounterService()
-
         val item = AlarmItem(LocalDateTime.now(),"lols")
         val alarmer = Alarmer()
         alarmer.schedule(item)
@@ -77,6 +73,8 @@ class MainActivity : AppCompatActivity() {
 
 
     companion object {
+        var stepCounterService:Intent?=null
+
         private lateinit var db: UserDB
         fun getDatabaseInstance(): UserDB {
             val context = MyApplication.getContext()

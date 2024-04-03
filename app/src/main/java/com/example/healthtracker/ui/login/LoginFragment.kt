@@ -21,6 +21,7 @@ import com.example.healthtracker.ui.isInternetAvailable
 import com.example.healthtracker.ui.showLoading
 import kotlinx.coroutines.launch
 import com.example.healthtracker.data.user.LoginUiMapper
+import com.example.healthtracker.ui.setLoadingVisibility
 
 
 class LoginFragment : Fragment() {
@@ -39,20 +40,20 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().hideLoading()
         binding.apply {
-
-
             registerButton.apply {
                 setOnClickListener {
                     findNavController().navigate(R.id.action_login_to_register)
                 }
             }
             loginFragmentViewModel.state.map { LoginUiMapper.map(it) }.observe(viewLifecycleOwner) {
+                Log.d("state", if(it.loadingVisibility == View.VISIBLE) "visibile" else "gone")
                 showLog(it.message)
+                requireActivity().setLoadingVisibility(it.loadingVisibility)
                 if(it.shouldNavigate) {
-                    requireActivity().hideLoading()
                     val intent =
                         Intent(context, MainActivity::class.java)
                     startActivity(intent)
+
                     activity?.finish()
                 }
             }

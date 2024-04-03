@@ -44,6 +44,7 @@ class AccountFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val dialog = FriendsDialogFragment()
+        accountViewModel.getDays()
         lifecycleScope.launch {
             val user = accountViewModel.getWholeUser()
             val photo = user?.userInfo?.image
@@ -78,7 +79,6 @@ class AccountFragment : Fragment() {
             statistics.setOnClickListener {
                 lifecycleScope.launch {
                     accountViewModel.sync()
-
                 }
             }
             signOutButton.setOnClickListener {

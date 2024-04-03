@@ -1,13 +1,11 @@
 package com.example.healthtracker.ui
 
-import android.Manifest
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
@@ -20,10 +18,9 @@ import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.RelativeLayout
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import com.example.healthtracker.MainActivity
 import com.example.healthtracker.MyApplication
 import com.example.healthtracker.R
 import com.example.healthtracker.data.room.UserData
@@ -108,6 +105,12 @@ fun FragmentActivity.showLoading() {
 fun FragmentActivity.hideLoading() {
     findViewById<RelativeLayout>(R.id.loadingPanel).apply {
         visibility = View.GONE
+    }
+}
+
+fun FragmentActivity.setLoadingVisibility(value: Int) {
+    findViewById<RelativeLayout>(R.id.loadingPanel).apply {
+        visibility = value
     }
 }
 
@@ -199,11 +202,19 @@ fun DataSnapshot.toUserSettingsInfo(): UserSettingsInfo {
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun DataSnapshot.toUserDays(): UserDays {
+    Log.d(
+        "user in converter", UserDays(
+            putInInfo = child("userPutInInfo").toUserPutInInfo(),
+            automaticInfo = child("userAutomaticInfo").toUserAutomaticInfo(),
+            dateTime = child("dateTime").getValue(String::class.java)!!
+        ).toString()
+    )
     return UserDays(
         putInInfo = child("userPutInInfo").toUserPutInInfo(),
         automaticInfo = child("userAutomaticInfo").toUserAutomaticInfo(),
         dateTime = child("dateTime").getValue(String::class.java)!!
     )
+
 }
 
 fun DataSnapshot.toUserGoals(): UserGoals {
@@ -248,20 +259,24 @@ fun isInternetAvailable(context: Context): Boolean {
     val network = connectivityManager.activeNetwork
     val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
 
-    return networkCapabilities != null &&
-            (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                    networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
+    return networkCapabilities != null && (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || networkCapabilities.hasTransport(
+        NetworkCapabilities.TRANSPORT_CELLULAR
+    ))
 }
 
 fun startStepCounterService() {
-    val serviceIntent = Intent(MyApplication.getContext(), StepCounterService::class.java)
-    ContextCompat.startForegroundService(MyApplication.getContext(), serviceIntent)
-    Log.d(
-        "starting stepper",
-        ContextCompat.startForegroundService(MyApplication.getContext(), serviceIntent)
-            .toString()
-    )
+    StepCounterService.stepIntent =
+        Intent(MyApplication.getContext(), StepCounterService::class.java).apply {
+            ContextCompat.startForegroundService(MyApplication.getContext(), this)
+        }
+    MainActivity.stepCounterService
 }
+
+fun stopStepCounterService() {
+    MyApplication.getContext().stopService(StepCounterService.stepIntent)
+    StepCounterService.stepIntent = null
+}
+
 fun formatDurationFromLong(milliseconds: Long): String {
     val totalSeconds = milliseconds / 1000
     val hours = totalSeconds / 3600
@@ -270,6 +285,7 @@ fun formatDurationFromLong(milliseconds: Long): String {
 
     return String.format("%02d:%02d:%02d", hours, minutes, seconds)
 }
+
 fun durationToString(duration: Duration): String {
     val hours = duration.toHours()
     val minutes = duration.toMinutes() % 60

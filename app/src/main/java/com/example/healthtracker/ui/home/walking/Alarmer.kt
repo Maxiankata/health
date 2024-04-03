@@ -18,6 +18,7 @@ import com.example.healthtracker.ui.calendarToString
 import com.example.healthtracker.ui.startStepCounterService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.util.Calendar
@@ -28,9 +29,9 @@ class Alarmer:AlarmScheduler {
     override fun schedule(item: AlarmItem) {
         val intent = Intent(context, AlarmRecieverer::class.java)
         val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, 4)
-        calendar.set(Calendar.SECOND, 30)
+        calendar.set(Calendar.HOUR_OF_DAY, 9)
+        calendar.set(Calendar.MINUTE, 56)
+        calendar.set(Calendar.SECOND, 0)
         val currentTime = System.currentTimeMillis()
         if (calendar.timeInMillis < currentTime) {
             calendar.add(Calendar.DAY_OF_MONTH, 1)
@@ -72,7 +73,9 @@ class AlarmRecieverer:BroadcastReceiver(){
                 sendToday
             )
             userDays.add(day)
-            userDao.updateDays(userDays)
+            async{
+                userDao.updateDays(userDays)
+            }.await()
             val syncer = roomToUserMegaInfoAdapter.adapt(userDao.getEntireUser()!!)
             authImpl.sync(syncer)
             authImpl.clearChallenges()

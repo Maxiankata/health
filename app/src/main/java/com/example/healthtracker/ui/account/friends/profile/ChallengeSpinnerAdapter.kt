@@ -9,11 +9,10 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.compose.ui.unit.dp
 import androidx.core.view.marginBottom
 import com.example.healthtracker.MyApplication
 import com.example.healthtracker.R
-import com.example.healthtracker.data.SpinnerItem
+import com.example.healthtracker.ui.account.friends.challenges.SpinnerItem
 
 class ChallengeSpinnerAdapter(context: Context, private val items: List<SpinnerItem>) :
     ArrayAdapter<SpinnerItem>(context, R.layout.custom_spinner_item, items) {
