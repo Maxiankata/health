@@ -16,7 +16,7 @@ interface AuthInterface {
     suspend fun createAcc(email: String, password: String, username: String):String?
     suspend fun logIn(email: String, password: String):Boolean?
     suspend fun checkCurrentUser():Boolean
-    suspend fun sync(megaInfo: UserMegaInfo)
+    suspend fun sync(megaInfo: UserMegaInfo, id:String)
     suspend fun addFriend(userId: String)
     suspend fun resetPassword(email: String):Boolean
     suspend fun fetchUserFriends(): List<UserInfo>?

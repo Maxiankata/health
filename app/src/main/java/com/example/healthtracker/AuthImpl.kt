@@ -141,16 +141,16 @@ class AuthImpl : AuthInterface {
             })
         }
 
-    override suspend fun sync(megaInfo: UserMegaInfo) {
-        Firebase.database.reference.child("user/${Firebase.auth.currentUser?.uid}/userInfo")
+    override suspend fun sync(megaInfo: UserMegaInfo, id:String) {
+        Firebase.database.reference.child("user/${id}/userInfo")
             .setValue(megaInfo.userInfo)
-        Firebase.database.reference.child("user/${Firebase.auth.currentUser?.uid}/userAutomaticInfo")
+        Firebase.database.reference.child("user/${id}/userAutomaticInfo")
             .setValue(megaInfo.userAutomaticInfo)
-        Firebase.database.reference.child("user/${Firebase.auth.currentUser?.uid}/userPutInInfo")
+        Firebase.database.reference.child("user/${id}/userPutInInfo")
             .setValue(megaInfo.userPutInInfo)
-        Firebase.database.reference.child("user/${Firebase.auth.currentUser?.uid}/userSettingsInfo")
+        Firebase.database.reference.child("user/${id}/userSettingsInfo")
             .setValue(megaInfo.userSettingsInfo)
-        Firebase.database.reference.child("user/${Firebase.auth.currentUser?.uid}/userDays")
+        Firebase.database.reference.child("user/${id}/userDays")
             .setValue(megaInfo.userDays)
     }
 

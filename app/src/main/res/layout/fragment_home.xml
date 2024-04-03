@@ -87,7 +87,7 @@
             android:layout_marginHorizontal="25dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="10dp"
-            android:backgroundTint="#5EABC6"
+            android:backgroundTint="@color/light_blue"
             android:background="@drawable/rounded_background"
             android:orientation="horizontal"
 
@@ -158,7 +158,7 @@
             android:layout_marginHorizontal="25dp"
             android:layout_marginBottom="10dp"
             android:background="@drawable/rounded_background"
-            android:backgroundTint="#84419C"
+            android:backgroundTint="@color/purple"
             android:orientation="horizontal">
 
             <ImageView

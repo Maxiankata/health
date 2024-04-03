@@ -25,6 +25,9 @@
         <action
             android:id="@+id/action_navigation_notifications_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_navigation_notifications_to_statisticsFragment"
+            app:destination="@id/statisticsFragment" />
     </fragment>
     <fragment
         android:id="@+id/friendAccountFragment"
@@ -45,7 +48,10 @@
         android:id="@+id/settingsFragment"
         android:name="com.example.healthtracker.ui.account.settings.SettingsFragment"
         android:label="SettingsFragment" />
-
+    <fragment
+        android:id="@+id/statisticsFragment"
+        android:name="com.example.healthtracker.ui.account.statistics.StatisticsFragment"
+        android:label="StatisticsFragment" />
 
 
 </navigation>

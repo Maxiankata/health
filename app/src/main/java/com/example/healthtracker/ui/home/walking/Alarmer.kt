@@ -16,6 +16,7 @@ import com.example.healthtracker.data.user.UserDays
 import com.example.healthtracker.data.user.UserPutInInfo
 import com.example.healthtracker.ui.calendarToString
 import com.example.healthtracker.ui.startStepCounterService
+import com.example.healthtracker.ui.stopStepCounterService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -29,9 +30,9 @@ class Alarmer:AlarmScheduler {
     override fun schedule(item: AlarmItem) {
         val intent = Intent(context, AlarmRecieverer::class.java)
         val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, 9)
-        calendar.set(Calendar.MINUTE, 56)
-        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.HOUR_OF_DAY, 23)
+        calendar.set(Calendar.MINUTE, 59)
+        calendar.set(Calendar.SECOND, 30d )
         val currentTime = System.currentTimeMillis()
         if (calendar.timeInMillis < currentTime) {
             calendar.add(Calendar.DAY_OF_MONTH, 1)
@@ -61,11 +62,12 @@ class AlarmRecieverer:BroadcastReceiver(){
     override fun onReceive(context: Context?, intent: Intent?) {
         val userDao = MainActivity.getDatabaseInstance().dao()
         val roomToUserMegaInfoAdapter = RoomToUserMegaInfoAdapter()
-        Log.d("Launching alarm reciever", "")
-        val stepCounterService = StepCounterService()
         customCoroutineScope.launch {
             val userPutInInfo = userDao.getPutInInfo()
             val userAutomaticInfo = userDao.getAutomaticInfo()
+            userAutomaticInfo?.steps?.stepsGoal = userDao.getUserSettings()?.userGoals?.stepGoal
+            userAutomaticInfo?.steps?.caloriesGoal = userDao.getUserSettings()?.userGoals?.calorieGoal
+            userPutInInfo?.waterInfo?.waterGoal = userDao.getUserSettings()?.userGoals?.waterGoal
             val userChallenges = userDao.getEntireUser()?.challenges as ArrayList<Challenge>
             val userDays = userDao.getEntireUser()?.userDays as ArrayList<UserDays>
             val sendToday = calendarToString(Calendar.getInstance())
@@ -77,7 +79,7 @@ class AlarmRecieverer:BroadcastReceiver(){
                 userDao.updateDays(userDays)
             }.await()
             val syncer = roomToUserMegaInfoAdapter.adapt(userDao.getEntireUser()!!)
-            authImpl.sync(syncer)
+            authImpl.sync(syncer, syncer.userInfo.uid!!)
             authImpl.clearChallenges()
             Log.d("Updated days from val", userDays.toString())
             Log.d("Updated days from base", userDao.getEntireUser()!!.userDays.toString())
@@ -86,9 +88,7 @@ class AlarmRecieverer:BroadcastReceiver(){
             userDao.wipeChallenges()
             userDao.updateUserAutomaticInfo(UserAutomaticInfo())
             userDao.updateUserPutInInfo(UserPutInInfo())
-            stepCounterService.nullifySteps()
-            stepCounterService.stopSelf()
-            stepCounterService.handler?.removeCallbacksAndMessages(null)
+            stopStepCounterService()
             startStepCounterService()
             Log.d("wiped days from base", userDao.getEntireUser()!!.userAutomaticInfo.toString())
 

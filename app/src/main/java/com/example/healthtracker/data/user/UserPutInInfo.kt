@@ -8,5 +8,6 @@ data class UserPutInInfo(
 
 data class WaterInfo(
     var currentWater: Int? = 0,
+    var waterGoal:Int?=6,
     val waterCompletion: Boolean? = false
 )

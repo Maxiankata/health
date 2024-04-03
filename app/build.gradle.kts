@@ -71,10 +71,9 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences-rxjava2:1.0.0")
     implementation ("androidx.work:work-runtime-ktx:2.7.0")
     implementation("net.danlew:android.joda:2.12.7")
-
-    // optional - RxJava3 support
+    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation("androidx.datastore:datastore-preferences-rxjava3:1.0.0")
-    //noinspection LifecycleAnnotationProcessorWithJava8
+    implementation ("com.github.AAChartModel:AAChartCore-Kotlin:7.1.0")
     kapt ("androidx.lifecycle:lifecycle-compiler:2.8.0-alpha01")
     kapt ("androidx.room:room-compiler:2.6.1")
     implementation ("androidx.room:room-ktx:2.6.1")
