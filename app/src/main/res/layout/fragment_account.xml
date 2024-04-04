@@ -10,6 +10,15 @@
     android:orientation="vertical"
     tools:context=".ui.account.AccountFragment"
     >
+    <View
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:id="@+id/background_color"
+
+        />
     <ImageView
         android:id="@+id/settings"
         app:layout_constraintTop_toTopOf="parent"
@@ -34,24 +43,8 @@
         />
 <!--    TODO() ADD BACKGROUND IMAGE PICKING MAYBE :)-->
 
-    <FrameLayout
-        android:id="@+id/background_frame"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:padding="5dp"
-        android:paddingBottom="0dp"
-        >
-        <ImageView
 
-            android:id="@+id/background_photo"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            />
-    </FrameLayout>
+
     <FrameLayout
         android:id="@+id/picture_frame"
         app:layout_constraintTop_toTopOf="parent"
@@ -106,9 +99,8 @@
         android:layout_marginHorizontal="45dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/rounded_background"
-        android:backgroundTint="@color/light_green"
         android:padding="5dp"
-
+        android:backgroundTint="@color/light_green"
         >
         <ImageView
             android:layout_width="40dp"

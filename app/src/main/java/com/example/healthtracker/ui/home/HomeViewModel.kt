@@ -16,13 +16,17 @@ import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.UserPutInInfo
 import com.example.healthtracker.data.user.WaterInfo
 import com.example.healthtracker.ui.calendarToString
+import com.example.healthtracker.ui.durationToString
 import com.example.healthtracker.ui.isInternetAvailable
+import com.example.healthtracker.ui.parseDurationToLong
 import com.example.healthtracker.ui.stringToCalendar
+import com.example.healthtracker.ui.stringToDuration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import okhttp3.internal.concurrent.formatDuration
 import java.util.Calendar
 import kotlin.math.log
 
@@ -58,6 +62,15 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
                     }
                 }
             }
+        }
+    }
+    fun getTodaysSleep(callback: (Long?) -> Unit) {
+        viewModelScope.launch {
+            val sleep = withContext(Dispatchers.IO) {
+                val sleepString = userDao.getPutInInfo()?.sleepDuration
+                sleepString?.let { parseDurationToLong(it) }
+            }
+            callback(sleep)
         }
     }
     suspend fun feedUser() {

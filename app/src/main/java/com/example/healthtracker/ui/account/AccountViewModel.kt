@@ -5,6 +5,8 @@ import android.graphics.Bitmap
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.healthtracker.AuthImpl
 import com.example.healthtracker.MainActivity
@@ -19,17 +21,17 @@ import com.example.healthtracker.ui.stopStepCounterService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import java.util.Calendar
 
 class AccountViewModel(private val application: Application) : AndroidViewModel(application) {
     private val auth = AuthImpl.getInstance()
     private val userDao = MainActivity.getDatabaseInstance().dao()
     private val roomToUserMegaInfoAdapter = RoomToUserMegaInfoAdapter()
+    private val _user = MutableLiveData<UserMegaInfo?>()
+    val user: LiveData<UserMegaInfo?> get() = _user
     fun signOut() {
         viewModelScope.launch {
-                sync()
+            sync()
             withContext(Dispatchers.IO) {
                 userDao.dropUser()
                 auth.signOut()
@@ -100,9 +102,17 @@ class AccountViewModel(private val application: Application) : AndroidViewModel(
         }
     }
 
-    suspend fun getWholeUser(): UserMegaInfo? {
-        return withContext(Dispatchers.IO) {
-            userDao.getEntireUser()?.let { roomToUserMegaInfoAdapter.adapt(it) }
+    fun getWholeUser() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                userDao.getEntireUser()?.let {
+                    _user.postValue(
+                        roomToUserMegaInfoAdapter.adapt(
+                            it
+                        )
+                    )
+                }
+            }
         }
     }
 }

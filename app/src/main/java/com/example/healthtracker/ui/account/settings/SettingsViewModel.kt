@@ -29,7 +29,6 @@ class SettingsViewModel(private val application: Application) : AndroidViewModel
     suspend fun deleteUser() {
         viewModelScope.launch {
             auth.deleteCurrentUser()
-            auth.signOut()
         }
         withContext(Dispatchers.IO) {
             userDao.dropUser()

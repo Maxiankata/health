@@ -61,7 +61,8 @@ class StatisticsFragment : Fragment() {
                 }
                 val chartModel = AAChartModel()
                     .chartType(AAChartType.Column)
-                    .title("Steps Progress Over Time")
+                    .title(getString(R.string.progress))
+                    .titleStyle(AAStyle().color("#FFFFFF"))
                     .categories(datetimeList.toTypedArray())
                     .backgroundColor("#000000")
                     .series(
@@ -83,6 +84,9 @@ class StatisticsFragment : Fragment() {
                 intChart.aa_drawChartWithChartModel(chartModel)
                 intChart.setRoundedCorners(30F)
 
+            }
+            backButton.setOnClickListener {
+                requireActivity().supportFragmentManager.popBackStack()
             }
         }
     }

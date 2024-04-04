@@ -1,6 +1,7 @@
 package com.example.healthtracker
 
 import android.graphics.Bitmap
+import com.example.healthtracker.data.user.UserDays
 import com.example.healthtracker.ui.account.friends.challenges.Challenge
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.data.user.UserMegaInfo
@@ -9,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 interface AuthInterface {
     fun setUser(email: String, username: String, uid: String)
 
-    suspend fun signOut()
+    fun signOut()
     suspend fun getCurrentUser(): UserMegaInfo?
     suspend fun getEntireUser(): Flow<UserMegaInfo?>
     suspend fun getUserInfo(uid: String): UserInfo?
@@ -23,6 +24,7 @@ interface AuthInterface {
     suspend fun fetchChallenges(userId: String):List<Challenge>?
     suspend fun fetchOwnChallenges():List<Challenge>?
     suspend fun clearChallenges()
+    suspend fun fetchFriendDays(id:String):List<UserDays>?
     suspend fun setChallenges(challenges: List<Challenge>, userId: String)
     suspend fun removeFriend(userId: String, userFriendList: List<UserInfo>)
     suspend fun fetchAllUsersInfo(): MutableList<UserInfo>

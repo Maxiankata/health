@@ -11,6 +11,7 @@
         <item name="colorOnSecondary">@color/nav_bar_dark_background</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/black</item>
+<!--        <attr name="pog" format="color">#520912</item>-->
 
         <!-- Customize your theme here. -->
 <!--        <style name="ScreenBackground"><item name="android:background">@color/yellow_mellow</item></style>-->

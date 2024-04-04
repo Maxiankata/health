@@ -85,7 +85,14 @@ class HomeFragment : Fragment() {
             }
             sleepDuration.observe(viewLifecycleOwner) {
                 sleepLogger.text = buildString {
-                    append("You have slept for ${formatDurationFromLong(it)} hours :)")
+                    if (it != 0.toLong()) {
+                        append("You have slept for ${formatDurationFromLong(it)} hours :)")
+                    }else{
+//                        homeViewModel.getTodaysSleep {
+//                            append("You have slept for $it hours :)")
+//                            Log.d("check","checkcer slep")
+//                        }
+                    }
                 }
             }
             homeViewModel.water.observe(viewLifecycleOwner) {

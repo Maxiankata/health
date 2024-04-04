@@ -57,21 +57,21 @@ class SettingsFragment : Fragment() {
             }
             rgbPickerDialogBinding.pick.setOnClickListener {
                 lifecycleScope.launch {
-                    val user = settingsViewModel.getUser()
-                    if (user!=null){
-                        user.userInfo = UserInfo(
-                            username = user.userInfo.username,
-                            uid = user.userInfo.uid,
-                            image= user.userInfo.image,
-                            mail= user.userInfo.mail,
-                            bgImage = user.userInfo.bgImage,
-                            theme = setRgbColor())
-                        Log.d("User Background Color", user.userInfo?.theme.toString())
-                        settingsViewModel.updateUser(user)
+                    settingsViewModel.getUser()?.let {user->
+                            user.userInfo = UserInfo(
+                                username = user.userInfo.username,
+                                uid = user.userInfo.uid,
+                                image = user.userInfo.image,
+                                mail = user.userInfo.mail,
+                                bgImage = user.userInfo.bgImage,
+                                theme = setRgbColor()
+                            )
+                            settingsViewModel.updateUser(user)
+                        }
                     }
                     rgbDialog.dismiss()
                 }
-            }
+
             setOnSeekBar(
                 "R",
                 rgbPickerDialogBinding.redLayout.typeTxt,
@@ -91,7 +91,6 @@ class SettingsFragment : Fragment() {
                 rgbPickerDialogBinding.blueLayout.typeTxt,
                 rgbPickerDialogBinding.blueLayout.seekBar,
                 rgbPickerDialogBinding.blueLayout.colorValueText,
-
                 )
             rgbPickerDialogBinding.cancel.setOnClickListener {
                 rgbDialog.dismiss()

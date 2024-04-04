@@ -102,6 +102,7 @@
     <string name="units">Units</string>
     <string name="lbs">lbs</string>
     <string name="today_steps">Today\'s steps:</string>
+    <string name="progress">Progress</string>
     <string-array name="activities">
         <item>Walking</item>
         <item>Power Walking</item>

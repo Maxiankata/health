@@ -279,6 +279,16 @@ fun formatDurationFromLong(milliseconds: Long): String {
     return String.format("%02d:%02d:%02d", hours, minutes, seconds)
 }
 
+fun parseDurationToLong(duration: String): Long {
+    val parts = duration.split(":")
+    require(parts.size == 3) { "Invalid duration format: $duration" }
+
+    val hours = parts[0].toLong()
+    val minutes = parts[1].toLong()
+    val seconds = parts[2].toLong()
+
+    return (hours * 3600 + minutes * 60 + seconds) * 1000
+}
 fun durationToString(duration: Duration): String {
     val hours = duration.toHours()
     val minutes = duration.toMinutes() % 60
