@@ -8,13 +8,13 @@ import com.example.healthtracker.data.user.UserMegaInfo
 import kotlinx.coroutines.flow.Flow
 
 interface AuthInterface {
-    fun setUser(email: String, username: String, uid: String)
+    suspend fun setUser(email: String, username: String, uid: String)
 
     fun signOut()
     suspend fun getCurrentUser(): UserMegaInfo?
     suspend fun getEntireUser(): Flow<UserMegaInfo?>
     suspend fun getUserInfo(uid: String): UserInfo?
-    suspend fun createAcc(email: String, password: String, username: String):String?
+    suspend fun createAcc(email: String, password: String, username: String):Boolean
     suspend fun logIn(email: String, password: String):Boolean?
     suspend fun checkCurrentUser():Boolean
     suspend fun sync(megaInfo: UserMegaInfo, id:String)

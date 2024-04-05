@@ -65,7 +65,9 @@ class AccountFragment : Fragment() {
                         append(it.userInfo.totalSteps.toString())
                     }
                     username.text = it.userInfo.username
-                    backgroundColor.setBackgroundColor(Color.parseColor(it.userInfo.theme))
+                    if(!it.userInfo.theme.isNullOrEmpty()){
+                        backgroundColor.setBackgroundColor(Color.parseColor(it.userInfo.theme))
+                    }
                 }
             }
             val pickImage = registerForActivityResult(StartActivityForResult()) { result ->

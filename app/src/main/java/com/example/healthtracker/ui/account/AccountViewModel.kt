@@ -17,6 +17,7 @@ import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.ui.bitmapToBase64
 import com.example.healthtracker.ui.isInternetAvailable
+import com.example.healthtracker.ui.stopSpeeder
 import com.example.healthtracker.ui.stopStepCounterService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -36,7 +37,7 @@ class AccountViewModel(private val application: Application) : AndroidViewModel(
                 userDao.dropUser()
                 auth.signOut()
                 stopStepCounterService()
-                Log.d("syn", "sync")
+                stopSpeeder()
             }
         }
     }

@@ -12,7 +12,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <CalendarView
@@ -24,7 +24,8 @@
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="15dp"
+                android:layout_marginHorizontal="15dp"
+                android:layout_marginBottom="10dp"
                 android:background="@drawable/rounded_background"
                 android:backgroundTint="@color/dark_background"
                 android:orientation="vertical"
@@ -33,45 +34,57 @@
 
                 <TextView
                     android:id="@+id/date"
+
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp" />
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="15dp"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/steps_taken"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp" />
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="15dp" />
 
                 <TextView
                     android:id="@+id/calories_burned"
 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp" />
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="15dp" />
 
                 <TextView
                     android:id="@+id/challenges_passed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp" />
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="15dp" />
+
                 <TextView
                     android:id="@+id/recorded_weight"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp" />
+                    android:layout_marginStart="5dp"
+
+                    android:layout_marginTop="15dp" />
 
                 <TextView
                     android:id="@+id/sleep_hours"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp" />
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="15dp" />
 
                 <TextView
                     android:id="@+id/water_goal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp" />
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="15dp" />
             </androidx.appcompat.widget.LinearLayoutCompat>
         </LinearLayout>
     </ScrollView>

@@ -87,6 +87,7 @@ class AlarmRecieverer : BroadcastReceiver() {
                 totalSteps = user.userInfo.totalSteps?.plus(getStepsValue()),
                 username = user.userInfo.username
                 )
+            val weight = userPutInInfo?.weight
             val sendToday = calendarToString(Calendar.getInstance())
             val day = UserDays(
                 userPutInInfo, userAutomaticInfo, userChallenges,
@@ -104,7 +105,7 @@ class AlarmRecieverer : BroadcastReceiver() {
             userDao.wipeUserPutInInfo()
             userDao.wipeChallenges()
             userDao.updateUserAutomaticInfo(UserAutomaticInfo())
-            userDao.updateUserPutInInfo(UserPutInInfo())
+            userDao.updateUserPutInInfo(UserPutInInfo(weight = weight))
             nullifyStepCounter()
         }
     }

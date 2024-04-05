@@ -24,7 +24,7 @@ data class UserData(
     @ColumnInfo(name = "userDays")
     @TypeConverters(GsonTypeConverter::class)
     val userDays:List<UserDays>?,
-    @ColumnInfo(name = "challenges") val challenges:List<Challenge>?,
+    @ColumnInfo(name = "challenges") var challenges:List<Challenge>?,
     @ColumnInfo(name = "achievements") val achievements:List<Achievement>?
 )
 

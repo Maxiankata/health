@@ -73,7 +73,7 @@
             android:id="@+id/editTextHours"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="HH"
+            android:hint="@string/hh"
             android:inputType="number"
             />
 
@@ -82,7 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
-            android:hint="mm"
+            android:hint="@string/mm"
             android:inputType="number"
             />
 
@@ -90,7 +90,7 @@
             android:id="@+id/editTextSeconds"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="ss"
+            android:hint="@string/ss"
             android:inputType="number"
             />
     </androidx.appcompat.widget.LinearLayoutCompat>

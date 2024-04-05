@@ -34,16 +34,26 @@
         app:layout_constraintEnd_toStartOf="@+id/accept_challenge"
         app:layout_constraintStart_toEndOf="@id/challenge_image"
         app:layout_constraintTop_toBottomOf="@id/challenge_type" />
+    <ImageView
+        android:id="@+id/challenger_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="10dp"
+        app:layout_constraintStart_toEndOf="@id/challenge_image"
+        app:layout_constraintTop_toBottomOf="@id/challenge_duration"
+        android:background="@drawable/circle_background"
+        />
 
     <TextView
-        android:id="@+id/challenger"
+        android:id="@+id/challenger_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="start"
         android:layout_margin="10dp"
+        android:gravity="start"
+        app:layout_constraintBottom_toBottomOf="@+id/challenger_icon"
         app:layout_constraintEnd_toStartOf="@+id/accept_challenge"
-        app:layout_constraintStart_toEndOf="@id/challenge_image"
-        app:layout_constraintTop_toBottomOf="@id/challenge_duration" />
+        app:layout_constraintStart_toEndOf="@id/challenger_icon"
+        app:layout_constraintTop_toTopOf="@+id/challenger_icon" />
 
     <Button
         android:id="@+id/accept_challenge"

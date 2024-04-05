@@ -19,6 +19,7 @@ import androidx.room.Room
 import com.example.healthtracker.data.room.UserDB
 import com.example.healthtracker.databinding.ActivityMainBinding
 import com.example.healthtracker.ui.home.speeder.SpeederService
+import com.example.healthtracker.ui.home.speeder.SpeederServiceBoolean
 import com.example.healthtracker.ui.home.walking.AlarmItem
 import com.example.healthtracker.ui.home.walking.AlarmScheduler
 import com.example.healthtracker.ui.home.walking.Alarmer

@@ -107,6 +107,11 @@
     <string name="new_friend_mode_on">New friend mode on</string>
     <string name="achieved">Achieved</string>
     <string name="unachieved">Unachieved</string>
+    <string name="active_activity">There is an already active activity</string>
+    <string name="empty_timer">00:00:00</string>
+    <string name="ss">SS</string>
+    <string name="mm">MM</string>
+    <string name="hh">HH</string>
     <string-array name="activities">
         <item>Walking</item>
         <item>Power Walking</item>

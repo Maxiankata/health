@@ -17,6 +17,8 @@ import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.UserSettingsInfo
 import com.example.healthtracker.databinding.RgbPickerDialogBinding
+import com.example.healthtracker.ui.stopSpeeder
+import com.example.healthtracker.ui.stopStepCounterService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -26,12 +28,16 @@ class SettingsViewModel(private val application: Application) : AndroidViewModel
     private val auth = AuthImpl.getInstance()
     private val roomToUserMegaInfoAdapter = RoomToUserMegaInfoAdapter()
 
-    suspend fun deleteUser() {
+    fun deleteUser() {
         viewModelScope.launch {
             auth.deleteCurrentUser()
-        }
-        withContext(Dispatchers.IO) {
-            userDao.dropUser()
+            withContext(Dispatchers.IO) {
+                userDao.dropUser()
+            }
+            stopStepCounterService()
+            stopSpeeder()
+            auth.signOut()
+
         }
     }
 

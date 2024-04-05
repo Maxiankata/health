@@ -1,9 +1,12 @@
 package com.example.healthtracker.ui.home.running
 
+import android.graphics.Color
+import android.graphics.Color.YELLOW
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
@@ -13,6 +16,7 @@ import com.example.healthtracker.databinding.RunningDialogBinding
 import com.example.healthtracker.ui.durationToString
 import com.example.healthtracker.ui.home.speeder.ActivityEnum
 import com.example.healthtracker.ui.home.speeder.SpeederService
+import com.example.healthtracker.ui.home.speeder.SpeederServiceBoolean
 import com.example.healthtracker.ui.parseDurationToLong
 import com.example.healthtracker.ui.startSpeeder
 import java.time.Duration
@@ -55,6 +59,12 @@ class RunningDialogFragment : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.apply {
+            cancel.setBackgroundColor(YELLOW)
+            cancel.setOnClickListener {
+                dismiss()
+            }
+            timePicker.visibility = GONE
+            start.setBackgroundColor(YELLOW)
             start.setOnClickListener {
                 val hours = editTextHours.text.toString().toIntOrNull() ?: 0
                 val minutes = editTextMinutes.text.toString().toIntOrNull() ?: 0
@@ -65,22 +75,21 @@ class RunningDialogFragment : DialogFragment() {
                 if (editTextHours.text.toString().isBlank() && editTextMinutes.text.toString()
                         .isEmpty() && editTextSeconds.text.toString().isEmpty()
                 ) {
-                    Log.d("DurationText is null", duration.toString())
                     Toast.makeText(
                         MyApplication.getContext(), R.string.empty_field, Toast.LENGTH_SHORT
                     ).show()
                 } else {
                     timePicker.visibility = View.VISIBLE
                     editTextHours.apply {
-                        visibility = View.GONE
+                        clearFocus()
                         text.clear()
                     }
                     editTextMinutes.apply {
-                        visibility = View.GONE
+                        clearFocus()
                         text.clear()
                     }
                     editTextHours.apply {
-                        visibility = View.GONE
+                        clearFocus()
                         text.clear()
                     }
                     val tag: ActivityEnum = when (tag) {
@@ -92,17 +101,15 @@ class RunningDialogFragment : DialogFragment() {
                             ActivityEnum.WALKING
                         }
                     }
-                    startSpeeder(stringDuration, dialogTag)
+                    startSpeeder(stringDuration, dialogTag, challenge = null)
 
                 }
             }
-            timePicker.text = "00:00:00"
-            SpeederService.time.observe(viewLifecycleOwner) {
-                timePicker.text = it
-                timer.progressMax = parseDurationToLong(SpeederService.timey).toFloat()
-                timer.setProgressWithAnimation(parseDurationToLong(it).toFloat())
-                if (it.equals("00:00:00")) {
-                    timePicker.text = "completed"
+            timePicker.text = getString(R.string.empty_timer)
+            SpeederServiceBoolean.isMyServiceRunningLive.observe(viewLifecycleOwner
+            ){
+                if (!it) {
+                    timePicker.text = getString(R.string.complete)
                     editTextHours.visibility = View.VISIBLE
                     editTextMinutes.visibility = View.VISIBLE
                     editTextSeconds.visibility = View.VISIBLE
@@ -113,6 +120,14 @@ class RunningDialogFragment : DialogFragment() {
                     editTextMinutes.visibility = View.GONE
                     editTextSeconds.visibility = View.GONE
                 }
+            }
+
+            SpeederService.time.observe(viewLifecycleOwner) {
+                timePicker.text = it
+                timer.progressMax = parseDurationToLong(SpeederService.timey).toFloat()
+                timer.setProgressWithAnimation(parseDurationToLong(it).toFloat())
+                timer.progressBarColor = YELLOW
+
             }
             when(dialogTag){
                 ActivityEnum.RUNNING -> {

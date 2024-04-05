@@ -15,6 +15,8 @@ import com.example.healthtracker.databinding.RgbPickerDialogBinding
 import com.example.healthtracker.ui.account.settings.colorchange.ColorChangerDialog
 import com.example.healthtracker.ui.account.settings.goals.GoalChangeDialogFragment
 import com.example.healthtracker.ui.hideBottomNav
+import com.example.healthtracker.ui.login.LoginActivity
+import com.example.healthtracker.ui.navigateToActivity
 import kotlinx.coroutines.launch
 
 
@@ -72,6 +74,7 @@ class SettingsFragment : Fragment() {
         builder.setPositiveButton(R.string.confirm) { dialogInterface: DialogInterface, i: Int ->
             lifecycleScope.launch {
                 settingsViewModel.deleteUser()
+                navigateToActivity(requireActivity(), LoginActivity::class.java)
             }
             dialogInterface.dismiss()
 

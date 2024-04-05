@@ -19,18 +19,15 @@ class ChallengeBuilderDialogViewModel(private val application: MyApplication) : 
             val previousChallenges = authImpl.fetchChallenges(userId)
             if (previousChallenges != null) {
                 for (item in previousChallenges){
-                    Log.d("challenge in list", item.toString())
                     renewedChallengesList.add(item)
                 }
                 renewedChallengesList.add(challenge)
-                Log.d("Challenges werent null, adding new challenge", renewedChallengesList.toString())
                 authImpl.setChallenges(renewedChallengesList, userId)
                 withContext(Dispatchers.IO){
                     userDao.updateChallenges(renewedChallengesList)
                 }
             }else{
                 renewedChallengesList.add(challenge)
-                Log.d("Challenges were null, adding new challenge", renewedChallengesList.toString())
                 authImpl.setChallenges(renewedChallengesList, userId)
                 withContext(Dispatchers.IO){
                     userDao.updateChallenges(renewedChallengesList)
@@ -38,9 +35,9 @@ class ChallengeBuilderDialogViewModel(private val application: MyApplication) : 
             }
         }
     }
-    suspend fun getAssigner():String?{
+    suspend fun getAssigner(): Pair<String?, String?> {
         return withContext(Dispatchers.IO){
-            userDao.getUserInfo()?.username
+            Pair(first = userDao.getUserInfo()?.username,second =  userDao.getUserInfo()?.image)
         }
     }
 

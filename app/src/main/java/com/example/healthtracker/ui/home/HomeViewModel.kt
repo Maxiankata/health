@@ -15,20 +15,11 @@ import com.example.healthtracker.data.room.UserMegaInfoToRoomAdapter
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.UserPutInInfo
 import com.example.healthtracker.data.user.WaterInfo
-import com.example.healthtracker.ui.calendarToString
-import com.example.healthtracker.ui.durationToString
 import com.example.healthtracker.ui.isInternetAvailable
-import com.example.healthtracker.ui.parseDurationToLong
-import com.example.healthtracker.ui.stringToCalendar
-import com.example.healthtracker.ui.stringToDuration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import okhttp3.internal.concurrent.formatDuration
-import java.util.Calendar
-import kotlin.math.log
 
 class HomeViewModel(private val application: Application) : AndroidViewModel(application) {
     private val userDao = MainActivity.getDatabaseInstance().dao()
@@ -42,43 +33,18 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
     private val userMegaInfoToRoomAdapter = UserMegaInfoToRoomAdapter()
     private val auth = AuthImpl.getInstance()
     private val _weight = MutableLiveData<Double?>()
-    val weight :LiveData<Double?> get() = _weight
+    val weight: LiveData<Double?> get() = _weight
     val water: LiveData<WaterInfo?> get() = _water
     val user: LiveData<UserMegaInfo?>
         get() = _user
 
-    fun getYesterdayWeight(){
+    fun feedUser() {
         viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                val today = Calendar.getInstance()
-                today.add(Calendar.DATE,-1)
-                val userDays=userDao.getEntireUser()!!.userDays
-                if (userDays!= null) {
-                    for (user in userDays){
-                        if (user.dateTime== calendarToString(today)){
-                            if (user.putInInfo?.weight !=null )
-                            _weight.postValue(user.putInInfo.weight)
-                        }
-                    }
-                }
-            }
-        }
-    }
-    fun getTodaysSleep(callback: (Long?) -> Unit) {
-        viewModelScope.launch {
-            val sleep = withContext(Dispatchers.IO) {
-                val sleepString = userDao.getPutInInfo()?.sleepDuration
-                sleepString?.let { parseDurationToLong(it) }
-            }
-            callback(sleep)
-        }
-    }
-    suspend fun feedUser() {
-        withContext(Dispatchers.IO) {
-            val user = userDao.getEntireUser()?.let { roomToUserMegaInfoAdapter.adapt(it) }
-            _water.postValue(user?.userPutInInfo?.waterInfo)
-            runBlocking {
+            withContext(Dispatchers.IO) {
+                val user = userDao.getEntireUser().let { roomToUserMegaInfoAdapter.adapt(it) }
+                _water.postValue(user.userPutInInfo?.waterInfo)
                 _user.postValue(user)
+                _weight.postValue(user.userPutInInfo?.weight)
             }
         }
     }
@@ -92,8 +58,25 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
             }
         }
     }
-
-    fun updatePutInInfo(weight: Double) {
+    fun updateSleep(sleep:String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val userPutIn = async {
+                    userDao.getPutInInfo()
+                }.await()
+                if (userPutIn != null) {
+                    userPutIn.sleepDuration = sleep
+                    userDao.updateUserPutInInfo(userPutIn)
+                }
+            }
+        }
+    }
+    suspend fun getSleep(): String? {
+        return withContext(Dispatchers.IO) {
+            userDao.getPutInInfo()?.sleepDuration
+        }
+    }
+    fun updateWeight(weight: Double) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val userPutIn = async {
@@ -106,17 +89,6 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
             }
         }
     }
-
-//    fun syncToFireBase() {
-//        viewModelScope.launch {
-//            withContext(Dispatchers.IO) {
-//                val user = async {
-//                    userDao.getEntireUser()
-//                }.await()
-//                auth.sync(roomToUserMegaInfoAdapter.adapt(user!!))
-//            }
-//        }
-//    }
 
     fun waterIncrement(incrementation: Int) {
         viewModelScope.launch {
@@ -131,7 +103,7 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
                                     currentWater = _water.value!!.currentWater?.plus(incrementation)
                                 )
                                 _water.postValue(newerWater)
-                                val userWeight = userDao.getEntireUser()?.userPutInInfo?.weight
+                                val userWeight = userDao.getEntireUser().userPutInInfo?.weight
                                 val newPutInInfo =
                                     UserPutInInfo(waterInfo = newerWater, weight = userWeight)
                                 userDao.updateUserPutInInfo(newPutInInfo)
@@ -143,7 +115,7 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
                                     currentWater = _water.value!!.currentWater?.plus(incrementation)
                                 )
                                 _water.postValue(newerWater)
-                                val userWeight = userDao.getEntireUser()?.userPutInInfo?.weight
+                                val userWeight = userDao.getEntireUser().userPutInInfo?.weight
                                 val newPutInInfo =
                                     UserPutInInfo(waterInfo = newerWater, weight = userWeight)
                                 userDao.updateUserPutInInfo(newPutInInfo)

@@ -194,7 +194,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <Button
-                android:id="@+id/button"
+                android:id="@+id/sleep_submit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#84419C"
@@ -405,16 +405,6 @@
                     android:textColor="@color/white"
                     android:textSize="20sp" />
             </LinearLayout>
-
-
-
-
         </GridLayout>
-        <Button
-            android:id="@+id/speeder_button"
-            android:layout_width="match_parent"
-            android:layout_margin="20dp"
-            android:layout_height="wrap_content"
-            android:text="open speeder"/>
     </LinearLayout>
 </ScrollView>

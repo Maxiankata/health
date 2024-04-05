@@ -31,8 +31,10 @@ import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.UserPutInInfo
 import com.example.healthtracker.data.user.UserSettingsInfo
 import com.example.healthtracker.data.user.WaterInfo
+import com.example.healthtracker.ui.account.friends.challenges.Challenge
 import com.example.healthtracker.ui.home.speeder.ActivityEnum
 import com.example.healthtracker.ui.home.speeder.SpeederService
+import com.example.healthtracker.ui.home.speeder.SpeederServiceBoolean
 import com.example.healthtracker.ui.home.walking.StepCounterService
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.DataSnapshot
@@ -267,8 +269,10 @@ fun stopStepCounterService() {
     MyApplication.getContext().stopService(StepCounterService.stepIntent)
 }
 
-fun startSpeeder(time: String, activity: ActivityEnum) {
-    val intent: Intent = SpeederService.speedIntent.putExtra("time", time).putExtra("activity", activity.name)
+fun startSpeeder(time: String, activity: ActivityEnum, challenge: Challenge?) {
+    val intent: Intent =
+        SpeederService.speedIntent.putExtra("time", time).putExtra("activity", activity.name)
+            .putExtra("challenge", challenge.toString())
 
     MyApplication.getContext().startForegroundService(intent)
 }
@@ -277,14 +281,20 @@ fun stopSpeeder() {
     MyApplication.getContext().stopService(SpeederService.speedIntent)
 }
 
+fun isServiceRunning(): Boolean {
+    return SpeederServiceBoolean.isMyServiceRunning.value!!
+}
+
 fun getStepsValue(): Int {
     return StepCounterService._steps.value ?: 0
 }
 
 fun nullifyStepCounter() {
     StepCounterService._steps.postValue(0)
+    StepCounterService._calories.postValue(0)
 }
-fun updateStepCalories(calories:Int){
+
+fun updateStepCalories(calories: Int) {
     StepCounterService._calories.postValue(StepCounterService._calories.value?.plus(calories))
 }
 

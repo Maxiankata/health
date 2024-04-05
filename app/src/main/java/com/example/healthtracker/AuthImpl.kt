@@ -6,8 +6,8 @@ import com.example.healthtracker.data.user.UserDays
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.ui.account.friends.challenges.Challenge
-import com.example.healthtracker.ui.account.friends.challenges.ChallengeType
 import com.example.healthtracker.ui.bitmapToBase64
+import com.example.healthtracker.ui.home.speeder.ActivityEnum
 import com.example.healthtracker.ui.toUserDays
 import com.example.healthtracker.ui.toUserMegaInfo
 import com.google.firebase.auth.FirebaseAuth
@@ -16,9 +16,11 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.getValue
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
@@ -28,14 +30,17 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class AuthImpl : AuthInterface {
-    override fun setUser(email: String, username: String, uid: String) {
-        Firebase.database.getReference("user/${Firebase.auth.uid}").setValue(
+    override suspend fun setUser(email: String, username: String, uid: String) {
+        Firebase.database.getReference("user/${Firebase.auth.currentUser?.uid}").setValue(
             UserMegaInfo(
                 UserInfo(
                     username, uid, "", email
                 )
             )
         )
+        coroutineScope {
+            Log.d("created acc", getCurrentUser().toString())
+        }
     }
 
     override suspend fun checkCurrentUser() = Firebase.auth.currentUser != null
@@ -53,27 +58,26 @@ class AuthImpl : AuthInterface {
             Firebase.auth.signOut()
     }
 
-    override suspend fun createAcc(email: String, password: String, username: String): String? {
-        return withContext(Dispatchers.IO) {
-            var uidReturn: String? = null
-            try {
-                suspendCoroutine { continuation ->
+    override suspend fun createAcc(email: String, password: String, username: String): Boolean {
+            return try {
                     Firebase.auth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener {
-                            val user = Firebase.auth.currentUser
-                            setUser(email, username, user?.uid ?: "")
-                            uidReturn = user?.uid
-
-                            Log.d("REGISTERED USER ID", uidReturn.toString())
-                            continuation.resume(Unit)
+                        .addOnCompleteListener {task->
+                            if (task.isSuccessful){
+                                val user = Firebase.auth.currentUser
+                                val userRef = Firebase.database.getReference("user")
+                                if (user!=null){
+                                    val userer = UserMegaInfo(UserInfo(username = username, mail = email, uid = user.uid))
+                                    userRef.child(user.uid).setValue(userer).addOnSuccessListener {
+                                        Log.d("nice", "ince")
+                                    }
+                                }
+                            }
                         }
-                }
+                true
             } catch (e: Exception) {
                 e.printStackTrace()
+                false
             }
-            Log.d("Returning id", uidReturn.toString())
-            uidReturn
-        }
     }
 
     override suspend fun fetchSearchedFriends(string: String): MutableList<UserInfo> =
@@ -158,11 +162,9 @@ class AuthImpl : AuthInterface {
             val dataSnapshot = userDaysRef.get().await()
             val userDaysList = mutableListOf<UserDays>()
             for (userDaysSnapshot in dataSnapshot.children) {
-                Log.d("Entering snapshot", "")
                 val userDays = userDaysSnapshot.toUserDays()
                 userDays.let {
                     userDaysList.add(it)
-                    Log.d("Adding userDays", it.toString())
                 }.run {
                     Log.d("Snapshot is null", "")
                 }
@@ -172,7 +174,7 @@ class AuthImpl : AuthInterface {
     }
 
 
-    override suspend fun getCurrentUser(): UserMegaInfo? {
+     override suspend fun getCurrentUser(): UserMegaInfo? {
         return try {
             val userRef =
                 Firebase.database.getReference("user/${Firebase.auth.currentUser!!.uid}")
@@ -225,19 +227,23 @@ class AuthImpl : AuthInterface {
                 val challengeList = mutableListOf<Challenge>()
                 for (challengeSnapshot in dataSnapshot.children) {
                     val assigner = challengeSnapshot.child("assigner").getValue(String::class.java)
+                    val image = challengeSnapshot.child("image").getValue(String::class.java)
                     val challengeType = challengeSnapshot.child("challengeType").getValue(
-                        ChallengeType::class.java
+                        ActivityEnum::class.java
                     )
+                    val id = challengeSnapshot.child("id").getValue(Int::class.java)
                     val challengeDuration =
                         challengeSnapshot.child("challengeDuration").getValue(String::class.java)
                     val challengeCompletion =
                         challengeSnapshot.child("challengeCompletion").getValue(Boolean::class.java)
-                    if (assigner != null && challengeType != null && challengeDuration != null && challengeCompletion != null) {
+                    if (id!=null&&assigner != null && challengeType != null && challengeDuration != null && challengeCompletion != null && image!=null) {
                         val challenge = Challenge(
+                            id,
+                            image,
                             assigner,
                             challengeType,
                             challengeDuration,
-                            challengeCompletion
+                            challengeCompletion,
                         )
                         challengeList.add(challenge)
                     }
@@ -259,29 +265,30 @@ class AuthImpl : AuthInterface {
                 val challengeList = mutableListOf<Challenge>()
                 for (challengeSnapshot in dataSnapshot.children) {
                     val assigner = challengeSnapshot.child("assigner").getValue(String::class.java)
+                    val image = challengeSnapshot.child("image").getValue(String::class.java)
                     val challengeType = challengeSnapshot.child("challengeType").getValue(
-                        ChallengeType::class.java
+                        ActivityEnum::class.java
                     )
+                    val id = challengeSnapshot.child("id").getValue(Int::class.java)
                     val challengeDuration =
                         challengeSnapshot.child("challengeDuration").getValue(String::class.java)
                     val challengeCompletion =
                         challengeSnapshot.child("challengeCompletion").getValue(Boolean::class.java)
-                    if (assigner != null && challengeType != null && challengeDuration != null && challengeCompletion != null) {
+                    if (id!=null && image!=null&&assigner != null && challengeType != null && challengeDuration != null && challengeCompletion != null) {
                         val challenge = Challenge(
+                            id,
+                            image,
                             assigner,
                             challengeType,
                             challengeDuration,
                             challengeCompletion
                         )
                         challengeList.add(challenge)
-                        Log.d("Adding challenge", challenge.toString())
                     } else {
-                        Log.e("Fetch Challenges", "Invalid data for challenge: $challengeSnapshot")
                     }
                 }
                 challengeList
             } catch (e: Exception) {
-                Log.e("Fetch Challenges", "Error fetching challenges", e)
                 null
             }
         }
@@ -354,6 +361,7 @@ class AuthImpl : AuthInterface {
         }
 
     override suspend fun deleteCurrentUser() {
+            Firebase.database.getReference("user/${Firebase.auth.currentUser?.uid}").setValue(null)
             Firebase.auth.currentUser?.delete()?.addOnCompleteListener {task->
                 if (task.isSuccessful){
                         signOut()

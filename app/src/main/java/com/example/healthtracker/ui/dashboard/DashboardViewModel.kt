@@ -25,10 +25,8 @@ class DashboardViewModel(private val application: Application) : AndroidViewMode
                 async {
                     authImpl.getCurrentUser()?.userDays?.let { userDao.updateDays(it) }
                 }.await()
-                Log.d("userdays from firebase", authImpl.getCurrentUser()?.userDays.toString())
-                Log.d("userdays in feeder", userDao.getEntireUser()?.userDays.toString())
                 val user = userDao.getEntireUser()
-                for (item in user?.userDays!!) {
+                for (item in user.userDays!!) {
                     if (item.dateTime == feeder) {
                         _userDay.postValue(item)
                     }

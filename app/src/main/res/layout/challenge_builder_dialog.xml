@@ -62,7 +62,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="5dp"
-        android:hint="HH"
+        android:hint="@string/hh"
         android:inputType="number" />
 
     <EditText
@@ -72,7 +72,7 @@
         android:id="@+id/editTextMinutes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="mm"
+        android:hint="@string/mm"
         android:layout_marginEnd="5dp"
         android:inputType="number" />
 
@@ -84,7 +84,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
-        android:hint="ss"
+        android:hint="@string/ss"
         android:inputType="number" />
 
     <com.google.android.material.button.MaterialButton

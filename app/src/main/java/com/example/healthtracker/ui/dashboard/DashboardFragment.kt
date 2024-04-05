@@ -1,19 +1,15 @@
 package com.example.healthtracker.ui.dashboard
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.FragmentDashboardBinding
 import com.example.healthtracker.ui.calendarToString
 import com.example.healthtracker.ui.showBottomNav
-import kotlinx.coroutines.launch
 import java.util.Calendar
 
 class DashboardFragment : Fragment() {
@@ -68,9 +64,18 @@ class DashboardFragment : Fragment() {
                             }
                         }
                         challengesPassed.apply {
+                            var challenges = 0
+                            if (it.challenges != null) {
+                                for (challenge in it.challenges) {
+                                    if (challenge.challengeCompletion) {
+                                        ++challenges
+                                    }
+                                }
+
+                            }
                             text = buildString {
                                 append(getString(R.string.challenges_passed))
-                                append(it.challenges?.size ?: 0)
+                                append(challenges)
                             }
                         }
                         recordedWeight.apply {

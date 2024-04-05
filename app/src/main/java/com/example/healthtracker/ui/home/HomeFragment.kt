@@ -7,9 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.healthtracker.R
@@ -26,7 +24,6 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val homeViewModel: HomeViewModel by activityViewModels()
-    private var sleepDuration: LiveData<Long> = StepCounterService.sleepDuration
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -91,15 +88,24 @@ class HomeFragment : Fragment() {
                 }
 
             }
-            sleepDuration.observe(viewLifecycleOwner) {
-                sleepLogger.text = buildString {
-                    if (it != 0.toLong()) {
-                        append("You have slept for ${formatDurationFromLong(it)} hours :)")
-                    } else {
-//                        homeViewModel.getTodaysSleep {
-//                            append("You have slept for $it hours :)")
-//                            Log.d("check","checkcer slep")
-//                        }
+            sleepLogger.apply {
+                text = buildString {
+                    lifecycleScope.launch {
+                        homeViewModel.getSleep().apply {
+                            append("You have slept for $this hours :)")
+                            Log.d("check", "checkcer slep")
+                        }
+                    }
+                }
+                StepCounterService.sleepDuration.observe(viewLifecycleOwner) { sleep ->
+                    if (formatDurationFromLong(sleep).isNotEmpty()) {
+                        text = buildString {
+                        append("You have slept for ${formatDurationFromLong(sleep)} hours :)")
+
+                        }
+                    }
+                    sleepSubmit.setOnClickListener {
+                        homeViewModel.updateSleep(formatDurationFromLong(sleep))
                     }
                 }
             }
@@ -121,7 +127,6 @@ class HomeFragment : Fragment() {
                         if (user.userPutInInfo?.weight != 0.0 && user.userPutInInfo?.weight != null) {
                             scrollToDouble(user.userPutInInfo.weight!!)
                         } else {
-                            homeViewModel.getYesterdayWeight()
                             homeViewModel.weight.observe(viewLifecycleOwner) {
                                 if (it != null) {
                                     scrollToDouble(it)
@@ -283,11 +288,8 @@ class HomeFragment : Fragment() {
                 if (mainUnits != 0 || subUnits != 0) {
                     val weight: Double = mainUnits + (subUnits.toDouble() / 10)
                     Log.d("current selected weight is", weight.toString())
-                    homeViewModel.updatePutInInfo(weight)
+                    homeViewModel.updateWeight(weight)
                 }
-            }
-            speederButton.setOnClickListener {
-                findNavController().navigate(R.id.action_navigation_home_to_speederFragment)
             }
         }
     }

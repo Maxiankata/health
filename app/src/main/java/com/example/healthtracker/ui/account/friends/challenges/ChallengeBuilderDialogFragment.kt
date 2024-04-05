@@ -17,6 +17,7 @@ import com.example.healthtracker.R
 import com.example.healthtracker.databinding.ChallengeBuilderDialogBinding
 import com.example.healthtracker.ui.account.friends.profile.ChallengeSpinnerAdapter
 import com.example.healthtracker.ui.durationToString
+import com.example.healthtracker.ui.home.speeder.ActivityEnum
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.format.DateTimeParseException
@@ -26,13 +27,11 @@ class ChallengeBuilderDialogFragment : DialogFragment() {
     private val binding get() = _binding!!
     private val challengeBuilderDialogViewModel = ChallengeBuilderDialogViewModel(MyApplication())
     private lateinit var userId: String
-    private var assigner: String? = ""
+    private lateinit var assigner: Pair<String?,String?>
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         userId = arguments?.getString("uid")!!
-        Log.d("bundle recieved by dialog", userId.toString())
-
         _binding = ChallengeBuilderDialogBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -98,21 +97,25 @@ class ChallengeBuilderDialogFragment : DialogFragment() {
                     val selectedItem = challengeTypeSpinner.selectedItem as SpinnerItem
                     val challengeTypeId = selectedItem.itemId
                     try {
-                        val activityType: ChallengeType = when (challengeTypeId) {
-                            1 -> ChallengeType.RUNNING
-                            2 -> ChallengeType.CYCLING
-                            3 -> ChallengeType.JOGGING
-                            4 -> ChallengeType.POWER_WALKING
+                        val activityType: ActivityEnum = when (challengeTypeId) {
+                            1 -> ActivityEnum.RUNNING
+                            2 -> ActivityEnum.CYCLING
+                            3 -> ActivityEnum.JOGGING
+                            4 -> ActivityEnum.WALKING
                             else -> {
-                                ChallengeType.WALKING
+                                ActivityEnum.WALKING
                             }
                         }
+                        val id = (Math.random())*100000
                         val challenge = Challenge(
                             challengeCompletion = false,
                             challengeDuration = stringDuration,
                             challengeType = activityType,
-                            assigner = assigner!!
+                            assigner = assigner.first!!,
+                            image = assigner.second!!,
+                            id = id.toInt()
                         )
+                        Log.d("challenge id", id.toInt().toString())
                         lifecycleScope.launch {
                             challengeBuilderDialogViewModel.sendChallenge(userId, challenge)
                         }

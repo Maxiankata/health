@@ -60,18 +60,14 @@ class LoginFragmentViewModel(private val application: Application) : AndroidView
     }
 
     suspend fun getUser() {
-        Log.d("running getUser() in login", "")
         auth.getEntireUser().collect {
-            Log.d("login collector ", it?.userDays.toString())
             if (it != null) {
-                Log.d("user from firebase", it.userDays.toString())
                 withContext(Dispatchers.IO) {
                     toRoomAdapter.adapt(it)?.let { it1 ->
                         async {
                             userDao.saveUser(it1)
 
                         }.await()
-                        Log.d("user from dao", userDao.getEntireUser()?.userDays.toString())
                     }
                 }
             }

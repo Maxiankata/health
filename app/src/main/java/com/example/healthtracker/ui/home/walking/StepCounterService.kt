@@ -74,7 +74,7 @@ class StepCounterService : Service(), SensorEventListener {
             userDao.getEntireUser().let {
                 callback(roomToUserMegaInfoAdapter.adapt(it))
                 Log.d("emitted user", roomToUserMegaInfoAdapter.adapt(it).userAutomaticInfo.toString())
-            } ?: callback(null)
+            }
         }
     }
 
