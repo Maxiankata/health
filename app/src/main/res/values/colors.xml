@@ -12,5 +12,7 @@
     <color name="input_grey">#E0E0E0</color>
     <color name="orange">#FF9237</color>
     <color name="red">#FF0000</color>
-
+    <color name="transparent">#00000000</color>
+    <color name="light_blue">#5EABC6</color>
+    <color name="purple">#84419C</color>
 </resources>

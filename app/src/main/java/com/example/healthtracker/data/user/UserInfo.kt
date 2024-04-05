@@ -6,5 +6,6 @@ data class UserInfo(
     val image: String? = null,
     val mail: String? = null,
     val theme: String? = null,
-    val bgImage: String? = null
+    val bgImage: String? = null,
+    val totalSteps:Int? = 0
 )

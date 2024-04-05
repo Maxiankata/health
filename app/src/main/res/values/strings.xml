@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Health Aid</string>
+    <string name="app_name">Health Tracker</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
@@ -55,8 +55,68 @@
     <string name="no_friends">Your friends list is empty! Add friends to see them here.</string>
     <string name="running">Running</string>
     <string name="cycling">Cycling</string>
-    <string name="hiking">Hiking</string>
+    <string name="jogging">Jogging</string>
     <string name="power_walking">Power\nWalking</string>
-    <string name="no_internet">Inacessability to the internet</string>
-
+    <string name="no_internet">Inaccessibility to the internet</string>
+    <string name="under_zero">You can\'t drink negative water</string>
+    <string name="reached_water_goal">You reached your daily water goal!</string>
+    <string name="background_theme">Account Background Theme</string>
+    <string name="change_language_and_units">Change Language or Units</string>
+    <string name="change_unit_system">Change Unit System</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="change_goal">Change Goals</string>
+    <string name="deletion_confirmation">Are you sure you want to delete your account?</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="pick">Pick</string>
+    <string name="start">Start</string>
+    <string name="time_placeholder">00:00:00</string>
+    <string name="stop">Stop</string>
+    <string name="date">Date:</string>
+    <string name="step_goal">Step goal:</string>
+    <string name="calorie_goal">Calorie goal:</string>
+    <string name="water_goal">Water goal:</string>
+    <string name="sleep_goal">Sleep goal:</string>
+    <string name="submit">Submit</string>
+    <string name="are_you_sure">Are you sure?</string>
+    <string name="challenge_duration">Challenge Duration</string>
+    <string name="challenge_type">Challenge Type</string>
+    <string name="mode">Mode</string>
+    <string name="challenge">Challenge</string>
+    <string name="invalid_duration_format">Invalid Duration Format</string>
+    <string name="daily_challenges">Today\'s Challenges</string>
+    <string name="type">Type</string>
+    <string name="duration">Duration</string>
+    <string name="by">By</string>
+    <string name="status">Status</string>
+    <string name="complete">complete</string>
+    <string name="incomplete">incomplete</string>
+    <string name="empty_challenges">No new challenges for today</string>
+    <string name="accept">Accept</string>
+    <string name="decline">Decline</string>
+    <string name="challenges_passed">Challenges passed:</string>
+    <string name="permissions_needed">The permissions requested are needed for the app to function.</string>
+    <string name="kg">kg</string>
+    <string name="apply">Apply changes</string>
+    <string name="language">Language</string>
+    <string name="units">Units</string>
+    <string name="lbs">lbs</string>
+    <string name="today_steps">Today\'s steps:</string>
+    <string name="progress">Progress</string>
+    <string name="friend_mode_on">Current friend mode on</string>
+    <string name="new_friend_mode_on">New friend mode on</string>
+    <string name="achieved">Achieved</string>
+    <string name="unachieved">Unachieved</string>
+    <string name="active_activity">There is an already active activity</string>
+    <string name="empty_timer">00:00:00</string>
+    <string name="ss">SS</string>
+    <string name="mm">MM</string>
+    <string name="hh">HH</string>
+    <string-array name="activities">
+        <item>Walking</item>
+        <item>Power Walking</item>
+        <item>Running</item>
+        <item>Cycling</item>
+        <item>Hiking</item>
+    </string-array>
 </resources>

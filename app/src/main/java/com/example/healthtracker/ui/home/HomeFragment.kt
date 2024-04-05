@@ -8,10 +8,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.FragmentHomeBinding
-import com.example.healthtracker.ui.home.walking.WalkViewModel
+import com.example.healthtracker.ui.formatDurationFromLong
+import com.example.healthtracker.ui.home.running.RunningDialogFragment
+import com.example.healthtracker.ui.home.walking.StepCounterService
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
@@ -19,16 +23,7 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    private val walkViewModel: WalkViewModel by activityViewModels()
     private val homeViewModel: HomeViewModel by activityViewModels()
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        walkViewModel.walkingStart(requireContext())
-
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -37,102 +32,283 @@ class HomeFragment : Fragment() {
 
     }
 
+    var weightRecyclerAdapterer = WeightRecyclerAdapter(Weight.weight.toMutableList())
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val weightRecyclerVal = WeightRecyclerAdapter()
+        lifecycleScope.launch {
+            homeViewModel.feedUser()
+            homeViewModel.checkForChallenges()
+        }
         binding.apply {
-            walkViewModel.walkService.currentSteps.observe(viewLifecycleOwner) {
-                stepcount.apply {
-                    text = buildString {
-                        append(getString(R.string.steps))
-                        append(it)
-                    }
-                    setOnLongClickListener {
-                        walkViewModel.walkService.resetSteps()
-                        true
-                    }
-                }
-                stepsCircularProgressBar.apply {
-                    setProgressWithAnimation(it.toFloat())
-                    progressMax = 6000f
-                }
-                walkViewModel.walkService.caloriesBurned.observe(viewLifecycleOwner) {
-                    binding.apply {
-                        calorieCount.text = buildString {
-                            append(getString(R.string.calories))
-                            append(it)
-                        }
-                        caloriesProgressBar.apply {
-                            setProgressWithAnimation(it.toFloat())
-                            progressMax = 240f
+            StepCounterService.steps.observe(viewLifecycleOwner) { steps ->
+                if (steps == null) {
+                    Log.d("wait for it :)", "i swear")
+                } else {
+                    lifecycleScope.launch {
+                        homeViewModel.user.observe(viewLifecycleOwner) {
+                            val user = it
+                            stepsCircularProgressBar.apply {
+                                val steppi = user?.userSettingsInfo?.userGoals?.stepGoal?.toFloat()
+                                setProgressWithAnimation(steps.toFloat())
+                                steppi?.let {
+                                    progressMax = steppi
+                                }
+                            }
+                            stepcount.apply {
+                                text = buildString {
+                                    append(getString(R.string.steps))
+                                    append(steps)
+                                }
+                            }
                         }
                     }
                 }
-                homeViewModel.user.observe(viewLifecycleOwner) {
-                    textView2.text = buildString {
-                        homeViewModel.water.observe(viewLifecycleOwner) {
-                            Log.d("water information", it.toString())
-                            append(it?.currentWater ?: 0)
-                            append("/")
-                            append(it?.waterGoal ?: 6)
+            }
+            StepCounterService.calories.observe(viewLifecycleOwner) { calories ->
+                if (calories == null) {
+                    Log.d("wait for it :)", "i swear")
+                } else {
+                    lifecycleScope.launch {
+                        homeViewModel.user.observe(viewLifecycleOwner) { user ->
+                            binding.calorieCount.text = buildString {
+                                append(getString(R.string.calories))
+                                append(calories)
+                            }
+                            binding.caloriesProgressBar.apply {
+                                val calori =
+                                    user?.userSettingsInfo?.userGoals?.calorieGoal?.toFloat()
+                                setProgressWithAnimation((calories).toFloat())
+                                calori?.let {
+                                    progressMax = calori
+                                }
+                            }
                         }
                     }
+                }
 
-
-                }
-                plus.setOnClickListener {
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        homeViewModel.waterIncrement(1)
-                        Log.d("INCREMENTED", "INCREMENTED")
-                    }
-                }
-                minus.setOnClickListener {
-                        lifecycleScope.launch {
-                            homeViewModel.waterIncrement(-1)
-                            Log.d("DECREMENTED", "DECREMENTED")
+            }
+            sleepLogger.apply {
+                text = buildString {
+                    lifecycleScope.launch {
+                        homeViewModel.getSleep().apply {
+                            append("You have slept for $this hours :)")
+                            Log.d("check", "checkcer slep")
                         }
-
                     }
+                }
+                StepCounterService.sleepDuration.observe(viewLifecycleOwner) { sleep ->
+                    if (formatDurationFromLong(sleep).isNotEmpty()) {
+                        text = buildString {
+                        append("You have slept for ${formatDurationFromLong(sleep)} hours :)")
+
+                        }
+                    }
+                    sleepSubmit.setOnClickListener {
+                        homeViewModel.updateSleep(formatDurationFromLong(sleep))
+                    }
+                }
             }
 
+            homeViewModel.water.observe(viewLifecycleOwner) {
+                homeViewModel.user.observe(viewLifecycleOwner) { user ->
+                    textView2.text = buildString {
+                        if (it != null) {
+                            if (it.currentWater != null && it.currentWater != 0) {
+                                append(it.currentWater)
+                            } else {
+                                append(0)
+                            }
+                        }
+                        append("/")
+                        append(user?.userSettingsInfo?.userGoals?.waterGoal ?: 6)
+                    }
+                    if (user != null) {
+                        if (user.userPutInInfo?.weight != 0.0 && user.userPutInInfo?.weight != null) {
+                            scrollToDouble(user.userPutInInfo.weight!!)
+                        } else {
+                            homeViewModel.weight.observe(viewLifecycleOwner) {
+                                if (it != null) {
+                                    scrollToDouble(it)
+                                }
+                            }
+                        }
+                    }
+                    if (user != null) {
+                        if (user.userSettingsInfo?.units.toString() == getString(R.string.kg)) {
+                            weightRecyclerAdapterer =
+                                WeightRecyclerAdapter(Weight.weight.toMutableList())
+                            units.text = getString(R.string.kg)
+                        } else if (user.userSettingsInfo?.units.toString() == getString(R.string.lbs)) {
+                            weightRecyclerAdapterer =
+                                WeightRecyclerAdapter(Weight.eagleBeerWeight.toMutableList())
+                            units.text = getString(R.string.lbs)
+                        }
+                    }
+                }
+            }
+            plus.setOnClickListener {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    homeViewModel.waterIncrement(1)
+                }
+            }
+            minus.setOnClickListener {
+                lifecycleScope.launch {
+                    homeViewModel.waterIncrement(-1)
+                }
+            }
 
-        weightRecycler.apply {
-            adapter = weightRecyclerVal
+            runLayout.setOnClickListener {
+                RunningDialogFragment().show(
+                    requireActivity().supportFragmentManager, "running"
+                )
+            }
+            cyclingLayout.setOnClickListener {
+                RunningDialogFragment().show(
+                    requireActivity().supportFragmentManager, "cycling"
+                )
+            }
+            joggingLayout.setOnClickListener {
+                RunningDialogFragment().show(
+                    requireActivity().supportFragmentManager, "jogging"
+                )
+            }
+            powerWalkingLayout.setOnClickListener {
+                RunningDialogFragment().show(
+                    requireActivity().supportFragmentManager, "walking"
+                )
 
-            layoutManager = GridLayoutManager(context, 1, GridLayoutManager.VERTICAL, false)
-            val fakeLayoutManager = this.layoutManager as GridLayoutManager
-            val fakeadapter = adapter
+            }
+            var mainUnits: Int = 0
 
-            if (fakeadapter is WeightRecyclerAdapter) {
-                scaleImage.setOnClickListener {
-                    val middleItem =
-                        fakeadapter.getItem((fakeLayoutManager.findFirstVisibleItemPosition() + fakeLayoutManager.findLastVisibleItemPosition()) / 2)
-                    Log.d("Middle Item", middleItem)
+            weightRecycler.apply {
+                adapter = weightRecyclerAdapterer
+                layoutManager = LinearLayoutManager(context)
+                val layoutManager = this.layoutManager as LinearLayoutManager
+                var isScrolling = false
+                weightRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        super.onScrolled(recyclerView, dx, dy)
+                        isScrolling = true
+                    }
+
+                    override fun onScrollStateChanged(
+                        recyclerView: RecyclerView, newState: Int
+                    ) {
+                        super.onScrollStateChanged(recyclerView, newState)
+                        if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                            if (isScrolling) {
+                                try {
+                                    lifecycleScope.launch {
+                                        var middleItem =
+                                            (layoutManager.findFirstCompletelyVisibleItemPosition() + layoutManager.findLastCompletelyVisibleItemPosition()) / 2
+
+
+                                        if (middleItem == -1) {
+                                            delay(100)
+                                            middleItem =
+                                                (layoutManager.findFirstVisibleItemPosition() + layoutManager.findLastVisibleItemPosition()) / 2
+                                            weightRecyclerAdapterer.updateMiddleItemSize(
+                                                middleItem
+                                            )
+                                            mainUnits = middleItem
+                                        }
+                                        weightRecyclerAdapterer.updateMiddleItemSize(middleItem)
+                                        mainUnits = middleItem
+                                    }
+                                } catch (e: Exception) {
+                                    lifecycleScope.launch {
+                                        var middlePosition =
+                                            (layoutManager.findFirstVisibleItemPosition() + layoutManager.findLastVisibleItemPosition()) / 2
+                                        if (middlePosition == -1) {
+                                            delay(100)
+                                            middlePosition =
+                                                (layoutManager.findFirstVisibleItemPosition() + layoutManager.findLastVisibleItemPosition()) / 2
+                                            mainUnits = middlePosition
+
+                                        }
+                                        weightRecyclerAdapterer.updateMiddleItemSize(
+                                            middlePosition
+                                        )
+                                        mainUnits = middlePosition
+                                    }
+                                }
+                                isScrolling = false
+                            }
+                        }
+                    }
+
+
+                })
+            }
+            var subUnits: Int = 0
+            secondWeightRecycler.apply {
+                val secondWeightRecyclerAdapter =
+                    WeightRecyclerAdapter(Weight.subWeight.toMutableList())
+                adapter = secondWeightRecyclerAdapter
+                layoutManager = LinearLayoutManager(context)
+                val layoutManager = this.layoutManager as LinearLayoutManager
+                var isScrolling = false
+                secondWeightRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+
+                        super.onScrolled(recyclerView, dx, dy)
+                        isScrolling = true
+                    }
+
+                    override fun onScrollStateChanged(
+                        recyclerView: RecyclerView, newState: Int
+                    ) {
+                        super.onScrollStateChanged(recyclerView, newState)
+                        if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                            if (isScrolling) {
+                                try {
+                                    val middleItem =
+                                        (layoutManager.findFirstCompletelyVisibleItemPosition() + layoutManager.findLastCompletelyVisibleItemPosition()) / 2
+                                    Log.d("middle item lookout", middleItem.toString())
+                                    secondWeightRecyclerAdapter.updateMiddleItemSize(middleItem)
+                                    subUnits = middleItem
+                                } catch (e: Exception) {
+                                    val middlePosition =
+                                        (layoutManager.findFirstVisibleItemPosition() + layoutManager.findLastVisibleItemPosition()) / 2
+                                    secondWeightRecyclerAdapter.updateMiddleItemSize(
+                                        middlePosition
+                                    )
+                                    subUnits = middlePosition
+                                }
+                                isScrolling = false
+                            }
+                        }
+                    }
+
+
+                })
+            }
+            applyChanges.setOnClickListener {
+                if (mainUnits != 0 || subUnits != 0) {
+                    val weight: Double = mainUnits + (subUnits.toDouble() / 10)
+                    Log.d("current selected weight is", weight.toString())
+                    homeViewModel.updateWeight(weight)
                 }
             }
         }
-//            secondWeightRecycler.apply{
-//                adapter = weightRecyclerVal
-//                layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL,false)
-////                    addItemDecoration(DividerItemDecoration(context, (layoutManager as LinearLayoutManager).orientation ))
-//                val fakelayoutmanager = this.layoutManager as LinearLayoutManager
-//                val fakeadapter = adapter
-//
-//                if (fakeadapter is WeightRecyclerAdapter) {
-//                    var middleItem =
-//                        fakeadapter.getItem((fakelayoutmanager.findFirstVisibleItemPosition() + fakelayoutmanager.findLastVisibleItemPosition()))
-//                }
-//            }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    fun scrollToDouble(weighte: Double) {
+        val weight: Double = weighte
+        val integer: Int = weight.toInt()
+        val decimal: Int = ((weight - integer) * 10).toInt()
+        if (integer < weightRecyclerAdapterer.itemCount) {
+            binding.weightRecycler.scrollToPosition(integer)
+        } else {
+            binding.weightRecycler.scrollToPosition(0)
+        }
+        binding.secondWeightRecycler.scrollToPosition(decimal)
     }
 }
 
-override fun onDestroyView() {
-    super.onDestroyView()
-    _binding = null
-}
-
-fun findMid() {
-
-}
-
-}

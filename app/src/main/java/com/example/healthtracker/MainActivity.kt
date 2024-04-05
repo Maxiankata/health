@@ -3,11 +3,12 @@ package com.example.healthtracker
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
@@ -17,15 +18,22 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.room.Room
 import com.example.healthtracker.data.room.UserDB
 import com.example.healthtracker.databinding.ActivityMainBinding
-import com.example.healthtracker.ui.home.walking.WalkViewModel
+import com.example.healthtracker.ui.home.speeder.SpeederService
+import com.example.healthtracker.ui.home.speeder.SpeederServiceBoolean
+import com.example.healthtracker.ui.home.walking.AlarmItem
+import com.example.healthtracker.ui.home.walking.AlarmScheduler
+import com.example.healthtracker.ui.home.walking.Alarmer
+import com.example.healthtracker.ui.home.walking.StepCounterService
+import com.example.healthtracker.ui.startSpeeder
+import com.example.healthtracker.ui.startStepCounterService
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mainViewModel: MainViewModel
     private lateinit var binding: ActivityMainBinding
-    private val walkViewModel: WalkViewModel by viewModels()
     private val channelID = "friend_channel"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,25 +48,16 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
             )
         )
-        walkViewModel.setupDailyTask()
+        startStepCounterService()
+        val item = AlarmItem(LocalDateTime.now(),"lols")
+        val alarmer = Alarmer()
+        alarmer.schedule(item)
         supportActionBar?.hide()
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-        lifecycleScope.launch {
-            mainViewModel.getUser()
-            mainViewModel.syncCloud()
-        }
         buildNotification()
     }
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
 
-        if (hasFocus) {
-        } else {
-            // The window lost focus
-            // Perform actions when the window loses focus
-        }
-    }
     private fun buildNotification() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.friends)
@@ -74,9 +73,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+
     companion object {
+        var stepCounterService:Intent?=null
+        var speederService:Intent?=null
+
         private lateinit var db: UserDB
-        fun getDatabaseInstance(context: Context): UserDB {
+        fun getDatabaseInstance(): UserDB {
+            val context = MyApplication.getContext()
             if (!::db.isInitialized) {
                 db = Room.databaseBuilder(
                     context.applicationContext, UserDB::class.java, "user-base"

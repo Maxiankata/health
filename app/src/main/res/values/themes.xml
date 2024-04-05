@@ -11,6 +11,7 @@
         <item name="colorOnSecondary">@color/nav_bar_dark_background</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/black</item>
+<!--        <attr name="pog" format="color">#520912</item>-->
 
         <!-- Customize your theme here. -->
 <!--        <style name="ScreenBackground"><item name="android:background">@color/yellow_mellow</item></style>-->
@@ -25,5 +26,8 @@
 
     <style name="Theme.HealthTracker.AppBarOverlay"
         parent="ThemeOverlay.AppCompat.ActionBar" />
+    <style name="MySpinnerStyle" parent="Widget.AppCompat.Spinner">
+        <item name="android:popupBackground">@color/transparent</item>
+    </style>
     <style name="Theme.MyApplication.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

@@ -15,35 +15,21 @@ import kotlinx.coroutines.withContext
 
 class MainViewModel(private val application: Application):AndroidViewModel(application) {
     private val auth = AuthImpl.getInstance()
-    private val userDao = MainActivity.getDatabaseInstance(application.applicationContext).dao()
+    private val userDao = MainActivity.getDatabaseInstance().dao()
     private var fromRoomAdapter= RoomToUserMegaInfoAdapter()
     private var toRoomAdapter = UserMegaInfoToRoomAdapter()
 
-    suspend fun getUser(){
+    fun syncCloud(){
         viewModelScope.launch {
             withContext(Dispatchers.IO){
                 val user = userDao.getEntireUser()
-                user?.let { fromRoomAdapter.adapt(it) }?.let { UserMegaInfo.setCurrentUser(it) }
+                user?.let {
+                    fromRoomAdapter.adapt(it)
+                }?.let {
+//                    auth.sync(it)
+
+                }
             }
-        }
-    }
-    suspend fun syncCloud(){
-        viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                val user = userDao.getEntireUser()
-                user?.let { fromRoomAdapter.adapt(it) }?.let { auth.sync(it) }
-            }
-        }
-    }
-    suspend fun leftWindow(userAutomaticInfo: UserAutomaticInfo){
-        withContext(Dispatchers.IO){
-            userDao.updateUserAutomaticInfo(userAutomaticInfo)
-            syncCloud()
-        }
-    }
-    suspend fun joinedWindow(userAutomaticInfo: UserAutomaticInfo){
-        withContext(Dispatchers.IO){
-            userDao.updateUserAutomaticInfo(userAutomaticInfo)
         }
     }
 }

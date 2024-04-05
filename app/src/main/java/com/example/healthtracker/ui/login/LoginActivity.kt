@@ -9,11 +9,15 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.R
+import com.example.healthtracker.databinding.ActivityLoginBinding
+import com.example.healthtracker.databinding.FragmentLoginBinding
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -32,7 +36,6 @@ class LoginActivity : AppCompatActivity() {
         super.onStart()
         lifecycleScope.launch {
             if (loginActivityViewModel.checkCurrentUser()) {
-                Log.d("running through login activity", loginActivityViewModel.checkCurrentUser().toString())
                 intent = Intent(applicationContext,MainActivity::class.java)
                 startActivity(intent)
                 finish()
@@ -55,5 +58,6 @@ class LoginActivity : AppCompatActivity() {
         })
         animatedVectorDrawable.start()
     }
+
 
 }

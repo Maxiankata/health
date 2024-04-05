@@ -1,12 +1,13 @@
 package com.example.healthtracker.data.user
 
 data class UserPutInInfo(
-    var waterInfo: WaterInfo? = null,
-    val weight: Double? = null
+    var waterInfo: WaterInfo? = WaterInfo(),
+    var weight: Double? = 0.0,
+    var sleepDuration:String?=""
 )
 
 data class WaterInfo(
-    val waterGoal: Int? = 6,
     var currentWater: Int? = 0,
+    var waterGoal:Int?=6,
     val waterCompletion: Boolean? = false
 )

@@ -1,6 +1,7 @@
 package com.example.healthtracker.ui
 
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
@@ -14,18 +15,27 @@ import android.os.Build
 import android.util.Base64
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.widget.RelativeLayout
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import com.example.healthtracker.MyApplication
 import com.example.healthtracker.R
 import com.example.healthtracker.data.room.UserData
 import com.example.healthtracker.data.user.StepsInfo
 import com.example.healthtracker.data.user.UserAutomaticInfo
 import com.example.healthtracker.data.user.UserDays
+import com.example.healthtracker.data.user.UserGoals
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.UserPutInInfo
 import com.example.healthtracker.data.user.UserSettingsInfo
 import com.example.healthtracker.data.user.WaterInfo
+import com.example.healthtracker.ui.account.friends.challenges.Challenge
+import com.example.healthtracker.ui.home.speeder.ActivityEnum
+import com.example.healthtracker.ui.home.speeder.SpeederService
+import com.example.healthtracker.ui.home.speeder.SpeederServiceBoolean
+import com.example.healthtracker.ui.home.walking.StepCounterService
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.DataSnapshot
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +43,9 @@ import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.FileNotFoundException
 import java.io.IOException
-import java.time.LocalDateTime
+import java.text.SimpleDateFormat
+import java.time.Duration
+import java.util.Calendar
 import java.util.Date
 
 fun navigateToActivity(currentActivity: Activity, targetActivityClass: Class<*>) {
@@ -86,6 +98,36 @@ fun FragmentActivity.showBottomNav() {
     }
 }
 
+fun FragmentActivity.showLoading() {
+    findViewById<RelativeLayout>(R.id.loadingPanel).apply {
+        visibility = View.VISIBLE
+    }
+}
+
+fun FragmentActivity.hideLoading() {
+    findViewById<RelativeLayout>(R.id.loadingPanel).apply {
+        visibility = View.GONE
+    }
+}
+
+fun FragmentActivity.setLoadingVisibility(value: Int) {
+    findViewById<RelativeLayout>(R.id.loadingPanel).apply {
+        visibility = value
+    }
+}
+
+fun FragmentActivity.showMainLoading() {
+    findViewById<RelativeLayout>(R.id.loadingPanelMain).apply {
+        visibility = View.VISIBLE
+    }
+}
+
+fun FragmentActivity.hideMainLoading() {
+    findViewById<RelativeLayout>(R.id.loadingPanelMain).apply {
+        visibility = View.GONE
+    }
+}
+
 fun rotateView(imageView: View, angle: Float) {
     val rotationAnim = ObjectAnimator.ofFloat(imageView, "rotation", angle)
     rotationAnim.duration = 300
@@ -101,9 +143,12 @@ fun UserMegaInfo.toUserData(): UserData {
         userFriends = this.userFriends,
         userPutInInfo = this.userPutInInfo,
         userSettingsInfo = this.userSettingsInfo,
-        userDays = this.userDays
+        userDays = this.userDays,
+        challenges = this.challenges,
+        achievements = this.achievements
     )
 }
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun DataSnapshot.toUserMegaInfo(): UserMegaInfo {
@@ -124,14 +169,15 @@ fun DataSnapshot.toUserInfo(): UserInfo {
         image = child("image").getValue(String::class.java) ?: "",
         mail = child("mail").getValue(String::class.java) ?: "",
         theme = child("theme").getValue(String::class.java) ?: "",
-        bgImage = child("bgImage").getValue(String::class.java) ?: ""
+        bgImage = child("bgImage").getValue(String::class.java) ?: "",
+        totalSteps = child("totalSteps").getValue(Int::class.java) ?: 0
     )
 }
 
 fun DataSnapshot.toUserAutomaticInfo(): UserAutomaticInfo {
     return UserAutomaticInfo(
         steps = child("steps").toStepsInfo(),
-        totalSleepHours = child("totalSleepHours").getValue(Double::class.java),
+        totalSleepHours = child("totalSleepHours").getValue(String::class.java),
         challengesPassed = child("challengesPassed").getValue(Int::class.java)
     )
 }
@@ -145,35 +191,44 @@ fun DataSnapshot.toUserPutInInfo(): UserPutInInfo {
 
 fun DataSnapshot.toWaterInfo(): WaterInfo {
     return WaterInfo(
-        waterGoal = child("waterGoal").getValue(Int::class.java) ?: 6,
         currentWater = child("currentWater").getValue(Int::class.java) ?: 0,
-        waterCompletion = child("waterCompletion").getValue(Boolean::class.java) ?: false
+        waterCompletion = child("waterCompletion").getValue(Boolean::class.java) ?: false,
+        waterGoal = child("waterGoal").getValue(Int::class.java) ?: 6
     )
 }
 
 fun DataSnapshot.toUserSettingsInfo(): UserSettingsInfo {
     return UserSettingsInfo(
-        language = child("language").getValue(String::class.java) ?: "",
-        units = child("units").getValue(String::class.java) ?: ""
+        language = child("language").getValue(String::class.java) ?: "english",
+        units = child("units").getValue(String::class.java) ?: "kg",
+        userGoals = child("userGoals").getValue(UserGoals::class.java) ?: UserGoals()
     )
 }
-@RequiresApi(Build.VERSION_CODES.O)
+
 fun DataSnapshot.toUserDays(): UserDays {
     return UserDays(
-        dateTime = child("dateTime").getValue(Date::class.java)!!,
-        putInInfo = child("userPutInInfo").toUserPutInInfo(),
-        automaticInfo = child("userAutomaticInfo").toUserAutomaticInfo()
+        putInInfo = child("putInInfo").toUserPutInInfo(),
+        automaticInfo = child("automaticInfo").toUserAutomaticInfo(),
+        dateTime = child("dateTime").getValue(String::class.java)!!
+    )
+
+}
+
+fun DataSnapshot.toUserGoals(): UserGoals {
+    return UserGoals(
+        stepGoal = child("stepGoal").getValue(Int::class.java),
+        waterGoal = child("waterGoal").getValue(Int::class.java),
+        calorieGoal = child("calorieGoal").getValue(Int::class.java),
+        sleepGoal = child("sleepGoal").getValue(Double::class.java)
     )
 }
 
 fun DataSnapshot.toStepsInfo(): StepsInfo {
     return StepsInfo(
-        totalSteps = child("totalSteps").getValue(Int::class.java),
-        totalCalories = child("totalCalories").getValue(Int::class.java),
-        onLeaveSteps = child("onLeaveSteps").getValue(Int::class.java),
-        onLogSteps = child("onLogSteps").getValue(Int::class.java),
         currentSteps = child("currentSteps").getValue(Int::class.java),
-        currentCalories = child("currentCalories").getValue(Int::class.java)
+        currentCalories = child("currentCalories").getValue(Int::class.java),
+        stepsGoal = child("stepsGoal").getValue(Int::class.java),
+        caloriesGoal = child("caloriesGoal").getValue(Int::class.java)
     )
 }
 
@@ -184,6 +239,7 @@ fun DataSnapshot.toUserFriendsList(): List<UserInfo> {
     }
     return userFriendsList
 }
+
 @RequiresApi(Build.VERSION_CODES.O)
 fun DataSnapshot.toUserDaysList(): List<UserDays> {
     val userDaysList = mutableListOf<UserDays>()
@@ -200,7 +256,105 @@ fun isInternetAvailable(context: Context): Boolean {
     val network = connectivityManager.activeNetwork
     val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
 
-    return networkCapabilities != null &&
-            (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                    networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
+    return networkCapabilities != null && (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || networkCapabilities.hasTransport(
+        NetworkCapabilities.TRANSPORT_CELLULAR
+    ))
 }
+
+fun startStepCounterService() {
+    ContextCompat.startForegroundService(MyApplication.getContext(), StepCounterService.stepIntent)
+}
+
+fun stopStepCounterService() {
+    MyApplication.getContext().stopService(StepCounterService.stepIntent)
+}
+
+fun startSpeeder(time: String, activity: ActivityEnum, challenge: Challenge?) {
+    val intent: Intent =
+        SpeederService.speedIntent.putExtra("time", time).putExtra("activity", activity.name)
+            .putExtra("challenge", challenge.toString())
+
+    MyApplication.getContext().startForegroundService(intent)
+}
+
+fun stopSpeeder() {
+    MyApplication.getContext().stopService(SpeederService.speedIntent)
+}
+
+fun isServiceRunning(): Boolean {
+    return SpeederServiceBoolean.isMyServiceRunning.value!!
+}
+
+fun getStepsValue(): Int {
+    return StepCounterService._steps.value ?: 0
+}
+
+fun nullifyStepCounter() {
+    StepCounterService._steps.postValue(0)
+    StepCounterService._calories.postValue(0)
+}
+
+fun updateStepCalories(calories: Int) {
+    StepCounterService._calories.postValue(StepCounterService._calories.value?.plus(calories))
+}
+
+fun formatDurationFromLong(milliseconds: Long): String {
+    val totalSeconds = milliseconds / 1000
+    val hours = totalSeconds / 3600
+    val minutes = (totalSeconds % 3600) / 60
+    val seconds = totalSeconds % 60
+
+    return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+}
+
+fun parseDurationToLong(duration: String): Long {
+    val parts = duration.split(":")
+    require(parts.size == 3) { "Invalid duration format: $duration" }
+
+    val hours = parts[0].toLong()
+    val minutes = parts[1].toLong()
+    val seconds = parts[2].toLong()
+
+    return (hours * 3600 + minutes * 60 + seconds) * 1000
+}
+
+fun durationToString(duration: Duration): String {
+    val hours = duration.toHours()
+    val minutes = duration.toMinutes() % 60
+    val seconds = duration.seconds % 60
+    return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+}
+
+fun stringToDuration(str: String): Duration? {
+    val parts = str.split(":")
+    if (parts.size != 3) {
+        return null
+    }
+    val hours = parts[0].toLongOrNull() ?: return null
+    val minutes = parts[1].toLongOrNull() ?: return null
+    val seconds = parts[2].toLongOrNull() ?: return null
+    return Duration.ofHours(hours).plusMinutes(minutes).plusSeconds(seconds)
+}
+
+@SuppressLint("SimpleDateFormat")
+fun calendarToString(calendar: Calendar): String {
+    val dateFormat = SimpleDateFormat("dd/MM/yyyy")
+    return dateFormat.format(calendar.time)
+}
+
+@SuppressLint("SimpleDateFormat")
+fun stringToCalendar(dateStr: String): Calendar? {
+    val dateFormat = SimpleDateFormat("dd/MM/yyyy")
+    try {
+        val date: Date = dateFormat.parse(dateStr) ?: return null
+        val calendar = Calendar.getInstance()
+        calendar.time = date
+        return calendar
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return null
+}
+
+
+

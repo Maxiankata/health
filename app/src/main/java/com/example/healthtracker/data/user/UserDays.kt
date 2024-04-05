@@ -1,9 +1,10 @@
 package com.example.healthtracker.data.user
 
-import java.util.Date
+import com.example.healthtracker.ui.account.friends.challenges.Challenge
 
 data class UserDays(
-    val dateTime: Date?=null,
     val putInInfo: UserPutInInfo?=null,
-    val automaticInfo: UserAutomaticInfo?=null
+    val automaticInfo: UserAutomaticInfo?=null,
+    val challenges:List<Challenge>?=null,
+    val dateTime: String,
 )

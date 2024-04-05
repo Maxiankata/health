@@ -4,11 +4,13 @@ import android.content.res.ColorStateList
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
@@ -25,11 +27,6 @@ import kotlinx.coroutines.launch
 class FriendsDialogFragment : DialogFragment() {
     private var _binding: PopupFriendsBinding? = null
     private val binding get() = _binding
-
-
-//    val friendListViewModel:FriendListViewModel by viewModels()
-//    val friendListAdapter = FriendListAdapter(friendListViewModel)
-
     private val friendListViewModel: FriendListViewModel by activityViewModels()
     private lateinit var friendListAdapter: FriendListAdapter
     override fun onCreateView(
@@ -37,8 +34,6 @@ class FriendsDialogFragment : DialogFragment() {
     ): View? {
         friendListAdapter = FriendListAdapter()
         _binding = PopupFriendsBinding.inflate(inflater, container, false)
-
-
         return binding?.root
     }
 
@@ -57,7 +52,10 @@ class FriendsDialogFragment : DialogFragment() {
         binding?.apply {
             friendListViewModel.usersList.observe(viewLifecycleOwner) {
                 if (it != null) {
-                    friendListAdapter.updateItems(it)
+                    loadingPanelMain.visibility = VISIBLE
+                    friendListAdapter.updateItems(it).also {
+                        loadingPanelMain.visibility = GONE
+                    }
                 }
                 if (it != null && it != listOf<UserInfo>()) {
                     noFriends.visibility = GONE
@@ -67,10 +65,37 @@ class FriendsDialogFragment : DialogFragment() {
                     noFriendsText.visibility = VISIBLE
                 }
             }
+            val editText = textInputLayout.editText
+            editText?.setOnEditorActionListener { _, actionId, event ->
+                if (actionId == EditorInfo.IME_ACTION_DONE || (event != null && event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    val query = editText.text?.toString()
+                    editText.clearFocus()
+                    if (!query.isNullOrBlank()) {
+                        friendListViewModel.searchState.observe(viewLifecycleOwner) {
+                            lifecycleScope.launch {
+                                if (it) {
+                                    friendListViewModel.clearList()
+                                    friendListViewModel.fetchSearchedUsers(query)
+                                } else {
+                                    friendListViewModel.fetchUserFriends()
+                                    friendListViewModel.fetchSearchedFriends(query)
+                                }
+                            }
+                        }
+                    } else (Log.d("blank query", "luluu"))
+                    return@setOnEditorActionListener true
+                }
+                false
+            }
+            editText?.setOnFocusChangeListener { _, hasFocus ->
+                if (!hasFocus) editText.text?.clear()
+            }
             usernameInput.setOnFocusChangeListener { _, hasFocus ->
                 val color = if (hasFocus) (ContextCompat.getColor(
                     requireContext(), R.color.light_green
-                )) else (ContextCompat.getColor(requireContext(), R.color.input_grey))
+                ))
+                else (ContextCompat.getColor(requireContext(), R.color.input_grey))
+
                 textInputLayout.setEndIconTintList(ColorStateList.valueOf(color))
 
                 searchSwitch.setColorFilter(color, PorterDuff.Mode.SRC_ATOP)
@@ -89,10 +114,8 @@ class FriendsDialogFragment : DialogFragment() {
                         }
                         viewLifecycleOwner.lifecycleScope.launch {
                             try {
-                                friendListViewModel.fetchAllUsersInfo()
                                 rotateView(searchSwitch, 45F)
-                                textInputLayout.helperText = "new friend mode on"
-
+                                textInputLayout.helperText = getString(R.string.new_friend_mode_on)
                             } catch (e: Exception) {
                                 Log.e("FetchUsersError", "Error fetching users", e)
                             }
@@ -101,12 +124,14 @@ class FriendsDialogFragment : DialogFragment() {
                     } else {
                         setOnClickListener {
                             friendListViewModel.switchSearchState()
+                            friendListViewModel.clearList()
+
                         }
                         viewLifecycleOwner.lifecycleScope.launch {
                             try {
                                 friendListViewModel.fetchUserFriends()
                                 rotateView(searchSwitch, 0F)
-                                textInputLayout.helperText = "current friend mode on"
+                                textInputLayout.helperText = getString(R.string.friend_mode_on)
 
                             } catch (e: Exception) {
                                 Log.e("FetchFriendsError", "Error fetching friends", e)
@@ -121,10 +146,13 @@ class FriendsDialogFragment : DialogFragment() {
             }
 
         }
+
         friendListAdapter.apply {
             itemClickListener = object : FriendListAdapter.ItemClickListener<UserInfo> {
                 override fun onItemClicked(item: UserInfo, itemPosition: Int) {
-                    item.uid?.let { Log.d("uid", it) }
+                    item.uid?.let {
+                        Log.d("uid", it)
+                    }
                     findNavController().navigate(
                         R.id.action_navigation_notifications_to_friendAccountFragment,
                         bundleOf("uid" to item.uid)

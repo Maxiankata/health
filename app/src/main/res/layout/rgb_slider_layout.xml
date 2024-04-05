@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    >
+    <TextView
+        android:id="@+id/typeTxt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="R"
+        android:textAlignment="center"
+        android:layout_weight="13"
+        android:textSize="32sp"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        />
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="5"
+        android:max="255"
+        android:min="0"
+        android:progress="0"
+        android:thumbTint="@color/light_green"
+
+        tools:targetApi="o" />
+    <TextView
+        android:id="@+id/colorValueText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="12"
+        android:textAlignment="center"
+        android:text="0"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        />
+</androidx.appcompat.widget.LinearLayoutCompat>

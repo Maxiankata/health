@@ -11,14 +11,16 @@ android {
 
     defaultConfig {
         applicationId = "com.example.healthtracker"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -43,6 +45,8 @@ android {
 
 dependencies {
     implementation ("androidx.room:room-runtime:2.6.1")
+    implementation("com.google.firebase:protolite-well-known-types:18.0.0")
+    implementation("com.google.android.gms:play-services-location:21.2.0")
     annotationProcessor ("androidx.room:room-compiler:2.6.1")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
@@ -67,13 +71,14 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation("androidx.datastore:datastore-preferences-rxjava2:1.0.0")
     implementation ("androidx.work:work-runtime-ktx:2.7.0")
-
-    // optional - RxJava3 support
+    implementation("net.danlew:android.joda:2.12.7")
+    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation("androidx.datastore:datastore-preferences-rxjava3:1.0.0")
-    //noinspection LifecycleAnnotationProcessorWithJava8
+    implementation ("com.github.AAChartModel:AAChartCore-Kotlin:7.1.0")
     kapt ("androidx.lifecycle:lifecycle-compiler:2.8.0-alpha01")
     kapt ("androidx.room:room-compiler:2.6.1")
     implementation ("androidx.room:room-ktx:2.6.1")
 
-
+    coreLibraryDesugaring ("com.android.tools:desugar_jdk_libs:2.0.4")
+    implementation ("com.kizitonwose.calendar:view:2.0.0")
 }

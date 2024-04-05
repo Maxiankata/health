@@ -1,17 +1,20 @@
 package com.example.healthtracker.data
 
 import androidx.room.TypeConverter
+import com.example.healthtracker.data.user.Achievement
 import com.example.healthtracker.data.user.StepsInfo
 import com.example.healthtracker.data.user.UserAutomaticInfo
 import com.example.healthtracker.data.user.UserDays
+import com.example.healthtracker.data.user.UserGoals
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.UserPutInInfo
 import com.example.healthtracker.data.user.UserSettingsInfo
 import com.example.healthtracker.data.user.WaterInfo
+import com.example.healthtracker.ui.account.friends.challenges.Challenge
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import java.util.Date
+import java.util.Calendar
 
 class GsonTypeConverter {
 
@@ -55,7 +58,15 @@ class GsonTypeConverter {
     fun toUserPutInInfo(userPutInInfoString: String?): UserPutInInfo? {
         return gson.fromJson(userPutInInfoString, UserPutInInfo::class.java)
     }
+    @TypeConverter
+    fun fromUserGoals(userGoals: UserGoals?): String? {
+        return gson.toJson(userGoals)
+    }
 
+    @TypeConverter
+    fun toUserGoals(userGoalsString: String?): UserGoals? {
+        return gson.fromJson(userGoalsString, UserGoals::class.java)
+    }
     @TypeConverter
     fun fromWaterInfo(waterInfo: WaterInfo?): String? {
         return gson.toJson(waterInfo)
@@ -80,6 +91,14 @@ class GsonTypeConverter {
     fun fromUserSettingsInfo(userSettingsInfo: UserSettingsInfo?): String? {
         return gson.toJson(userSettingsInfo)
     }
+    @TypeConverter
+    fun fromAchievements(achievements: Achievement?): String? {
+        return gson.toJson(achievements)
+    }
+    @TypeConverter
+    fun toAchievements(achievements: String?): Achievement? {
+        return gson.fromJson(achievements, Achievement::class.java)
+    }
 
     @TypeConverter
     fun toUserSettingsInfo(userSettingsInfoString: String?): UserSettingsInfo? {
@@ -97,21 +116,40 @@ class GsonTypeConverter {
         return gson.fromJson(userInfoListString, listType)
     }
     @TypeConverter
-    fun fromUserDaysList(userDaysList: List<UserDays>?):String?{
+    fun fromChallengesList(challengeList: List<Challenge>?): String? {
+        return gson.toJson(challengeList)
+    }
+
+    @TypeConverter
+    fun toChallengeList(challengeList: String?): List<Challenge>? {
+        val listType = object : TypeToken<List<Challenge>>() {}.type
+        return gson.fromJson(challengeList, listType)
+    }
+    private val type = object : TypeToken<List<UserDays>>() {}.type
+
+    @TypeConverter
+    fun fromString(userDaysListString: String?): List<UserDays>? {
+        return gson.fromJson(userDaysListString, type)
+    }
+
+    @TypeConverter
+    fun toString(userDaysList: List<UserDays>?): String? {
         return gson.toJson(userDaysList)
     }
     @TypeConverter
-    fun toUserDaysList(userDaysListString: String?):List<UserDays>?{
-        val listType = object : TypeToken<List<UserDays>>(){}.type
-        return gson.fromJson(userDaysListString,listType)
+    fun fromAchievementsList(achievementList: List<Achievement>?): String? {
+        return gson.toJson(achievementList)
     }
-//    @TypeConverter
-//    fun fromDate(value: Long?): Date? {
-//        return if (value == null) null else Date(value)
-//    }
-//
-//    @TypeConverter
-//    fun toDate(date: Date?): Long? {
-//        return date?.time
-//    }
+
+    @TypeConverter
+    fun toAchievementList(achievementList: String?): List<Achievement>? {
+        val listType = object : TypeToken<List<Achievement>>() {}.type
+        return gson.fromJson(achievementList, listType)
+    }
+    @TypeConverter
+    fun calendarToJson(calendar: Calendar?): String? = Gson().toJson(calendar)
+
+    @TypeConverter
+    fun jsonToCalendar(json: String?): Calendar? = Gson().fromJson(json, Calendar::class.java)
+
 }

@@ -87,7 +87,7 @@
             android:layout_marginHorizontal="25dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="10dp"
-            android:backgroundTint="#5EABC6"
+            android:backgroundTint="@color/light_blue"
             android:background="@drawable/rounded_background"
             android:orientation="horizontal"
 
@@ -158,7 +158,7 @@
             android:layout_marginHorizontal="25dp"
             android:layout_marginBottom="10dp"
             android:background="@drawable/rounded_background"
-            android:backgroundTint="#84419C"
+            android:backgroundTint="@color/purple"
             android:orientation="horizontal">
 
             <ImageView
@@ -166,12 +166,11 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:src="@drawable/moon_icon"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-
+                android:id="@+id/dailyeep"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:fontFamily="sans-serif-black"
@@ -179,9 +178,32 @@
                 android:text="@string/sleep"
                 android:textColor="@color/white"
                 android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/imageView2"
                 app:layout_constraintStart_toEndOf="@+id/imageView2"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/sleepLogger"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_margin="15dp"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toBottomOf="@+id/imageView2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/dailyeep"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/sleep_submit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#84419C"
+                android:text="@string/submit"
+                android:textColor="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/imageView2" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -201,7 +223,6 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:src="@drawable/weight_scale"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -214,33 +235,62 @@
                 android:text="@string/daily_weight"
                 android:textColor="@color/white"
                 android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/scaleImage"
                 app:layout_constraintStart_toEndOf="@id/scaleImage"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/weight_recycler"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="50dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_width="50dp"
+                android:layout_height="45dp"
+                app:layout_constraintBottom_toBottomOf="@id/scaleImage"
+                app:layout_constraintEnd_toStartOf="@id/second_weight_recycler"
                 app:layout_constraintStart_toEndOf="@+id/textView"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"/>
 
-            </androidx.recyclerview.widget.RecyclerView>
-
+            <TextView
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/second_weight_recycler"
+                app:layout_constraintStart_toEndOf="@id/weight_recycler"
+                app:layout_constraintBottom_toBottomOf="@id/scaleImage"
+                android:textSize="30sp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="."
+                />
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/second_weight_recycler"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_width="50dp"
+                android:layout_height="45dp"
+                app:layout_constraintBottom_toBottomOf="@id/scaleImage"
                 app:layout_constraintStart_toEndOf="@+id/weight_recycler"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:itemCount="1">
+                app:layout_constraintEnd_toStartOf="@id/units"
+                />
 
-            </androidx.recyclerview.widget.RecyclerView>
-
+            <TextView
+                android:id="@+id/units"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/kg"
+                android:layout_marginEnd="5dp"
+                android:textSize="30sp"
+                app:layout_constraintBottom_toBottomOf="@id/scaleImage"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <Button
+                android:id="@+id/apply_changes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/orange"
+                app:layout_constraintTop_toBottomOf="@id/units"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:text="@string/apply"
+                android:textColor="@color/white"
+                />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <GridLayout
@@ -248,21 +298,69 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="25dp"
-            android:backgroundTint="@color/input_grey"
-            android:background="@drawable/rounded_background"
             android:columnCount="2"
             android:padding="8dp"
             android:rowCount="2"
             android:useDefaultMargins="true"
             >
+            <LinearLayout
+                android:id="@+id/power_walking_layout"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_marginEnd="8dp"
+                android:backgroundTint="@color/light_green"
+                android:background="@drawable/rounded_background"
+                android:gravity="center"
+                android:orientation="horizontal"
+                >
 
+                <ImageView
+                    android:padding="5dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/power_walking_icon"
+                    app:tint="@color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/power_walking"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/jogging_layout"
+                android:layout_height="0dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:layout_marginEnd="8dp"
+                android:backgroundTint="@color/light_green"
+                android:background="@drawable/rounded_background"
+                android:gravity="center"
+                android:orientation="horizontal"
+                >
+
+                <ImageView
+                    android:padding="5dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/jogging_icon"
+                    app:tint="@color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/jogging"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+            </LinearLayout>
             <LinearLayout
                 android:id="@+id/run_layout"
                 android:layout_height="0dp"
                 android:layout_columnWeight="1"
                 android:layout_rowWeight="1"
                 android:layout_marginEnd="8dp"
-                android:backgroundTint="@color/dark_background"
+                android:backgroundTint="@color/light_green"
                 android:background="@drawable/rounded_background"
                 android:gravity="center"
                 android:orientation="horizontal"
@@ -271,7 +369,7 @@
                 <ImageView
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/friend_add"
+                    android:src="@drawable/running_icon"
                     app:tint="@color/white" />
 
                 <TextView
@@ -287,16 +385,17 @@
                 android:layout_columnWeight="1"
                 android:layout_rowWeight="1"
                 android:layout_marginEnd="8dp"
-                android:backgroundTint="@color/dark_background"
+                android:backgroundTint="@color/light_green"
                 android:background="@drawable/rounded_background"
                 android:gravity="center"
                 android:orientation="horizontal"
                 >
 
                 <ImageView
+                    android:padding="3dp"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/friend_add"
+                    android:src="@drawable/cycling_icon"
                     app:tint="@color/white" />
 
                 <TextView
@@ -306,57 +405,6 @@
                     android:textColor="@color/white"
                     android:textSize="20sp" />
             </LinearLayout>
-            <LinearLayout
-                android:id="@+id/hiking_layout"
-                android:layout_height="0dp"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_marginEnd="8dp"
-                android:backgroundTint="@color/dark_background"
-                android:background="@drawable/rounded_background"
-                android:gravity="center"
-                android:orientation="horizontal"
-                >
-
-                <ImageView
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:src="@drawable/friend_add"
-                    app:tint="@color/white" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/hiking"
-                    android:textColor="@color/white"
-                    android:textSize="20sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/run4_layout"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:layout_marginEnd="8dp"
-                android:backgroundTint="@color/dark_background"
-                android:background="@drawable/rounded_background"
-                android:gravity="center"
-                android:orientation="horizontal"
-                >
-
-            <ImageView
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:src="@drawable/friend_add"
-                app:tint="@color/white" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/power_walking"
-                android:textColor="@color/white"
-                android:textSize="20sp" />
-            </LinearLayout>
-
         </GridLayout>
     </LinearLayout>
 </ScrollView>

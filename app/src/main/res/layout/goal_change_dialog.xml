@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="10dp"
+    android:paddingBottom="20dp"
+    >
+    <TextView
+        android:layout_margin="10dp"
+        android:id="@+id/text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/change_goal"
+        android:textSize="26sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+
+        android:background="@color/input_grey"
+        app:layout_constraintTop_toBottomOf="@id/text_view" />
+    <TextView
+        android:id="@+id/step_goal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:text="@string/step_goal"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/step_submit"
+        app:layout_constraintBottom_toBottomOf="@+id/step_goal_edit"
+        />
+
+    <TextView
+        android:id="@+id/calorie_goal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:text="@string/calorie_goal"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/calorie_submit"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/calorie_submit" />
+
+    <TextView
+        android:id="@+id/water_goal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:text="@string/water_goal"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/water_submit"
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintTop_toTopOf="@id/water_submit" />
+
+    <TextView
+        android:id="@+id/sleep_goal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:text="@string/sleep_goal"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/sleep_submit"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/sleep_submit" />
+    <Button
+        android:id="@+id/calorie_submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/step_submit"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="15dp"
+        android:text="@string/submit"
+        />
+
+    <Button
+        android:id="@+id/water_submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/calorie_submit"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="15dp"
+        android:text="@string/submit"
+        />
+
+    <Button
+        android:id="@+id/step_submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/view"
+        app:layout_constraintBottom_toBottomOf="@id/step_goal"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="15dp"
+        android:text="@string/submit"
+        />
+
+    <Button
+        android:id="@+id/sleep_submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/water_submit"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="15dp"
+        android:text="@string/submit"
+        />
+    <EditText
+        android:backgroundTint="@color/light_green"
+        android:imeOptions="actionDone"
+        android:id="@+id/step_goal_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/step_submit"
+        app:layout_constraintTop_toTopOf="@id/step_submit"
+        app:layout_constraintBottom_toBottomOf="@id/step_submit"
+        android:layout_marginHorizontal="10dp"
+        android:inputType="number"
+        android:textSize="24sp"
+        />
+
+    <EditText
+        android:imeOptions="actionDone"
+        android:id="@+id/calorie_goal_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/calorie_submit"
+        app:layout_constraintTop_toTopOf="@id/calorie_submit"
+        app:layout_constraintBottom_toBottomOf="@id/calorie_submit"
+        android:layout_marginHorizontal="10dp"
+        android:inputType="number"
+        android:textSize="24sp"
+        />
+    <EditText
+        android:id="@+id/water_goal_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/water_submit"
+        app:layout_constraintTop_toTopOf="@id/water_submit"
+        app:layout_constraintBottom_toBottomOf="@id/water_submit"
+        android:layout_marginHorizontal="10dp"
+        android:inputType="number"
+        android:textSize="24sp"
+        android:imeOptions="actionDone"
+        />
+
+    <EditText
+        android:id="@+id/sleep_goal_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/sleep_submit"
+        app:layout_constraintTop_toTopOf="@id/sleep_submit"
+        app:layout_constraintBottom_toBottomOf="@id/sleep_submit"
+        android:layout_marginHorizontal="10dp"
+        android:inputType="numberDecimal"
+        android:textSize="24sp"
+        android:imeOptions="actionDone"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>
