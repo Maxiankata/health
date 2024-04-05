@@ -34,15 +34,5 @@ class SettingsViewModel(private val application: Application) : AndroidViewModel
             userDao.dropUser()
         }
     }
-    suspend fun getUser(): UserMegaInfo? {
-        return withContext(Dispatchers.IO){
-            val user = userDao.getEntireUser()
-            if (user!=null) roomToUserMegaInfoAdapter.adapt(user) else null
-        }
-    }
-    suspend fun updateUser(userMegaInfo: UserMegaInfo){
-        withContext(Dispatchers.IO){
-            userDao.updateImage(userMegaInfo.userInfo)
-        }
-    }
+
 }

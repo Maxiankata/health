@@ -18,10 +18,12 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.room.Room
 import com.example.healthtracker.data.room.UserDB
 import com.example.healthtracker.databinding.ActivityMainBinding
+import com.example.healthtracker.ui.home.speeder.SpeederService
 import com.example.healthtracker.ui.home.walking.AlarmItem
 import com.example.healthtracker.ui.home.walking.AlarmScheduler
 import com.example.healthtracker.ui.home.walking.Alarmer
 import com.example.healthtracker.ui.home.walking.StepCounterService
+import com.example.healthtracker.ui.startSpeeder
 import com.example.healthtracker.ui.startStepCounterService
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
@@ -74,6 +76,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         var stepCounterService:Intent?=null
+        var speederService:Intent?=null
 
         private lateinit var db: UserDB
         fun getDatabaseInstance(): UserDB {

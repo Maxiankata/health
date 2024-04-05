@@ -82,7 +82,6 @@
         android:id="@+id/total_steps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/total_steps"
         android:fontFamily="sans-serif-black"
         android:textColor="@color/nav_bar_dark_background"
         android:gravity="center"

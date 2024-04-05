@@ -20,6 +20,7 @@ import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.healthtracker.MainActivity
+import com.example.healthtracker.MyApplication
 import com.example.healthtracker.R
 import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
 import com.example.healthtracker.data.user.UserAutomaticInfo
@@ -34,27 +35,27 @@ import java.util.Calendar
 
 class StepCounterService : Service(), SensorEventListener {
     companion object {
-        private val _steps = MutableLiveData<Int>()
+        val _steps = MutableLiveData<Int>()
         val steps: LiveData<Int> get() = _steps
 
-        private val _calories = MutableLiveData<Int>()
+        val _calories = MutableLiveData<Int>()
         val calories: LiveData<Int> get() = _calories
         private var _sleepDuration = MutableLiveData<Long>()
         val sleepDuration: LiveData<Long> get() = _sleepDuration
+        val channelId = "step_counter_channel"
 
-        var stepIntent: Intent? = null
+        var stepIntent: Intent = Intent(MyApplication.getContext(), StepCounterService::class.java)
     }
 
     private var lastSensorEventTime: Long = 0
     private var isSleeping = false
     private var sleepStartTime: Long = 0
     private var sleepStopTime: Long = 0
-    val currentTimeMillis = System.currentTimeMillis()
-    val calendar = Calendar.getInstance()
+    private val currentTimeMillis = System.currentTimeMillis()
+    private val calendar = Calendar.getInstance()
 
     private val idleThresholdMillis = 2 * 60 * 60 * 1000
 
-    private val channelId = "step_counter_channel"
     private var sensorManager: SensorManager? = null
 
     init {
@@ -70,7 +71,7 @@ class StepCounterService : Service(), SensorEventListener {
     private val roomToUserMegaInfoAdapter = RoomToUserMegaInfoAdapter()
     private fun getUser(callback: (UserMegaInfo?) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            userDao.getEntireUser()?.let {
+            userDao.getEntireUser().let {
                 callback(roomToUserMegaInfoAdapter.adapt(it))
                 Log.d("emitted user", roomToUserMegaInfoAdapter.adapt(it).userAutomaticInfo.toString())
             } ?: callback(null)
@@ -94,7 +95,7 @@ class StepCounterService : Service(), SensorEventListener {
     suspend fun updateUserAutomaticInfo() {
         withContext(Dispatchers.IO) {
             val user = async { userDao.getEntireUser() }.await()
-            user?.userAutomaticInfo.let {
+            user.userAutomaticInfo.let {
                 val renewedAutomaticInfo = UserAutomaticInfo(
                     challengesPassed = it?.challengesPassed ?: 0,
                     totalSleepHours = it?.totalSleepHours,
@@ -104,6 +105,7 @@ class StepCounterService : Service(), SensorEventListener {
                     )
                 )
                 userDao.updateUserAutomaticInfo(renewedAutomaticInfo)
+
             }
         }
     }
@@ -200,10 +202,10 @@ class StepCounterService : Service(), SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent) {
         if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
-            _steps.value?.plus(1).let {
+            _steps.value?.plus(1)?.let {
                 _steps.postValue(it)
-                if (it != null) {
-                    _calories.postValue(it / 25)
+                if (_steps.value!! %25==0){
+                    _calories.postValue(_calories.value?.plus(1))
                 }
                 updateNotification()
             }

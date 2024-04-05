@@ -17,7 +17,7 @@ class ChallengesDisplayDialogViewModel(private val application: Application): An
 
     suspend fun feedChallenges(){
         return withContext(Dispatchers.IO){
-            val user = userDao.getBasicInfo()!!.uid
+            val user = userDao.getUserInfo()!!.uid
                 val challenges = authImpl.fetchChallenges(user!!)
                 _challenges.postValue(challenges)
         }

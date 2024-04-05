@@ -103,6 +103,10 @@
     <string name="lbs">lbs</string>
     <string name="today_steps">Today\'s steps:</string>
     <string name="progress">Progress</string>
+    <string name="friend_mode_on">Current friend mode on</string>
+    <string name="new_friend_mode_on">New friend mode on</string>
+    <string name="achieved">Achieved</string>
+    <string name="unachieved">Unachieved</string>
     <string-array name="activities">
         <item>Walking</item>
         <item>Power Walking</item>

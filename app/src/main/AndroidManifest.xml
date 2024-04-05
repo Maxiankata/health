@@ -58,7 +58,10 @@
         <service android:name=".ui.home.walking.StepCounterService"
             android:foregroundServiceType=""/>
         <receiver android:name=".ui.home.walking.AlarmRecieverer" />
-
+        <service
+            android:name=".ui.home.speeder.SpeederService"
+            android:enabled="true"
+            android:exported="false" />
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"

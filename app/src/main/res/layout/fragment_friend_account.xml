@@ -9,7 +9,14 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
+    <TextView
+        android:id="@+id/total_steps"
+        app:layout_constraintTop_toBottomOf="@id/user_name"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"/>
     <View
         android:id="@+id/background_color"
         app:layout_constraintTop_toBottomOf="@id/back_button"
@@ -72,7 +79,7 @@
         android:src="@drawable/friend_add"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/challenge_friend"
-        app:layout_constraintTop_toBottomOf="@+id/user_name"
+        app:layout_constraintTop_toBottomOf="@+id/total_steps"
         app:tint="@color/white" />
 
     <ImageView
@@ -84,10 +91,16 @@
         android:src="@drawable/flag"
         app:layout_constraintEnd_toStartOf="@+id/relationship_status"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/user_name"
+        app:layout_constraintTop_toBottomOf="@+id/total_steps"
         app:tint="@color/white" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/challenge_friend"
+            android:id="@+id/achievement_recycler"
+            />
     <com.github.aachartmodel.aainfographics.aachartcreator.AAChartView
-        app:layout_constraintTop_toBottomOf="@id/challenge_friend"
+        app:layout_constraintTop_toBottomOf="@id/achievement_recycler"
         android:id="@+id/friend_chart"
         android:layout_margin="10dp"
         android:layout_width="match_parent"

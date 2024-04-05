@@ -13,14 +13,12 @@ import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
 import android.util.Base64
-import android.util.Log
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.RelativeLayout
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
-import com.example.healthtracker.MainActivity
 import com.example.healthtracker.MyApplication
 import com.example.healthtracker.R
 import com.example.healthtracker.data.room.UserData
@@ -33,6 +31,8 @@ import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.UserPutInInfo
 import com.example.healthtracker.data.user.UserSettingsInfo
 import com.example.healthtracker.data.user.WaterInfo
+import com.example.healthtracker.ui.home.speeder.ActivityEnum
+import com.example.healthtracker.ui.home.speeder.SpeederService
 import com.example.healthtracker.ui.home.walking.StepCounterService
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.DataSnapshot
@@ -142,7 +142,8 @@ fun UserMegaInfo.toUserData(): UserData {
         userPutInInfo = this.userPutInInfo,
         userSettingsInfo = this.userSettingsInfo,
         userDays = this.userDays,
-        challenges = this.challenges
+        challenges = this.challenges,
+        achievements = this.achievements
     )
 }
 
@@ -166,7 +167,8 @@ fun DataSnapshot.toUserInfo(): UserInfo {
         image = child("image").getValue(String::class.java) ?: "",
         mail = child("mail").getValue(String::class.java) ?: "",
         theme = child("theme").getValue(String::class.java) ?: "",
-        bgImage = child("bgImage").getValue(String::class.java) ?: ""
+        bgImage = child("bgImage").getValue(String::class.java) ?: "",
+        totalSteps = child("totalSteps").getValue(Int::class.java) ?: 0
     )
 }
 
@@ -189,7 +191,7 @@ fun DataSnapshot.toWaterInfo(): WaterInfo {
     return WaterInfo(
         currentWater = child("currentWater").getValue(Int::class.java) ?: 0,
         waterCompletion = child("waterCompletion").getValue(Boolean::class.java) ?: false,
-        waterGoal = child("waterGoal").getValue(Int::class.java)?:6
+        waterGoal = child("waterGoal").getValue(Int::class.java) ?: 6
     )
 }
 
@@ -222,7 +224,7 @@ fun DataSnapshot.toUserGoals(): UserGoals {
 fun DataSnapshot.toStepsInfo(): StepsInfo {
     return StepsInfo(
         currentSteps = child("currentSteps").getValue(Int::class.java),
-        currentCalories  = child("currentCalories").getValue(Int::class.java),
+        currentCalories = child("currentCalories").getValue(Int::class.java),
         stepsGoal = child("stepsGoal").getValue(Int::class.java),
         caloriesGoal = child("caloriesGoal").getValue(Int::class.java)
     )
@@ -258,16 +260,32 @@ fun isInternetAvailable(context: Context): Boolean {
 }
 
 fun startStepCounterService() {
-    StepCounterService.stepIntent =
-        Intent(MyApplication.getContext(), StepCounterService::class.java).apply {
-            ContextCompat.startForegroundService(MyApplication.getContext(), this)
-        }
-    MainActivity.stepCounterService
+    ContextCompat.startForegroundService(MyApplication.getContext(), StepCounterService.stepIntent)
 }
 
 fun stopStepCounterService() {
     MyApplication.getContext().stopService(StepCounterService.stepIntent)
-    StepCounterService.stepIntent = null
+}
+
+fun startSpeeder(time: String, activity: ActivityEnum) {
+    val intent: Intent = SpeederService.speedIntent.putExtra("time", time).putExtra("activity", activity.name)
+
+    MyApplication.getContext().startForegroundService(intent)
+}
+
+fun stopSpeeder() {
+    MyApplication.getContext().stopService(SpeederService.speedIntent)
+}
+
+fun getStepsValue(): Int {
+    return StepCounterService._steps.value ?: 0
+}
+
+fun nullifyStepCounter() {
+    StepCounterService._steps.postValue(0)
+}
+fun updateStepCalories(calories:Int){
+    StepCounterService._calories.postValue(StepCounterService._calories.value?.plus(calories))
 }
 
 fun formatDurationFromLong(milliseconds: Long): String {
@@ -289,6 +307,7 @@ fun parseDurationToLong(duration: String): Long {
 
     return (hours * 3600 + minutes * 60 + seconds) * 1000
 }
+
 fun durationToString(duration: Duration): String {
     val hours = duration.toHours()
     val minutes = duration.toMinutes() % 60

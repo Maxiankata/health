@@ -127,7 +127,6 @@ class LoginFragmentViewModel(private val application: Application) : AndroidView
     sealed interface State {
         data class LoggedIn(val flag: Boolean) : State
         data class Notify(val message: String, val visibility: Int = View.GONE) : State
-
         data class Loading(val loadingVisibility: Int): State
     }
 }

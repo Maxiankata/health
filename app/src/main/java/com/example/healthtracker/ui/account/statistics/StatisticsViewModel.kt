@@ -9,6 +9,7 @@ import com.example.healthtracker.AuthImpl
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.MyApplication
 import com.example.healthtracker.data.user.UserDays
+import com.example.healthtracker.data.user.UserInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -18,8 +19,6 @@ class StatisticsViewModel(private val application: Application) : AndroidViewMod
     private val authImpl = AuthImpl.getInstance()
     private val _userDays = MutableLiveData<List<UserDays?>?>()
     val userDays: LiveData<List<UserDays?>?> get() = _userDays
-
-
 
     fun getUserDays() {
         viewModelScope.launch {

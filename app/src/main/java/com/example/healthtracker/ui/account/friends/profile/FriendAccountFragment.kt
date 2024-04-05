@@ -15,10 +15,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.healthtracker.R
+import com.example.healthtracker.data.user.Achievement
 import com.example.healthtracker.data.user.UserDays
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.databinding.FragmentFriendAccountBinding
+import com.example.healthtracker.ui.account.achievements.Achievements.achievements
+import com.example.healthtracker.ui.account.achievements.AchievementsRecyclerAdapter
 import com.example.healthtracker.ui.account.friends.challenges.ChallengeBuilderDialogFragment
 import com.example.healthtracker.ui.base64ToBitmap
 import com.example.healthtracker.ui.account.friends.popup.FriendListViewModel
@@ -40,7 +44,7 @@ class FriendAccountFragment : Fragment() {
     private var notificationId = 1
 
     private val binding get() = _binding!!
-    private val _user = MutableLiveData<Pair<UserInfo, UserDays>>()
+    lateinit var achievementsRecyclerAdapter :AchievementsRecyclerAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -55,6 +59,19 @@ class FriendAccountFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
             friendAccountViewModel.user.observe(viewLifecycleOwner) {
+                val achieved = mutableListOf<Achievement>()
+                for (achievement in achievements) {
+                    if (achievement.goal <= it.first.totalSteps!!) {
+                        achieved.add(achievement)
+                    }
+                }
+                achievementRecycler.apply {
+                    achievementsRecyclerAdapter =
+                        AchievementsRecyclerAdapter(it.first.totalSteps!!, achieved)
+                    layoutManager =
+                        LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                    adapter = achievementsRecyclerAdapter
+                }
                 val user = it.first
                 val days = it.second
                 profilePhoto.apply {
@@ -130,9 +147,9 @@ class FriendAccountFragment : Fragment() {
                     val stepsList = mutableListOf<Int>()
                     val caloriesList = mutableListOf<Int>()
                     val watersList = mutableListOf<Int>()
-                    if (it.second != null) {
-                        Log.d("second isnt null", it.second.toString())
-                        for (userday in it.second!!) {
+                    if (days != null) {
+                        Log.d("second isnt null", days.toString())
+                        for (userday in days) {
                             datetimeList.add(userday.dateTime)
                             val steps = userday.automaticInfo?.steps?.currentSteps ?: 0
                             stepsList.add(steps)

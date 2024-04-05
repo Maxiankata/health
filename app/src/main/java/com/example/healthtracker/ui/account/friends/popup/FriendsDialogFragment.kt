@@ -21,19 +21,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.healthtracker.R
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.databinding.PopupFriendsBinding
-import com.example.healthtracker.ui.hideLoading
-import com.example.healthtracker.ui.hideMainLoading
 import com.example.healthtracker.ui.rotateView
 import kotlinx.coroutines.launch
 
 class FriendsDialogFragment : DialogFragment() {
     private var _binding: PopupFriendsBinding? = null
     private val binding get() = _binding
-
-
-//    val friendListViewModel:FriendListViewModel by viewModels()
-//    val friendListAdapter = FriendListAdapter(friendListViewModel)
-
     private val friendListViewModel: FriendListViewModel by activityViewModels()
     private lateinit var friendListAdapter: FriendListAdapter
     override fun onCreateView(
@@ -41,8 +34,6 @@ class FriendsDialogFragment : DialogFragment() {
     ): View? {
         friendListAdapter = FriendListAdapter()
         _binding = PopupFriendsBinding.inflate(inflater, container, false)
-
-
         return binding?.root
     }
 
@@ -61,7 +52,7 @@ class FriendsDialogFragment : DialogFragment() {
         binding?.apply {
             friendListViewModel.usersList.observe(viewLifecycleOwner) {
                 if (it != null) {
-                    loadingPanelMain.visibility=VISIBLE
+                    loadingPanelMain.visibility = VISIBLE
                     friendListAdapter.updateItems(it).also {
                         loadingPanelMain.visibility = GONE
                     }
@@ -124,7 +115,7 @@ class FriendsDialogFragment : DialogFragment() {
                         viewLifecycleOwner.lifecycleScope.launch {
                             try {
                                 rotateView(searchSwitch, 45F)
-                                textInputLayout.helperText = "new friend mode on"
+                                textInputLayout.helperText = getString(R.string.new_friend_mode_on)
                             } catch (e: Exception) {
                                 Log.e("FetchUsersError", "Error fetching users", e)
                             }
@@ -140,7 +131,7 @@ class FriendsDialogFragment : DialogFragment() {
                             try {
                                 friendListViewModel.fetchUserFriends()
                                 rotateView(searchSwitch, 0F)
-                                textInputLayout.helperText = "current friend mode on"
+                                textInputLayout.helperText = getString(R.string.friend_mode_on)
 
                             } catch (e: Exception) {
                                 Log.e("FetchFriendsError", "Error fetching friends", e)
@@ -160,7 +151,8 @@ class FriendsDialogFragment : DialogFragment() {
             itemClickListener = object : FriendListAdapter.ItemClickListener<UserInfo> {
                 override fun onItemClicked(item: UserInfo, itemPosition: Int) {
                     item.uid?.let {
-                        Log.d("uid", it) }
+                        Log.d("uid", it)
+                    }
                     findNavController().navigate(
                         R.id.action_navigation_notifications_to_friendAccountFragment,
                         bundleOf("uid" to item.uid)

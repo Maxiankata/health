@@ -40,7 +40,7 @@ class ChallengeBuilderDialogViewModel(private val application: MyApplication) : 
     }
     suspend fun getAssigner():String?{
         return withContext(Dispatchers.IO){
-            userDao.getBasicInfo()?.username
+            userDao.getUserInfo()?.username
         }
     }
 

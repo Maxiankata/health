@@ -60,12 +60,14 @@ class AccountFragment : Fragment() {
                             profilePhoto.setBackgroundResource(R.drawable.circle_background)
                         }
                     }
+                    totalSteps.text = buildString {
+                        append(getString(R.string.total_steps))
+                        append(it.userInfo.totalSteps.toString())
+                    }
                     username.text = it.userInfo.username
                     backgroundColor.setBackgroundColor(Color.parseColor(it.userInfo.theme))
-                    Log.d("background color", it.userInfo.theme.toString())
                 }
             }
-
             val pickImage = registerForActivityResult(StartActivityForResult()) { result ->
                 fun onActivityResult(data: Intent?) {
                     data?.data?.let { uri ->
@@ -87,9 +89,13 @@ class AccountFragment : Fragment() {
                     R.id.action_navigation_notifications_to_statisticsFragment
                 )
             }
+
             signOutButton.setOnClickListener {
                 accountViewModel.signOut()
                 navigateToActivity(requireActivity(), LoginActivity::class.java)
+            }
+            achievements.setOnClickListener {
+                findNavController().navigate(R.id.action_navigation_notifications_to_achievementsFragment)
             }
             friends.setOnClickListener {
                 dialog.show(requireActivity().supportFragmentManager, "friends dialog")

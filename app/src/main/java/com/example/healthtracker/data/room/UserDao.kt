@@ -17,7 +17,7 @@ interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveUser(userMegaInfoEntity: UserData)
     @Query("SELECT * FROM UserData")
-    fun getEntireUser(): UserData?
+    fun getEntireUser(): UserData
 
     @Query("SELECT * FROM UserData")
     fun getEntireUserFlow(): Flow<UserData?>
@@ -25,7 +25,7 @@ interface UserDao {
     @Query("DELETE FROM UserData")
     fun dropUser()
     @Query("SELECT userInfo FROM UserData")
-    fun getBasicInfo(): UserInfo?
+    fun getUserInfo(): UserInfo?
 
     @Query("SELECT userSettingsInfo FROM UserData ")
     fun getUserSettings(): UserSettingsInfo?
@@ -43,7 +43,7 @@ interface UserDao {
     @Query("UPDATE UserData SET userSettingsInfo = :updatedUserSettingsInfo")
     fun updateUserSettings(updatedUserSettingsInfo: UserSettingsInfo)
     @Query("UPDATE UserData SET UserInfo = :updatedUserInfo")
-    suspend fun updateImage( updatedUserInfo: UserInfo)
+    suspend fun updateUserInfo(updatedUserInfo: UserInfo)
 
     @Query("UPDATE UserData SET userAutomaticInfo = NULL")
     suspend fun wipeUserAutomaticInfo()

@@ -69,7 +69,7 @@ class AccountViewModel(private val application: Application) : AndroidViewModel(
     fun saveBitmapToDatabase(bitmap: Bitmap) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                userDao.getBasicInfo()
+                userDao.getUserInfo()
                     ?.let {
                         val newImageInfo =
                             UserInfo(
@@ -81,7 +81,7 @@ class AccountViewModel(private val application: Application) : AndroidViewModel(
                                 it.bgImage
                             )
                         it.let {
-                            userDao.updateImage(
+                            userDao.updateUserInfo(
                                 newImageInfo
                             )
                         }

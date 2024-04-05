@@ -9,13 +9,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.FragmentHomeBinding
 import com.example.healthtracker.ui.formatDurationFromLong
 import com.example.healthtracker.ui.home.running.RunningDialogFragment
-import com.example.healthtracker.ui.home.running.RunningSensorListener
 import com.example.healthtracker.ui.home.walking.StepCounterService
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -26,8 +26,6 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val homeViewModel: HomeViewModel by activityViewModels()
-    private lateinit var speedTracker: RunningSensorListener
-    private var stepCount: LiveData<Int> = StepCounterService.steps
     private var sleepDuration: LiveData<Long> = StepCounterService.sleepDuration
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -36,17 +34,17 @@ class HomeFragment : Fragment() {
         return binding.root
 
     }
-    var weightRecyclerAdapterer= WeightRecyclerAdapter(Weight.weight.toMutableList())
+
+    var weightRecyclerAdapterer = WeightRecyclerAdapter(Weight.weight.toMutableList())
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch {
-            speedTracker = RunningSensorListener(requireContext())
             homeViewModel.feedUser()
             homeViewModel.checkForChallenges()
         }
         binding.apply {
-            stepCount.observe(viewLifecycleOwner) { steps ->
+            StepCounterService.steps.observe(viewLifecycleOwner) { steps ->
                 if (steps == null) {
                     Log.d("wait for it :)", "i swear")
                 } else {
@@ -66,15 +64,24 @@ class HomeFragment : Fragment() {
                                     append(steps)
                                 }
                             }
-
+                        }
+                    }
+                }
+            }
+            StepCounterService.calories.observe(viewLifecycleOwner) { calories ->
+                if (calories == null) {
+                    Log.d("wait for it :)", "i swear")
+                } else {
+                    lifecycleScope.launch {
+                        homeViewModel.user.observe(viewLifecycleOwner) { user ->
                             binding.calorieCount.text = buildString {
                                 append(getString(R.string.calories))
-                                append(steps / 25)
+                                append(calories)
                             }
                             binding.caloriesProgressBar.apply {
                                 val calori =
                                     user?.userSettingsInfo?.userGoals?.calorieGoal?.toFloat()
-                                setProgressWithAnimation((steps / 25).toFloat())
+                                setProgressWithAnimation((calories).toFloat())
                                 calori?.let {
                                     progressMax = calori
                                 }
@@ -82,12 +89,13 @@ class HomeFragment : Fragment() {
                         }
                     }
                 }
+
             }
             sleepDuration.observe(viewLifecycleOwner) {
                 sleepLogger.text = buildString {
                     if (it != 0.toLong()) {
                         append("You have slept for ${formatDurationFromLong(it)} hours :)")
-                    }else{
+                    } else {
 //                        homeViewModel.getTodaysSleep {
 //                            append("You have slept for $it hours :)")
 //                            Log.d("check","checkcer slep")
@@ -95,6 +103,7 @@ class HomeFragment : Fragment() {
                     }
                 }
             }
+
             homeViewModel.water.observe(viewLifecycleOwner) {
                 homeViewModel.user.observe(viewLifecycleOwner) { user ->
                     textView2.text = buildString {
@@ -109,11 +118,11 @@ class HomeFragment : Fragment() {
                         append(user?.userSettingsInfo?.userGoals?.waterGoal ?: 6)
                     }
                     if (user != null) {
-                        if (user.userPutInInfo?.weight!=0.0&&user.userPutInInfo?.weight!=null) {
+                        if (user.userPutInInfo?.weight != 0.0 && user.userPutInInfo?.weight != null) {
                             scrollToDouble(user.userPutInInfo.weight!!)
-                        }else{
+                        } else {
                             homeViewModel.getYesterdayWeight()
-                            homeViewModel.weight.observe(viewLifecycleOwner){
+                            homeViewModel.weight.observe(viewLifecycleOwner) {
                                 if (it != null) {
                                     scrollToDouble(it)
                                 }
@@ -121,11 +130,13 @@ class HomeFragment : Fragment() {
                         }
                     }
                     if (user != null) {
-                        if (user.userSettingsInfo?.units.toString()==getString(R.string.kg)){
-                            weightRecyclerAdapterer= WeightRecyclerAdapter(Weight.weight.toMutableList())
+                        if (user.userSettingsInfo?.units.toString() == getString(R.string.kg)) {
+                            weightRecyclerAdapterer =
+                                WeightRecyclerAdapter(Weight.weight.toMutableList())
                             units.text = getString(R.string.kg)
-                        }else if (user.userSettingsInfo?.units.toString()==getString(R.string.lbs)){
-                            weightRecyclerAdapterer= WeightRecyclerAdapter(Weight.eagleBeerWeight.toMutableList())
+                        } else if (user.userSettingsInfo?.units.toString() == getString(R.string.lbs)) {
+                            weightRecyclerAdapterer =
+                                WeightRecyclerAdapter(Weight.eagleBeerWeight.toMutableList())
                             units.text = getString(R.string.lbs)
                         }
                     }
@@ -143,18 +154,24 @@ class HomeFragment : Fragment() {
             }
 
             runLayout.setOnClickListener {
-                RunningDialogFragment().show(requireActivity().supportFragmentManager, "running dialog")
+                RunningDialogFragment().show(
+                    requireActivity().supportFragmentManager, "running"
+                )
             }
             cyclingLayout.setOnClickListener {
                 RunningDialogFragment().show(
-                    requireActivity().supportFragmentManager, "cycling dialog"
+                    requireActivity().supportFragmentManager, "cycling"
                 )
             }
             joggingLayout.setOnClickListener {
-                RunningDialogFragment().show(requireActivity().supportFragmentManager, "hiking dialog")
+                RunningDialogFragment().show(
+                    requireActivity().supportFragmentManager, "jogging"
+                )
             }
             powerWalkingLayout.setOnClickListener {
-                RunningDialogFragment().show(requireActivity().supportFragmentManager, "hiking dialog")
+                RunningDialogFragment().show(
+                    requireActivity().supportFragmentManager, "walking"
+                )
 
             }
             var mainUnits: Int = 0
@@ -170,7 +187,9 @@ class HomeFragment : Fragment() {
                         isScrolling = true
                     }
 
-                    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    override fun onScrollStateChanged(
+                        recyclerView: RecyclerView, newState: Int
+                    ) {
                         super.onScrollStateChanged(recyclerView, newState)
                         if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                             if (isScrolling) {
@@ -184,7 +203,9 @@ class HomeFragment : Fragment() {
                                             delay(100)
                                             middleItem =
                                                 (layoutManager.findFirstVisibleItemPosition() + layoutManager.findLastVisibleItemPosition()) / 2
-                                            weightRecyclerAdapterer.updateMiddleItemSize(middleItem)
+                                            weightRecyclerAdapterer.updateMiddleItemSize(
+                                                middleItem
+                                            )
                                             mainUnits = middleItem
                                         }
                                         weightRecyclerAdapterer.updateMiddleItemSize(middleItem)
@@ -201,7 +222,9 @@ class HomeFragment : Fragment() {
                                             mainUnits = middlePosition
 
                                         }
-                                        weightRecyclerAdapterer.updateMiddleItemSize(middlePosition)
+                                        weightRecyclerAdapterer.updateMiddleItemSize(
+                                            middlePosition
+                                        )
                                         mainUnits = middlePosition
                                     }
                                 }
@@ -228,7 +251,9 @@ class HomeFragment : Fragment() {
                         isScrolling = true
                     }
 
-                    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    override fun onScrollStateChanged(
+                        recyclerView: RecyclerView, newState: Int
+                    ) {
                         super.onScrollStateChanged(recyclerView, newState)
                         if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                             if (isScrolling) {
@@ -241,7 +266,9 @@ class HomeFragment : Fragment() {
                                 } catch (e: Exception) {
                                     val middlePosition =
                                         (layoutManager.findFirstVisibleItemPosition() + layoutManager.findLastVisibleItemPosition()) / 2
-                                    secondWeightRecyclerAdapter.updateMiddleItemSize(middlePosition)
+                                    secondWeightRecyclerAdapter.updateMiddleItemSize(
+                                        middlePosition
+                                    )
                                     subUnits = middlePosition
                                 }
                                 isScrolling = false
@@ -259,6 +286,9 @@ class HomeFragment : Fragment() {
                     homeViewModel.updatePutInInfo(weight)
                 }
             }
+            speederButton.setOnClickListener {
+                findNavController().navigate(R.id.action_navigation_home_to_speederFragment)
+            }
         }
     }
 
@@ -266,7 +296,8 @@ class HomeFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-    fun scrollToDouble(weighte:Double){
+
+    fun scrollToDouble(weighte: Double) {
         val weight: Double = weighte
         val integer: Int = weight.toInt()
         val decimal: Int = ((weight - integer) * 10).toInt()
@@ -278,3 +309,4 @@ class HomeFragment : Fragment() {
         binding.secondWeightRecycler.scrollToPosition(decimal)
     }
 }
+

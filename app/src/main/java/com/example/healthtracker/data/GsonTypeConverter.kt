@@ -1,6 +1,7 @@
 package com.example.healthtracker.data
 
 import androidx.room.TypeConverter
+import com.example.healthtracker.data.user.Achievement
 import com.example.healthtracker.data.user.StepsInfo
 import com.example.healthtracker.data.user.UserAutomaticInfo
 import com.example.healthtracker.data.user.UserDays
@@ -90,6 +91,14 @@ class GsonTypeConverter {
     fun fromUserSettingsInfo(userSettingsInfo: UserSettingsInfo?): String? {
         return gson.toJson(userSettingsInfo)
     }
+    @TypeConverter
+    fun fromAchievements(achievements: Achievement?): String? {
+        return gson.toJson(achievements)
+    }
+    @TypeConverter
+    fun toAchievements(achievements: String?): Achievement? {
+        return gson.fromJson(achievements, Achievement::class.java)
+    }
 
     @TypeConverter
     fun toUserSettingsInfo(userSettingsInfoString: String?): UserSettingsInfo? {
@@ -126,6 +135,16 @@ class GsonTypeConverter {
     @TypeConverter
     fun toString(userDaysList: List<UserDays>?): String? {
         return gson.toJson(userDaysList)
+    }
+    @TypeConverter
+    fun fromAchievementsList(achievementList: List<Achievement>?): String? {
+        return gson.toJson(achievementList)
+    }
+
+    @TypeConverter
+    fun toAchievementList(achievementList: String?): List<Achievement>? {
+        val listType = object : TypeToken<List<Achievement>>() {}.type
+        return gson.fromJson(achievementList, listType)
     }
     @TypeConverter
     fun calendarToJson(calendar: Calendar?): String? = Gson().toJson(calendar)

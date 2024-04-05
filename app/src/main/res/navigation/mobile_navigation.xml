@@ -9,7 +9,9 @@
         android:id="@+id/navigation_home"
         android:name="com.example.healthtracker.ui.home.HomeFragment"
 
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_dashboard"
@@ -28,6 +30,9 @@
         <action
             android:id="@+id/action_navigation_notifications_to_statisticsFragment"
             app:destination="@id/statisticsFragment" />
+        <action
+            android:id="@+id/action_navigation_notifications_to_achievementsFragment"
+            app:destination="@id/achievementsFragment" />
     </fragment>
     <fragment
         android:id="@+id/friendAccountFragment"
@@ -52,6 +57,10 @@
         android:id="@+id/statisticsFragment"
         android:name="com.example.healthtracker.ui.account.statistics.StatisticsFragment"
         android:label="StatisticsFragment" />
+    <fragment
+        android:id="@+id/achievementsFragment"
+        android:name="com.example.healthtracker.ui.account.achievements.AchievementsFragment"
+        android:label="AchievementsFragment" />
 
 
 </navigation>

@@ -410,5 +410,11 @@
 
 
         </GridLayout>
+        <Button
+            android:id="@+id/speeder_button"
+            android:layout_width="match_parent"
+            android:layout_margin="20dp"
+            android:layout_height="wrap_content"
+            android:text="open speeder"/>
     </LinearLayout>
 </ScrollView>
