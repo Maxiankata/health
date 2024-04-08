@@ -48,11 +48,15 @@ class ChallengeDisplayDialog : DialogFragment() {
                 binding.emptyChallenges.visibility= VISIBLE
             }
         }
+
         binding.apply {
             challengeRecycler.apply {
                 adapter = recyclerAdapter
                 layoutManager = LinearLayoutManager(requireContext())
 
+            }
+            refresh.setOnClickListener {
+                challengesDisplayDialogViewModel.refreshChallenges()
             }
             closeButton.setOnClickListener {
                 dismiss()

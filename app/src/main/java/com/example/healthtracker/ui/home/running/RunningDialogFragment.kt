@@ -7,9 +7,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import com.example.healthtracker.MyApplication
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.RunningDialogBinding
@@ -19,6 +21,8 @@ import com.example.healthtracker.ui.home.speeder.SpeederService
 import com.example.healthtracker.ui.home.speeder.SpeederServiceBoolean
 import com.example.healthtracker.ui.parseDurationToLong
 import com.example.healthtracker.ui.startSpeeder
+import com.example.healthtracker.ui.stopSpeeder
+import java.text.DecimalFormat
 import java.time.Duration
 import java.util.Timer
 
@@ -27,7 +31,7 @@ class RunningDialogFragment : DialogFragment() {
     private val binding get() = _binding!!
     private val timer = Timer()
     private lateinit var dialogTag: ActivityEnum
-
+    private val runningDialogViewModel : RunningDialogViewModel by viewModels()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -42,7 +46,6 @@ class RunningDialogFragment : DialogFragment() {
                 ActivityEnum.WALKING
             }
         }
-        Log.d("dialog tag is", dialogTag.name)
         return binding.root
     }
 
@@ -57,11 +60,22 @@ class RunningDialogFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        runningDialogViewModel.getMetric()
         binding.apply {
             cancel.setBackgroundColor(YELLOW)
-            cancel.setOnClickListener {
-                dismiss()
+            SpeederServiceBoolean.isMyServiceRunningLive.observe(viewLifecycleOwner){
+                if (it){
+                    start.visibility=GONE
+                    cancel.setOnClickListener {
+                        stopSpeeder()
+                        timer.setProgressWithAnimation(0F)
+                    }
+                }else{
+                    start.visibility= VISIBLE
+                    cancel.setOnClickListener {
+                        dismiss()
+                    }
+                }
             }
             timePicker.visibility = GONE
             start.setBackgroundColor(YELLOW)
@@ -92,15 +106,6 @@ class RunningDialogFragment : DialogFragment() {
                         clearFocus()
                         text.clear()
                     }
-                    val tag: ActivityEnum = when (tag) {
-                        "running" -> ActivityEnum.RUNNING
-                        "walking" -> ActivityEnum.WALKING
-                        "jogging" -> ActivityEnum.JOGGING
-                        "cycling" -> ActivityEnum.CYCLING
-                        else -> {
-                            ActivityEnum.WALKING
-                        }
-                    }
                     startSpeeder(stringDuration, dialogTag, challenge = null)
 
                 }
@@ -109,12 +114,14 @@ class RunningDialogFragment : DialogFragment() {
             SpeederServiceBoolean.isMyServiceRunningLive.observe(viewLifecycleOwner
             ){
                 if (!it) {
+                    speed.visibility = View.GONE
                     timePicker.text = getString(R.string.complete)
                     editTextHours.visibility = View.VISIBLE
                     editTextMinutes.visibility = View.VISIBLE
                     editTextSeconds.visibility = View.VISIBLE
                     timePicker.visibility = View.GONE
                 } else {
+                    speed.visibility = View.VISIBLE
                     timePicker.visibility = View.VISIBLE
                     editTextHours.visibility = View.GONE
                     editTextMinutes.visibility = View.GONE
@@ -122,12 +129,18 @@ class RunningDialogFragment : DialogFragment() {
                 }
             }
 
+            SpeederService.speed.observe(viewLifecycleOwner){
+                if (runningDialogViewModel.userMetric.value=="kg"){
+                    speed.text = "${limitSpeed(it)} kph"
+                }else{
+                    speed.text = "${limitSpeed(it)} mph"
+                }
+            }
             SpeederService.time.observe(viewLifecycleOwner) {
                 timePicker.text = it
                 timer.progressMax = parseDurationToLong(SpeederService.timey).toFloat()
                 timer.setProgressWithAnimation(parseDurationToLong(it).toFloat())
                 timer.progressBarColor = YELLOW
-
             }
             when(dialogTag){
                 ActivityEnum.RUNNING -> {
@@ -149,6 +162,9 @@ class RunningDialogFragment : DialogFragment() {
             }
         }
     }
-
+    private fun limitSpeed(value: Double): Double {
+        val df = DecimalFormat("#.#")
+        return df.format(value).toDouble()
+    }
 
 }

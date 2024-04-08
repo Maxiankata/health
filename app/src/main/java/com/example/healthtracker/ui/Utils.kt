@@ -177,7 +177,6 @@ fun DataSnapshot.toUserInfo(): UserInfo {
 fun DataSnapshot.toUserAutomaticInfo(): UserAutomaticInfo {
     return UserAutomaticInfo(
         steps = child("steps").toStepsInfo(),
-        totalSleepHours = child("totalSleepHours").getValue(String::class.java),
         challengesPassed = child("challengesPassed").getValue(Int::class.java)
     )
 }
@@ -185,7 +184,8 @@ fun DataSnapshot.toUserAutomaticInfo(): UserAutomaticInfo {
 fun DataSnapshot.toUserPutInInfo(): UserPutInInfo {
     return UserPutInInfo(
         waterInfo = child("waterInfo").toWaterInfo(),
-        weight = child("weight").getValue(Double::class.java)
+        weight = child("weight").getValue(Double::class.java),
+        sleepDuration = child("sleepDuration").getValue(String::class.java),
     )
 }
 

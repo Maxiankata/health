@@ -1,5 +1,7 @@
 package com.example.healthtracker.ui.home
 
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,7 +16,10 @@ import com.example.healthtracker.R
 import com.example.healthtracker.databinding.FragmentHomeBinding
 import com.example.healthtracker.ui.formatDurationFromLong
 import com.example.healthtracker.ui.home.running.RunningDialogFragment
+import com.example.healthtracker.ui.home.speeder.SpeederService
+import com.example.healthtracker.ui.home.speeder.SpeederServiceBoolean
 import com.example.healthtracker.ui.home.walking.StepCounterService
+import com.example.healthtracker.ui.stopSpeeder
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -36,10 +41,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        lifecycleScope.launch {
             homeViewModel.feedUser()
-            homeViewModel.checkForChallenges()
-        }
         binding.apply {
             StepCounterService.steps.observe(viewLifecycleOwner) { steps ->
                 if (steps == null) {
@@ -88,28 +90,14 @@ class HomeFragment : Fragment() {
                 }
 
             }
-            sleepLogger.apply {
-                text = buildString {
-                    lifecycleScope.launch {
-                        homeViewModel.getSleep().apply {
-                            append("You have slept for $this hours :)")
-                            Log.d("check", "checkcer slep")
-                        }
+            StepCounterService.sleepDuration.observe(viewLifecycleOwner) { sleep ->
+                    sleepLogger.text = buildString {
+                        append("${getString(R.string.you_have_slept_for)} ${formatDurationFromLong(sleep)} ${getString(R.string.hours)}")
                     }
-                }
-                StepCounterService.sleepDuration.observe(viewLifecycleOwner) { sleep ->
-                    if (formatDurationFromLong(sleep).isNotEmpty()) {
-                        text = buildString {
-                        append("You have slept for ${formatDurationFromLong(sleep)} hours :)")
-
-                        }
-                    }
-                    sleepSubmit.setOnClickListener {
-                        homeViewModel.updateSleep(formatDurationFromLong(sleep))
-                    }
+                sleepSubmit.setOnClickListener {
+                    homeViewModel.updateSleep(formatDurationFromLong(sleep))
                 }
             }
-
             homeViewModel.water.observe(viewLifecycleOwner) {
                 homeViewModel.user.observe(viewLifecycleOwner) { user ->
                     textView2.text = buildString {
@@ -147,17 +135,32 @@ class HomeFragment : Fragment() {
                     }
                 }
             }
+
             plus.setOnClickListener {
-                viewLifecycleOwner.lifecycleScope.launch {
                     homeViewModel.waterIncrement(1)
-                }
             }
             minus.setOnClickListener {
-                lifecycleScope.launch {
                     homeViewModel.waterIncrement(-1)
-                }
             }
 
+            SpeederServiceBoolean.isMyServiceRunningLive.observe(viewLifecycleOwner){
+                if (it){
+                    activityGrid.visibility = View.GONE
+                    activityButton.visibility = View.VISIBLE
+                }else{
+                    activityGrid.visibility = View.VISIBLE
+                    activityButton.visibility = View.GONE
+                }
+            }
+            activityButton.apply{
+                setOnClickListener {
+                    val tag = SpeederService.speedIntent.getStringExtra("activity")
+                    RunningDialogFragment().show(requireActivity(). supportFragmentManager,tag)
+                }
+                val backgroundTintList = ColorStateList.valueOf(Color.YELLOW)
+                setBackgroundTintList(backgroundTintList)
+
+            }
             runLayout.setOnClickListener {
                 RunningDialogFragment().show(
                     requireActivity().supportFragmentManager, "running"
@@ -177,7 +180,6 @@ class HomeFragment : Fragment() {
                 RunningDialogFragment().show(
                     requireActivity().supportFragmentManager, "walking"
                 )
-
             }
             var mainUnits: Int = 0
 

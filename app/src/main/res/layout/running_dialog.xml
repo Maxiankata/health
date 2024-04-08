@@ -94,7 +94,15 @@
             android:inputType="number"
             />
     </androidx.appcompat.widget.LinearLayoutCompat>
-
+    <TextView
+        android:id="@+id/speed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/timePicker"
+        app:layout_constraintEnd_toEndOf="@id/timePicker"
+        app:layout_constraintTop_toBottomOf="@id/timePicker"
+        android:textSize="16sp"
+        />
     <Button
         android:id="@+id/cancel"
         android:layout_width="wrap_content"

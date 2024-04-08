@@ -50,7 +50,7 @@ class FriendAccountFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         requireActivity().hideBottomNav()
-                friendAccountViewModel.feedUser(arguments?.getString("uid")!!)
+        friendAccountViewModel.feedUser(arguments?.getString("uid")!!)
         _binding = FragmentFriendAccountBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -86,10 +86,22 @@ class FriendAccountFragment : Fragment() {
                 userName.apply {
                     text = user.username
                 }
-                backgroundColor.setBackgroundColor(Color.parseColor(it.first.theme))
+                if (!it.first.theme.isNullOrEmpty()) {
+                    backgroundColor.setBackgroundColor(Color.parseColor(it.first.theme))
+                }
                 friendListViewModel.friendsList.observe(viewLifecycleOwner) {friendlist->
                     if (friendlist != null) {
                         if (friendlist.contains(user)) {
+                            challengeFriend.apply {
+                                setOnClickListener {
+                                    val bundle = Bundle().apply {
+                                        putString("uid", arguments?.getString("uid"))
+                                    }
+                                    val dialogFragment = ChallengeBuilderDialogFragment()
+                                    dialogFragment.arguments = bundle
+                                    dialogFragment.show(parentFragmentManager, "MyDialogFragment")
+                                }
+                            }
                             relationshipStatus.apply {
                                 setImageResource(R.drawable.friend_remove)
                                 setOnClickListener {
@@ -111,38 +123,24 @@ class FriendAccountFragment : Fragment() {
                                 }
                             }
                         } else {
+                            challengeFriend.setOnClickListener {
+                                showToast(getString(R.string.not_a_friend))
+                            }
                             relationshipStatus.apply {
                                 setImageResource(R.drawable.friend_add)
                                 setOnClickListener {
-                                    lifecycleScope.launch {
-
                                         user.uid?.let { it1 -> friendListViewModel.addFriend(it1) }
                                         val message =
                                             "${getString(R.string.friend)} ${user.username} ${
                                                 getString(R.string.added)
                                             }"
-                                        Toast.makeText(
-                                            requireContext(),
-                                            message,
-                                            Toast.LENGTH_SHORT
-                                        )
-                                            .show()
-                                    }
+                                        showToast(message)
                                 }
                             }
                         }
                     }
                 }
-                challengeFriend.apply {
-                    setOnClickListener {
-                        val bundle = Bundle().apply {
-                            putString("uid", arguments?.getString("uid"))
-                        }
-                        val dialogFragment = ChallengeBuilderDialogFragment()
-                        dialogFragment.arguments = bundle
-                        dialogFragment.show(parentFragmentManager, "MyDialogFragment")
-                    }
-                }
+
                     val datetimeList = mutableListOf<String>()
                     val stepsList = mutableListOf<Int>()
                     val caloriesList = mutableListOf<Int>()
@@ -199,7 +197,14 @@ class FriendAccountFragment : Fragment() {
             notificationId++
         }
     }
-
+    private fun showToast(message:String){
+        Toast.makeText(
+            requireContext(),
+            message,
+            Toast.LENGTH_SHORT
+        )
+            .show()
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

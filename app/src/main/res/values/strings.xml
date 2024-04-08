@@ -112,6 +112,12 @@
     <string name="ss">SS</string>
     <string name="mm">MM</string>
     <string name="hh">HH</string>
+    <string name="not_a_friend">You need to be friends with a user to send out challenges</string>
+    <string name="activity">ACTIVITY</string>
+    <string name="local_update">No internet. Updated only locally</string>
+    <string name="active">active</string>
+    <string name="you_have_slept_for">You have slept for</string>
+    <string name="hours">hours</string>
     <string-array name="activities">
         <item>Walking</item>
         <item>Power Walking</item>

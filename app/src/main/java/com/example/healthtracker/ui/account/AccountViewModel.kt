@@ -45,7 +45,7 @@ class AccountViewModel(private val application: Application) : AndroidViewModel(
     fun getDays() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                Log.d("userdays in account", userDao.getEntireUser()?.userDays.toString())
+                Log.d("userdays in account", userDao.getEntireUser().userDays.toString())
             }
         }
     }
@@ -54,15 +54,7 @@ class AccountViewModel(private val application: Application) : AndroidViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val syncer = async { userDao.getEntireUser() }.await()
-                if (syncer != null) {
-                    auth.sync(roomToUserMegaInfoAdapter.adapt(syncer), syncer.userInfo.uid!!)
-                } else {
-                    Toast.makeText(
-                        MyApplication.getContext(),
-                        "user from base was null",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                auth.sync(roomToUserMegaInfoAdapter.adapt(syncer), syncer.userInfo.uid!!)
             }
         }
     }

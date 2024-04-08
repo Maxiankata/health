@@ -44,9 +44,9 @@
         android:id="@+id/friendsDialogFragment"
         android:name="com.example.healthtracker.ui.account.friends.popup.FriendsDialogFragment"
         android:label="FriendsDialogFragment" >
-        <action
-            android:id="@+id/action_friendsDialogFragment_to_friendAccountFragment"
-            app:destination="@id/friendAccountFragment" />
+<!--        <action-->
+<!--            android:id="@+id/action_friendsDialogFragment_to_friendAccountFragment"-->
+<!--            app:destination="@id/friendAccountFragment" />-->
 
     </dialog>
     <fragment

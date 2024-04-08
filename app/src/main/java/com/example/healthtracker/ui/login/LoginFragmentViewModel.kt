@@ -66,7 +66,6 @@ class LoginFragmentViewModel(private val application: Application) : AndroidView
                     toRoomAdapter.adapt(it)?.let { it1 ->
                         async {
                             userDao.saveUser(it1)
-
                         }.await()
                     }
                 }

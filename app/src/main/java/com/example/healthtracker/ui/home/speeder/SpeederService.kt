@@ -39,11 +39,12 @@ import kotlinx.coroutines.withContext
 class SpeederService : Service() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
+    private lateinit var timer: CountDownTimer
 
     companion object {
         private val _speed = MutableLiveData<Double>()
         var timey: String = ""
-        val _time = MutableLiveData<String>()
+        private val _time = MutableLiveData<String>()
         val time: LiveData<String> get() = _time
         val speed: LiveData<Double> get() = _speed
         var speedIntent = Intent(MyApplication.getContext(), SpeederService::class.java)
@@ -80,19 +81,14 @@ class SpeederService : Service() {
         customCoroutineScope.launch {
             weight = userDao.getPutInInfo()?.weight!!
         }
-        Log.d("challenge extra",speedIntent.getStringExtra("challenge").toString())
-        val extra = speedIntent.getStringExtra("challenge").toString()
-        val challenge :Challenge? = if (extra =="null"){
-            null
-        }else {
-            Challenge.fromString(speedIntent.getStringExtra("challenge")!!)
-        }
-        startCountdownFromString(time, onTick = { timeRemaining ->
+        val challengeExtra = speedIntent.getStringExtra("challenge").toString()
+        val challenge: Challenge? = if (challengeExtra == "null") null else Challenge.fromString(speedIntent.getStringExtra("challenge")!!)
+        if (challenge != null) speedIntent.putExtra("challenge_id", challenge.id.toString())
+        timer = startCountdownFromString(time, onTick = { timeRemaining ->
             _time.postValue(timeRemaining)
             updateNotification()
         }, onFinish = {
             val averageSpeed = divided / divider
-            Log.d("weight", weight.toString())
             var MET: Double
             when (ActivityEnum.valueOf(
                 speedIntent.getStringExtra("activity") ?: ActivityEnum.WALKING.name
@@ -185,6 +181,7 @@ class SpeederService : Service() {
                 stopSpeeder()
             }
         })
+        timer.start()
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult) {
                 for (location in p0.locations) {
@@ -194,15 +191,18 @@ class SpeederService : Service() {
                 }
             }
         }
-
         startLocationUpdates()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(NOTIFICATION_ID)
         stopLocationUpdates()
+        SpeederServiceBoolean.isMyServiceRunning.postValue(false)
+
+        timer.cancel()
     }
 
     private fun startLocationUpdates() {

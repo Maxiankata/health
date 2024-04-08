@@ -26,11 +26,11 @@ import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
 import com.example.healthtracker.data.user.UserAutomaticInfo
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.ui.formatDurationFromLong
+import com.example.healthtracker.ui.parseDurationToLong
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.Calendar
 
 class StepCounterService : Service(), SensorEventListener {
@@ -40,13 +40,12 @@ class StepCounterService : Service(), SensorEventListener {
 
         val _calories = MutableLiveData<Int>()
         val calories: LiveData<Int> get() = _calories
-        private var _sleepDuration = MutableLiveData<Long>()
+        var _sleepDuration = MutableLiveData<Long>()
         val sleepDuration: LiveData<Long> get() = _sleepDuration
         val channelId = "step_counter_channel"
 
         var stepIntent: Intent = Intent(MyApplication.getContext(), StepCounterService::class.java)
     }
-
     private var lastSensorEventTime: Long = 0
     private var isSleeping = false
     private var sleepStartTime: Long = 0
@@ -67,7 +66,6 @@ class StepCounterService : Service(), SensorEventListener {
     }
 
     private val userDao = MainActivity.getDatabaseInstance().dao()
-    private val customCoroutineScope = CoroutineScope(Dispatchers.Main)
     private val roomToUserMegaInfoAdapter = RoomToUserMegaInfoAdapter()
     private fun getUser(callback: (UserMegaInfo?) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -78,7 +76,7 @@ class StepCounterService : Service(), SensorEventListener {
         }
     }
 
-    private fun getUserSteps() {
+    private fun getStartingMetrics() {
         getUser { user ->
             user?.let {
                 it.userAutomaticInfo?.steps?.currentSteps.let { it1 ->
@@ -87,18 +85,21 @@ class StepCounterService : Service(), SensorEventListener {
                 it.userAutomaticInfo?.steps?.currentCalories.let { it1 ->
                     _calories.postValue(it1)
                 }
+                it.userPutInInfo?.sleepDuration?.let { duration->
+                    val sleep = parseDurationToLong(duration)
+                    _sleepDuration.postValue(sleep)
+                }
             }
         }
     }
 
     var handler: Handler? = null
-    suspend fun updateUserAutomaticInfo() {
-        withContext(Dispatchers.IO) {
+    fun updateUserAutomaticInfo() {
+        CoroutineScope(Dispatchers.IO).launch {
             val user = async { userDao.getEntireUser() }.await()
             user.userAutomaticInfo.let {
                 val renewedAutomaticInfo = UserAutomaticInfo(
                     challengesPassed = it?.challengesPassed ?: 0,
-                    totalSleepHours = it?.totalSleepHours,
                     steps = it?.steps?.copy(
                         currentSteps = _steps.value,
                         currentCalories = _calories.value
@@ -106,23 +107,21 @@ class StepCounterService : Service(), SensorEventListener {
                 )
                 userDao.updateUserAutomaticInfo(renewedAutomaticInfo)
 
+
             }
         }
-    }
+        }
+
 
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
-        customCoroutineScope.launch {
-            getUserSteps()
-        }
+            getStartingMetrics()
         handler = Handler(Looper.getMainLooper())
         handler?.post(object : Runnable {
             override fun run() {
-                customCoroutineScope.launch {
                     updateUserAutomaticInfo()
                     checkForSleep()
-                }
                 handler?.postDelayed(this, 10000)
             }
         })
@@ -146,15 +145,13 @@ class StepCounterService : Service(), SensorEventListener {
         isSleeping = false
         sleepStopTime = System.currentTimeMillis()
         _sleepDuration.postValue(sleepStopTime - sleepStartTime)
-        customCoroutineScope.launch {
-            withContext(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch {
                 val userPutInInfo = async {
                     userDao.getPutInInfo()
                 }.await()
                 userPutInInfo?.sleepDuration = formatDurationFromLong(_sleepDuration.value!!)
                 userPutInInfo?.let {
                     userDao.updateUserPutInInfo(it)
-                }
             }
         }
     }
@@ -241,4 +238,5 @@ class StepCounterService : Service(), SensorEventListener {
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
+
 }

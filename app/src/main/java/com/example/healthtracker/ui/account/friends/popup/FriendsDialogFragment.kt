@@ -71,7 +71,7 @@ class FriendsDialogFragment : DialogFragment() {
                     val query = editText.text?.toString()
                     editText.clearFocus()
                     if (!query.isNullOrBlank()) {
-                        friendListViewModel.searchState.observe(viewLifecycleOwner) {
+                        FriendListViewModel.searchState.observe(viewLifecycleOwner) {
                             lifecycleScope.launch {
                                 if (it) {
                                     friendListViewModel.clearList()
@@ -107,38 +107,24 @@ class FriendsDialogFragment : DialogFragment() {
             }
 
             searchSwitch.apply {
-                friendListViewModel.searchState.observe(viewLifecycleOwner) { it1 ->
-                    if (it1 == true) {
-                        setOnClickListener {
-                            friendListViewModel.switchSearchState()
-                        }
-                        viewLifecycleOwner.lifecycleScope.launch {
-                            try {
-                                rotateView(searchSwitch, 45F)
-                                textInputLayout.helperText = getString(R.string.new_friend_mode_on)
-                            } catch (e: Exception) {
-                                Log.e("FetchUsersError", "Error fetching users", e)
-                            }
-                        }
-
-                    } else {
-                        setOnClickListener {
-                            friendListViewModel.switchSearchState()
-                            friendListViewModel.clearList()
-
-                        }
-                        viewLifecycleOwner.lifecycleScope.launch {
-                            try {
-                                friendListViewModel.fetchUserFriends()
-                                rotateView(searchSwitch, 0F)
-                                textInputLayout.helperText = getString(R.string.friend_mode_on)
-
-                            } catch (e: Exception) {
-                                Log.e("FetchFriendsError", "Error fetching friends", e)
-                            }
-                        }
-
+                setOnClickListener {
+                    friendListViewModel.switchSearchState()
+                    friendListViewModel.clearList()
+                }
+            }
+            FriendListViewModel.searchState.observeForever {
+                if (it) {
+                        rotateView(searchSwitch, 45F)
+                        textInputLayout.helperText = getString(R.string.new_friend_mode_on)
+                } else {
+                    try {
+                        friendListViewModel.fetchUserFriends()
+                        rotateView(searchSwitch, 0F)
+                        textInputLayout.helperText = getString(R.string.friend_mode_on)
+                    } catch (e: Exception) {
+                        Log.e("FetchFriendsError", "Error fetching friends", e)
                     }
+
                 }
             }
             close.setOnClickListener {

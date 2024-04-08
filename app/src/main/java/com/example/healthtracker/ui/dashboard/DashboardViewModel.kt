@@ -22,13 +22,11 @@ class DashboardViewModel(private val application: Application) : AndroidViewMode
     fun feedDays(feeder: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                async {
-                    authImpl.getCurrentUser()?.userDays?.let { userDao.updateDays(it) }
-                }.await()
                 val user = userDao.getEntireUser()
                 for (item in user.userDays!!) {
                     if (item.dateTime == feeder) {
                         _userDay.postValue(item)
+                        break
                     }
                 }
             }

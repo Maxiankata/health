@@ -83,7 +83,7 @@ class ColorChangerDialog:DialogFragment() {
             )
         }
     }
-    fun setOnSeekBar(type:String, typeTxt: TextView, seekBar: SeekBar, colorTxt: TextView){
+    private fun setOnSeekBar(type:String, typeTxt: TextView, seekBar: SeekBar, colorTxt: TextView){
         typeTxt.text=type
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {

@@ -16,7 +16,6 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.getValue
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
@@ -55,29 +54,35 @@ class AuthImpl : AuthInterface {
     }
 
     override fun signOut() {
-            Firebase.auth.signOut()
+        Firebase.auth.signOut()
     }
 
     override suspend fun createAcc(email: String, password: String, username: String): Boolean {
-            return try {
-                    Firebase.auth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener {task->
-                            if (task.isSuccessful){
-                                val user = Firebase.auth.currentUser
-                                val userRef = Firebase.database.getReference("user")
-                                if (user!=null){
-                                    val userer = UserMegaInfo(UserInfo(username = username, mail = email, uid = user.uid))
-                                    userRef.child(user.uid).setValue(userer).addOnSuccessListener {
-                                        Log.d("nice", "ince")
-                                    }
-                                }
+        return try {
+            Firebase.auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val user = Firebase.auth.currentUser
+                        val userRef = Firebase.database.getReference("user")
+                        if (user != null) {
+                            val userer = UserMegaInfo(
+                                UserInfo(
+                                    username = username,
+                                    mail = email,
+                                    uid = user.uid
+                                )
+                            )
+                            userRef.child(user.uid).setValue(userer).addOnSuccessListener {
+                                Log.d("nice", "ince")
                             }
                         }
-                true
-            } catch (e: Exception) {
-                e.printStackTrace()
-                false
-            }
+                    }
+                }
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
     }
 
     override suspend fun fetchSearchedFriends(string: String): MutableList<UserInfo> =
@@ -156,7 +161,7 @@ class AuthImpl : AuthInterface {
             .setValue(null)
     }
 
-    override suspend fun fetchFriendDays(id: String): List<UserDays>? {
+    override suspend fun fetchFriendDays(id: String): List<UserDays> {
         return withContext(Dispatchers.IO) {
             val userDaysRef = Firebase.database.getReference("user/$id/userDays")
             val dataSnapshot = userDaysRef.get().await()
@@ -174,7 +179,7 @@ class AuthImpl : AuthInterface {
     }
 
 
-     override suspend fun getCurrentUser(): UserMegaInfo? {
+    override suspend fun getCurrentUser(): UserMegaInfo? {
         return try {
             val userRef =
                 Firebase.database.getReference("user/${Firebase.auth.currentUser!!.uid}")
@@ -236,7 +241,7 @@ class AuthImpl : AuthInterface {
                         challengeSnapshot.child("challengeDuration").getValue(String::class.java)
                     val challengeCompletion =
                         challengeSnapshot.child("challengeCompletion").getValue(Boolean::class.java)
-                    if (id!=null&&assigner != null && challengeType != null && challengeDuration != null && challengeCompletion != null && image!=null) {
+                    if (id != null && assigner != null && challengeType != null && challengeDuration != null && challengeCompletion != null && image != null) {
                         val challenge = Challenge(
                             id,
                             image,
@@ -274,7 +279,7 @@ class AuthImpl : AuthInterface {
                         challengeSnapshot.child("challengeDuration").getValue(String::class.java)
                     val challengeCompletion =
                         challengeSnapshot.child("challengeCompletion").getValue(Boolean::class.java)
-                    if (id!=null && image!=null&&assigner != null && challengeType != null && challengeDuration != null && challengeCompletion != null) {
+                    if (id != null && image != null && assigner != null && challengeType != null && challengeDuration != null && challengeCompletion != null) {
                         val challenge = Challenge(
                             id,
                             image,
@@ -307,6 +312,13 @@ class AuthImpl : AuthInterface {
                     continuation.resume(isSuccessful)
                 }
         }
+    }
+
+    override suspend fun updateUserInfo(userInfo: UserInfo) {
+        Firebase.database.reference.child("user/${userInfo.uid}/userInfo")
+            .setValue(userInfo).addOnCompleteListener {
+                Log.d("new user theme", userInfo.theme.toString())
+            }
     }
 
     override suspend fun removeFriend(userId: String, userFriendList: List<UserInfo>) {
@@ -361,12 +373,12 @@ class AuthImpl : AuthInterface {
         }
 
     override suspend fun deleteCurrentUser() {
-            Firebase.database.getReference("user/${Firebase.auth.currentUser?.uid}").setValue(null)
-            Firebase.auth.currentUser?.delete()?.addOnCompleteListener {task->
-                if (task.isSuccessful){
-                        signOut()
-                }
+        Firebase.database.getReference("user/${Firebase.auth.currentUser?.uid}").setValue(null)
+        Firebase.auth.currentUser?.delete()?.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                signOut()
             }
+        }
     }
 
 }

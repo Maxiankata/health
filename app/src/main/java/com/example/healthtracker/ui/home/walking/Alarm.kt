@@ -24,11 +24,11 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.util.Calendar
 
-class Alarmer : AlarmScheduler {
+class Alarm : AlarmScheduler {
     val context = MyApplication.getContext()
-    val alarmManager = context.getSystemService(AlarmManager::class.java)
+    private val alarmManager: AlarmManager = context.getSystemService(AlarmManager::class.java)
     override fun schedule(item: AlarmItem) {
-        val intent = Intent(context, AlarmRecieverer::class.java)
+        val intent = Intent(context, AlarmReciever::class.java)
         val calendar = Calendar.getInstance()
         calendar.set(Calendar.HOUR_OF_DAY, 23)
         calendar.set(Calendar.MINUTE, 59)
@@ -54,7 +54,7 @@ class Alarmer : AlarmScheduler {
             PendingIntent.getBroadcast(
                 context,
                 item.hashCode(),
-                Intent(context, AlarmRecieverer::class.java),
+                Intent(context, AlarmReciever::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         )
@@ -62,13 +62,12 @@ class Alarmer : AlarmScheduler {
 
 }
 
-class AlarmRecieverer : BroadcastReceiver() {
-    private val customCoroutineScope = CoroutineScope(Dispatchers.IO)
+class AlarmReciever : BroadcastReceiver() {
     private val authImpl = AuthImpl()
     override fun onReceive(context: Context?, intent: Intent?) {
         val userDao = MainActivity.getDatabaseInstance().dao()
         val roomToUserMegaInfoAdapter = RoomToUserMegaInfoAdapter()
-        customCoroutineScope.launch {
+        CoroutineScope(Dispatchers.IO).launch {
             val user = userDao.getEntireUser()
             val userPutInInfo = user.userPutInInfo
             val userAutomaticInfo = user.userAutomaticInfo

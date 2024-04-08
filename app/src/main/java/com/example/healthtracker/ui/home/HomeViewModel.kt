@@ -15,7 +15,9 @@ import com.example.healthtracker.data.room.UserMegaInfoToRoomAdapter
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.UserPutInInfo
 import com.example.healthtracker.data.user.WaterInfo
+import com.example.healthtracker.ui.home.walking.StepCounterService
 import com.example.healthtracker.ui.isInternetAvailable
+import com.example.healthtracker.ui.parseDurationToLong
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -37,7 +39,8 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
     val water: LiveData<WaterInfo?> get() = _water
     val user: LiveData<UserMegaInfo?>
         get() = _user
-
+    private val _sleep = MutableLiveData<String>()
+    val sleep : LiveData<String> get() = _sleep
     fun feedUser() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -45,16 +48,6 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
                 _water.postValue(user.userPutInInfo?.waterInfo)
                 _user.postValue(user)
                 _weight.postValue(user.userPutInInfo?.weight)
-            }
-        }
-    }
-
-    suspend fun checkForChallenges() {
-        if (isInternetAvailable(MyApplication.getContext())) {
-            withContext(Dispatchers.IO) {
-                auth.fetchOwnChallenges()?.let {
-                    userDao.updateChallenges(it)
-                }
             }
         }
     }
@@ -71,11 +64,7 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
             }
         }
     }
-    suspend fun getSleep(): String? {
-        return withContext(Dispatchers.IO) {
-            userDao.getPutInInfo()?.sleepDuration
-        }
-    }
+
     fun updateWeight(weight: Double) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
