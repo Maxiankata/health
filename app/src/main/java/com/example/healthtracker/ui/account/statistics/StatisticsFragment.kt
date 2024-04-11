@@ -69,15 +69,15 @@ class StatisticsFragment : Fragment() {
                         arrayOf(
                             AASeriesElement()
                                 .name(getString(R.string.steps))
-                                .color("#1CFEBA")
+                                .color("#1CFEBA") //swap with R.color.lightgreen
                                 .data(stepsList.toTypedArray()),
                             AASeriesElement()
                                 .name(getString(R.string.calories))
-                                .color("#FF9237")
+                                .color("#FF9237") //swap with R.color.orange
                                 .data(caloriesList.toTypedArray()),
                             AASeriesElement()
                                 .name(getString(R.string.water))
-                                .color("#5EABC6")
+                                .color("#5EABC6") // swap with R.color.blue
                                 .data(watersList.toTypedArray())
                         )
                     )

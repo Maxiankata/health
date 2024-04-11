@@ -128,74 +128,72 @@ class ChallengesListAdapter :
                             text = getString(context, R.string.cancel)
                             setOnClickListener {
                                 stopSpeeder()
-                            } }
+                            }
                         }
-                    } else {
+                    }
+                } else {
                     decline.visibility = View.VISIBLE
                     accept.visibility = View.VISIBLE
                     decline.text = getString(context, R.string.decline)
-                        if (challenge.challengeCompletion) {
-                            status.text = buildString {
-                                append(
-                                    "${getString(context, R.string.status)}: ${
-                                        getString(
-                                            context, R.string.complete
-                                        )
-                                    }"
-                                )
-                            }
-                            decline.visibility = View.GONE
-                            accept.visibility = View.GONE
-                            val parseColor = Color.parseColor("#00FF00")
-                            status.setTextColor(parseColor)
-                        } else {
-                            Log.d("status is complete", "hehe")
-                            status.text = buildString {
-                                append(
-                                    "${getString(context, R.string.status)}: ${
-                                        getString(
-                                            context, R.string.incomplete
-                                        )
-                                    }"
-                                )
-                            }
-                            val parseColor = Color.parseColor("#FF0000")
-                            status.setTextColor(parseColor)
-                            accept.setOnClickListener {
-                                if (!isServiceRunning()) {
-                                    startSpeeder(
-                                        challenge.challengeDuration,
-                                        challenge.challengeType,
-                                        challenge
+                    if (challenge.challengeCompletion) {
+                        status.text = buildString {
+                            append(
+                                "${getString(context, R.string.status)}: ${
+                                    getString(
+                                        context, R.string.complete
                                     )
-                                } else {
-                                    Toast.makeText(
-                                        MyApplication.getContext(),
-                                        R.string.active_activity,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    Toast.makeText(
-                                        MyApplication.getContext(),
-                                        R.string.active_activity,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
+                                }"
+                            )
+                        }
+                        decline.visibility = View.GONE
+                        accept.visibility = View.GONE
+                        val parseColor = Color.parseColor("#00FF00")
+                        status.setTextColor(parseColor)
+                    } else {
+                        Log.d("status is complete", "hehe")
+                        status.text = buildString {
+                            append(
+                                "${getString(context, R.string.status)}: ${
+                                    getString(
+                                        context, R.string.incomplete
+                                    )
+                                }"
+                            )
+                        }
+                        val parseColor = Color.parseColor("#FF0000")
+                        status.setTextColor(parseColor)
+                        accept.setOnClickListener {
+                            if (!isServiceRunning()) {
+                                startSpeeder(
+                                    challenge.challengeDuration, challenge.challengeType, challenge
+                                )
+                            } else {
+                                Toast.makeText(
+                                    MyApplication.getContext(),
+                                    R.string.active_activity,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                Toast.makeText(
+                                    MyApplication.getContext(),
+                                    R.string.active_activity,
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
-                            decline.setOnClickListener {
-                                customCoroutineScope.launch {
-                                    val challenges = getChallenges().toMutableList()
-                                    Log.d("challenges", challenges.toString())
-                                    for (item in challenges) {
-                                        if (item.id == challenge.id) {
-                                            Log.d("removing item at", item.id.toString())
-                                            Log.d(
-                                                "Removed item",
-                                                "${item.id} , ${item.assigner}, ${item.challengeType}"
-                                            )
-                                            challenges.remove(item)
-                                            updateChallenges(challenges)
-                                            break
-                                        }
+                        }
+                        decline.setOnClickListener {
+                            customCoroutineScope.launch {
+                                val challenges = getChallenges().toMutableList()
+                                Log.d("challenges", challenges.toString())
+                                for (item in challenges) {
+                                    if (item.id == challenge.id) {
+                                        Log.d("removing item at", item.id.toString())
+                                        Log.d(
+                                            "Removed item",
+                                            "${item.id} , ${item.assigner}, ${item.challengeType}"
+                                        )
+                                        challenges.remove(item)
+                                        updateChallenges(challenges)
+                                        break
                                     }
                                 }
                             }
@@ -204,45 +202,46 @@ class ChallengesListAdapter :
                 }
             }
         }
+    }
 
-        override fun onCreateViewHolder(
-            parent: ViewGroup, viewType: Int
-        ): ChallengeListViewHolder {
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.challenge_recycler_card, parent, false)
-            return ChallengeListViewHolder(view)
+    override fun onCreateViewHolder(
+        parent: ViewGroup, viewType: Int
+    ): ChallengeListViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.challenge_recycler_card, parent, false)
+        return ChallengeListViewHolder(view)
 
-        }
+    }
 
-        override fun getItemCount(): Int = items.size
-        interface ItemClickListener<T> {
-            fun onItemClicked(item: T, itemPosition: Int)
-        }
+    override fun getItemCount(): Int = items.size
+    interface ItemClickListener<T> {
+        fun onItemClicked(item: T, itemPosition: Int)
+    }
 
-        suspend fun getChallenges(): List<Challenge> {
-            return withContext(Dispatchers.IO) {
-                userDao.getEntireUser().challenges ?: emptyList()
-            }
-        }
-
-        fun updateChallenges(challenges: List<Challenge>) {
-            ChallengesDisplayDialogViewModel._challenges.postValue(challenges)
-            customCoroutineScope.launch {
-                withContext(Dispatchers.IO) {
-                    userDao.updateChallenges(challenges)
-                    userDao.getUserInfo()?.uid?.let { authImpl.setChallenges(challenges, it) }
-                }
-            }
-        }
-
-        @SuppressLint("NotifyDataSetChanged")
-        fun updateItems(newItems: List<Challenge>) {
-            items.clear()
-            items.addAll(newItems)
-            notifyDataSetChanged()
-        }
-
-        override fun onBindViewHolder(holder: ChallengeListViewHolder, position: Int) {
-            return holder.bind(items[position])
+    suspend fun getChallenges(): List<Challenge> {
+        return withContext(Dispatchers.IO) {
+            userDao.getEntireUser().challenges ?: emptyList()
         }
     }
+
+    fun updateChallenges(challenges: List<Challenge>) {
+        ChallengesDisplayDialogViewModel._challenges.postValue(challenges)
+        customCoroutineScope.launch {
+            withContext(Dispatchers.IO) {
+                userDao.updateChallenges(challenges)
+                userDao.getUserInfo()?.uid?.let { authImpl.setChallenges(challenges, it) }
+            }
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateItems(newItems: List<Challenge>) {
+        items.clear()
+        items.addAll(newItems)
+        notifyDataSetChanged()
+    }
+
+    override fun onBindViewHolder(holder: ChallengeListViewHolder, position: Int) {
+        return holder.bind(items[position])
+    }
+}

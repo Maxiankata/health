@@ -25,7 +25,6 @@ class FriendListViewModel : ViewModel() {
         _searchState.value = false
 
     }
-
     private var friendsInfoList = mutableListOf<UserInfo>()
 
     fun fetchSearchedUsers(string: String) {

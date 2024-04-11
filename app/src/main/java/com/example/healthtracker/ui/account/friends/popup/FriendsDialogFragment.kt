@@ -108,14 +108,23 @@ class FriendsDialogFragment : DialogFragment() {
 
             searchSwitch.apply {
                 setOnClickListener {
-                    friendListViewModel.switchSearchState()
-                    friendListViewModel.clearList()
+                    try {
+                        friendListViewModel.switchSearchState()
+                    }catch (e:Exception){
+                        Log.d("List swap error", "Error switching list")
+                    }
                 }
             }
             FriendListViewModel.searchState.observeForever {
                 if (it) {
+                    try {
+                        friendListViewModel.clearList()
                         rotateView(searchSwitch, 45F)
                         textInputLayout.helperText = getString(R.string.new_friend_mode_on)
+                    }catch (e: Exception) {
+                        Log.e("FetchFriendsError", "Error fetching friends", e)
+                    }
+
                 } else {
                     try {
                         friendListViewModel.fetchUserFriends()

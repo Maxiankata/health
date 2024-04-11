@@ -26,8 +26,8 @@ class LanguageChangeDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
-            val languages = arrayOf("english", "bulgarian")
-            unitsSpinner.apply {
+            val languages = arrayOf("","english", "bulgarian")
+            languageSpinner.apply {
                 val adapter =
                     ArrayAdapter(requireContext(), R.layout.simple_spinner_item, languages)
                 adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
@@ -47,7 +47,7 @@ class LanguageChangeDialogFragment : DialogFragment() {
                     }
                 }
             }
-            val weightUnits = arrayOf("kg", "lbs")
+            val weightUnits = arrayOf("","kg", "lbs")
             unitsSpinner.apply {
                 val adapter =
                     ArrayAdapter(requireContext(), R.layout.simple_spinner_item, weightUnits)
