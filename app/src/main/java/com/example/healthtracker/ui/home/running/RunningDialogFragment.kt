@@ -1,6 +1,5 @@
 package com.example.healthtracker.ui.home.running
 
-import android.graphics.Color
 import android.graphics.Color.YELLOW
 import android.os.Bundle
 import android.util.Log
@@ -63,7 +62,7 @@ class RunningDialogFragment : DialogFragment() {
         runningDialogViewModel.getMetric()
         binding.apply {
             cancel.setBackgroundColor(YELLOW)
-            SpeederServiceBoolean.isMyServiceRunningLive.observe(viewLifecycleOwner){
+            SpeederServiceBoolean.isMyServiceRunning.observe(viewLifecycleOwner){
                 if (it){
                     start.visibility=GONE
                     cancel.setOnClickListener {
@@ -111,7 +110,7 @@ class RunningDialogFragment : DialogFragment() {
                 }
             }
             timePicker.text = getString(R.string.empty_timer)
-            SpeederServiceBoolean.isMyServiceRunningLive.observe(viewLifecycleOwner
+            SpeederServiceBoolean.isMyServiceRunning.observe(viewLifecycleOwner
             ){
                 if (!it) {
                     speed.visibility = View.GONE

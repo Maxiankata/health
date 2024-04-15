@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.healthtracker.R
 import com.example.healthtracker.data.user.Achievement
 import com.example.healthtracker.data.user.UserDays
+import com.example.healthtracker.data.user.UserFriends
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.databinding.FragmentFriendAccountBinding
 import com.example.healthtracker.ui.account.achievements.Achievements.achievements
@@ -91,7 +92,7 @@ class FriendAccountFragment : Fragment() {
                 }
                 friendListViewModel.friendsList.observe(viewLifecycleOwner) {friendlist->
                     if (friendlist != null) {
-                        if (friendlist.contains(user)) {
+                        if (friendlist.contains(user.uid?.let { it1 -> UserFriends(it1, true) })) {
                             challengeFriend.apply {
                                 setOnClickListener {
                                     val bundle = Bundle().apply {

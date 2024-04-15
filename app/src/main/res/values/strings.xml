@@ -118,6 +118,8 @@
     <string name="active">active</string>
     <string name="you_have_slept_for">You have slept for</string>
     <string name="hours">hours</string>
+    <string name="requests">Requests</string>
+    <string name="no_friend_requests">No friend requests</string>
     <string-array name="activities">
         <item>Walking</item>
         <item>Power Walking</item>

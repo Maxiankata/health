@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import com.example.healthtracker.AuthImpl
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.MyApplication
@@ -16,7 +17,9 @@ import com.example.healthtracker.data.user.UserPutInInfo
 import com.example.healthtracker.ui.account.friends.challenges.Challenge
 import com.example.healthtracker.ui.calendarToString
 import com.example.healthtracker.ui.getStepsValue
+import com.example.healthtracker.ui.home.speeder.SpeederServiceBoolean
 import com.example.healthtracker.ui.nullifyStepCounter
+import com.example.healthtracker.ui.nullifyTimer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -71,11 +74,13 @@ class AlarmReciever : BroadcastReceiver() {
             val user = userDao.getEntireUser()
             val userPutInInfo = user.userPutInInfo
             val userAutomaticInfo = user.userAutomaticInfo
-            userAutomaticInfo?.steps?.stepsGoal = userDao.getUserSettings()?.userGoals?.stepGoal
-            userAutomaticInfo?.steps?.caloriesGoal =
-                userDao.getUserSettings()?.userGoals?.calorieGoal
-            userPutInInfo?.waterInfo?.waterGoal = userDao.getUserSettings()?.userGoals?.waterGoal
-            val userChallenges = user.challenges as ArrayList<Challenge>
+            val userSettings = userDao.getUserSettings()
+            userAutomaticInfo?.steps?.stepsGoal = userSettings?.userGoals?.stepGoal
+            userAutomaticInfo?.steps?.caloriesGoal =  userSettings?.userGoals?.calorieGoal
+            userAutomaticInfo?.activeTime = SpeederServiceBoolean.activityTime.value
+            userPutInInfo?.waterInfo?.waterGoal =  userSettings?.userGoals?.waterGoal
+            userPutInInfo?.units = userSettings?.units
+            val userChallenges = user.challenges as ArrayList<Challenge>?
             val userDays = user.userDays as ArrayList<UserDays>
             val newUserInfo = UserInfo(
                 uid = user.userInfo.uid,
@@ -106,6 +111,7 @@ class AlarmReciever : BroadcastReceiver() {
             userDao.updateUserAutomaticInfo(UserAutomaticInfo())
             userDao.updateUserPutInInfo(UserPutInInfo(weight = weight))
             nullifyStepCounter()
+            nullifyTimer()
         }
     }
 }

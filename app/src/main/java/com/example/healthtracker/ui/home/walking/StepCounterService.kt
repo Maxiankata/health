@@ -85,9 +85,11 @@ class StepCounterService : Service(), SensorEventListener {
                 it.userAutomaticInfo?.steps?.currentCalories.let { it1 ->
                     _calories.postValue(it1)
                 }
-                it.userPutInInfo?.sleepDuration?.let { duration->
-                    val sleep = parseDurationToLong(duration)
-                    _sleepDuration.postValue(sleep)
+                it.userPutInInfo?.sleepDuration?.let { duration ->
+                    if (duration.isNotEmpty()) {
+                        val sleep = parseDurationToLong(duration)
+                        _sleepDuration.postValue(sleep)
+                    }
                 }
             }
         }

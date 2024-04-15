@@ -108,7 +108,7 @@ class ChallengesListAdapter :
                 append("${getString(context, R.string.by)}: ${challenge.assigner}")
             }
             challengerIcon.setImageBitmap(base64ToBitmap(challenge.image))
-            SpeederServiceBoolean.isMyServiceRunningLive.observeForever {
+            SpeederServiceBoolean.isMyServiceRunning.observeForever {
                 if (it) {
                     val id = SpeederService.speedIntent.getStringExtra("challenge_id")
                     if (id == challenge.id.toString()) {

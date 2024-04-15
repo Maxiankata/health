@@ -13,14 +13,14 @@ class LanguageChangeDialogViewModel(private val application: MyApplication):Andr
     fun updateUnits(string: String){
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val previousUnits = userDao.getUserSettings()?.units
-                val userSettings = userDao.getUserSettings()
-                val userPutInInfo = userDao.getPutInInfo()
-                userSettings?.units = string
-                if (userSettings != null) {
-                    userDao.updateUserSettings(userSettings)
-                }
-                if (!string.isNullOrEmpty()) {
+                if (string.isNotEmpty()) {
+                    val previousUnits = userDao.getUserSettings()?.units
+                    val userSettings = userDao.getUserSettings()
+                    val userPutInInfo = userDao.getPutInInfo()
+                    userSettings?.units = string
+                    if (userSettings != null) {
+                        userDao.updateUserSettings(userSettings)
+                    }
                     if (previousUnits != string) {
                         if (previousUnits == "kg") {
                             userPutInInfo?.weight = userPutInInfo?.weight?.times(2.2)
@@ -41,10 +41,12 @@ class LanguageChangeDialogViewModel(private val application: MyApplication):Andr
     fun updateLanguage(string: String){
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val userSettings = userDao.getUserSettings()
-                userSettings?.language = string
-                if (userSettings != null) {
-                    userDao.updateUserSettings(userSettings)
+                if (string.isNotEmpty()){
+                    val userSettings = userDao.getUserSettings()
+                    userSettings?.language = string
+                    if (userSettings != null) {
+                        userDao.updateUserSettings(userSettings)
+                    }
                 }
             }
         }

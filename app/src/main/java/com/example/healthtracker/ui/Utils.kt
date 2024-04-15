@@ -13,6 +13,7 @@ import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
 import android.util.Base64
+import android.util.Log
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.RelativeLayout
@@ -25,6 +26,7 @@ import com.example.healthtracker.data.room.UserData
 import com.example.healthtracker.data.user.StepsInfo
 import com.example.healthtracker.data.user.UserAutomaticInfo
 import com.example.healthtracker.data.user.UserDays
+import com.example.healthtracker.data.user.UserFriends
 import com.example.healthtracker.data.user.UserGoals
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.data.user.UserMegaInfo
@@ -46,7 +48,6 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.util.Calendar
-import java.util.Date
 
 fun navigateToActivity(currentActivity: Activity, targetActivityClass: Class<*>) {
     val intent = Intent(currentActivity, targetActivityClass)
@@ -174,10 +175,18 @@ fun DataSnapshot.toUserInfo(): UserInfo {
     )
 }
 
+fun DataSnapshot.toUserFriends(): UserFriends {
+    return UserFriends(
+        uid = child("uid").getValue(String::class.java) ?: "",
+        isFriend  = child("friend").getValue(Boolean::class.java) ?: true
+    )
+}
+
 fun DataSnapshot.toUserAutomaticInfo(): UserAutomaticInfo {
     return UserAutomaticInfo(
         steps = child("steps").toStepsInfo(),
-        challengesPassed = child("challengesPassed").getValue(Int::class.java)
+        challengesPassed = child("challengesPassed").getValue(Int::class.java),
+        activeTime = child("activeTime").getValue(Long::class.java)
     )
 }
 
@@ -186,6 +195,7 @@ fun DataSnapshot.toUserPutInInfo(): UserPutInInfo {
         waterInfo = child("waterInfo").toWaterInfo(),
         weight = child("weight").getValue(Double::class.java),
         sleepDuration = child("sleepDuration").getValue(String::class.java),
+        units = child("units").getValue(String::class.java)
     )
 }
 
@@ -232,10 +242,10 @@ fun DataSnapshot.toStepsInfo(): StepsInfo {
     )
 }
 
-fun DataSnapshot.toUserFriendsList(): List<UserInfo> {
-    val userFriendsList = mutableListOf<UserInfo>()
+fun DataSnapshot.toUserFriendsList(): List<UserFriends> {
+    val userFriendsList = mutableListOf<UserFriends>()
     for (childSnapshot in children) {
-        userFriendsList.add(childSnapshot.toUserInfo())
+        userFriendsList.add(childSnapshot.toUserFriends())
     }
     return userFriendsList
 }
@@ -282,7 +292,7 @@ fun stopSpeeder() {
 }
 
 fun isServiceRunning(): Boolean {
-    return SpeederServiceBoolean.isMyServiceRunning.value!!
+    return SpeederServiceBoolean._isMyServiceRunning.value!!
 }
 
 fun getStepsValue(): Int {
@@ -292,6 +302,16 @@ fun getStepsValue(): Int {
 fun nullifyStepCounter() {
     StepCounterService._steps.postValue(0)
     StepCounterService._calories.postValue(0)
+}
+
+fun updateTimer(time: Long) {
+    Log.d("time to be updated", time.toString())
+    SpeederServiceBoolean._activityTime.value =
+        SpeederServiceBoolean._activityTime.value?.plus(time)
+}
+
+fun nullifyTimer() {
+    SpeederServiceBoolean._activityTime.postValue(0)
 }
 
 fun updateStepCalories(calories: Int) {
@@ -342,19 +362,6 @@ fun calendarToString(calendar: Calendar): String {
     return dateFormat.format(calendar.time)
 }
 
-@SuppressLint("SimpleDateFormat")
-fun stringToCalendar(dateStr: String): Calendar? {
-    val dateFormat = SimpleDateFormat("dd/MM/yyyy")
-    try {
-        val date: Date = dateFormat.parse(dateStr) ?: return null
-        val calendar = Calendar.getInstance()
-        calendar.time = date
-        return calendar
-    } catch (e: Exception) {
-        e.printStackTrace()
-    }
-    return null
-}
 
 
 

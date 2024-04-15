@@ -41,7 +41,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
             )
         )
-        SpeederServiceBoolean.isMyServiceRunning.postValue(false)
+        mainViewModel.syncTimer()
+        SpeederServiceBoolean._isMyServiceRunning.postValue(false)
         startStepCounterService()
         val item = AlarmItem(LocalDateTime.now(),"wipe it")
         Alarm().schedule(item)
@@ -83,5 +84,6 @@ class MainActivity : AppCompatActivity() {
             return db
         }
     }
+
 }
 

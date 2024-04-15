@@ -3,7 +3,8 @@ package com.example.healthtracker.data.user
 data class UserPutInInfo(
     var waterInfo: WaterInfo? = WaterInfo(),
     var weight: Double? = 0.0,
-    var sleepDuration:String?=""
+    var sleepDuration:String?="",
+    var units: String? = ""
 )
 
 data class WaterInfo(

@@ -6,12 +6,14 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.healthtracker.MyApplication
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.ChallengesDialogBinding
+import com.example.healthtracker.ui.isInternetAvailable
 import kotlinx.coroutines.launch
 
 class ChallengeDisplayDialog : DialogFragment() {
@@ -56,7 +58,13 @@ class ChallengeDisplayDialog : DialogFragment() {
 
             }
             refresh.setOnClickListener {
-                challengesDisplayDialogViewModel.refreshChallenges()
+                if (isInternetAvailable(MyApplication.getContext())) {
+                    challengesDisplayDialogViewModel.refreshChallenges()
+                } else {
+                    Toast.makeText(
+                        MyApplication.getContext(), R.string.no_internet, Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
             closeButton.setOnClickListener {
                 dismiss()

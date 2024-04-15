@@ -25,6 +25,7 @@ import com.example.healthtracker.ui.home.walking.StepCounterService
 import com.example.healthtracker.ui.parseDurationToLong
 import com.example.healthtracker.ui.stopSpeeder
 import com.example.healthtracker.ui.updateStepCalories
+import com.example.healthtracker.ui.updateTimer
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -66,7 +67,7 @@ class SpeederService : Service() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
-        SpeederServiceBoolean.isMyServiceRunning.postValue(true)
+        SpeederServiceBoolean._isMyServiceRunning.postValue(true)
         startForeground(NOTIFICATION_ID, createNotification())
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         customCoroutineScope.launch {
@@ -88,6 +89,16 @@ class SpeederService : Service() {
             _time.postValue(timeRemaining)
             updateNotification()
         }, onFinish = {
+            updateTimer(parseDurationToLong(time))
+            customCoroutineScope.launch {
+                val autoInfo = userDao.getAutomaticInfo()
+                Log.d("newtimer", "added $time to spedeer time for it to become ${SpeederServiceBoolean._activityTime.value.toString()}")
+                autoInfo?.activeTime = SpeederServiceBoolean._activityTime.value
+                if (autoInfo != null) {
+                    userDao.updateUserAutomaticInfo(autoInfo)
+                    Log.d("updated auto", userDao.getAutomaticInfo()?.activeTime.toString())
+                }
+            }
             val averageSpeed = divided / divider
             var MET: Double
             when (ActivityEnum.valueOf(
@@ -177,7 +188,7 @@ class SpeederService : Service() {
                         }
                     }
                 }
-                SpeederServiceBoolean.isMyServiceRunning.postValue(false)
+                SpeederServiceBoolean._isMyServiceRunning.postValue(false)
                 stopSpeeder()
             }
         })
@@ -200,7 +211,7 @@ class SpeederService : Service() {
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(NOTIFICATION_ID)
         stopLocationUpdates()
-        SpeederServiceBoolean.isMyServiceRunning.postValue(false)
+        SpeederServiceBoolean._isMyServiceRunning.postValue(false)
 
         timer.cancel()
     }

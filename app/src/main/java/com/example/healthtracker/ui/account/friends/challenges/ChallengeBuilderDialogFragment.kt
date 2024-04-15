@@ -86,12 +86,10 @@ class ChallengeBuilderDialogFragment : DialogFragment() {
                         .isBlank() && editTextMinutes.text.toString()
                         .isEmpty() && editTextSeconds.text.toString().isEmpty())
                 ) {
-                    Log.d("DurationText is null", duration.toString())
                     Toast.makeText(
                         MyApplication.getContext(), R.string.empty_field, Toast.LENGTH_SHORT
                     ).show()
                 } else {
-                    Log.d("DurationText isnt null", stringDuration)
                     Toast.makeText(MyApplication.getContext(), "both are fine", Toast.LENGTH_SHORT)
                         .show()
                     val selectedItem = challengeTypeSpinner.selectedItem as SpinnerItem

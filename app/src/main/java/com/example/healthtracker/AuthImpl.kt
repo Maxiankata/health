@@ -3,12 +3,14 @@ package com.example.healthtracker
 import android.graphics.Bitmap
 import android.util.Log
 import com.example.healthtracker.data.user.UserDays
+import com.example.healthtracker.data.user.UserFriends
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.ui.account.friends.challenges.Challenge
 import com.example.healthtracker.ui.bitmapToBase64
 import com.example.healthtracker.ui.home.speeder.ActivityEnum
 import com.example.healthtracker.ui.toUserDays
+import com.example.healthtracker.ui.toUserFriends
 import com.example.healthtracker.ui.toUserMegaInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -18,10 +20,12 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
@@ -29,6 +33,8 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class AuthImpl : AuthInterface {
+    private val customCoroutineScope = CoroutineScope(Dispatchers.IO)
+
     override suspend fun setUser(email: String, username: String, uid: String) {
         Firebase.database.getReference("user/${Firebase.auth.currentUser?.uid}").setValue(
             UserMegaInfo(
@@ -67,9 +73,7 @@ class AuthImpl : AuthInterface {
                         if (user != null) {
                             val userer = UserMegaInfo(
                                 UserInfo(
-                                    username = username,
-                                    mail = email,
-                                    uid = user.uid
+                                    username = username, mail = email, uid = user.uid
                                 )
                             )
                             userRef.child(user.uid).setValue(userer).addOnSuccessListener {
@@ -85,18 +89,22 @@ class AuthImpl : AuthInterface {
         }
     }
 
-    override suspend fun fetchSearchedFriends(string: String): MutableList<UserInfo> =
+    override suspend fun fetchSearchedFriends(string: String): MutableList<UserFriends> =
         suspendCoroutine { continuation ->
             val ref = Firebase.database.getReference("user/${Firebase.auth.currentUser!!.uid}")
             ref.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    val tempList = mutableListOf<UserInfo>()
+                    val tempList = mutableListOf<UserFriends>()
                     for (userSnapshot in dataSnapshot.children) {
-                        val userInfoSnapshot = userSnapshot.child("UserFriends")
-                        val userInfo = userInfoSnapshot.getValue(UserInfo::class.java)
-                        userInfo?.let {
-                            if (it.username == string) {
-                                tempList.add(it)
+                        val userInfoSnapshot = userSnapshot.child("userFriends")
+                        val userFriends = userInfoSnapshot.getValue(UserFriends::class.java)
+                        userFriends?.let {
+                            customCoroutineScope.launch {
+                                val name = getUserInfo(it.uid)?.username
+                                if (name == string) {
+                                    tempList.add(it)
+
+                                }
                             }
                         }
                     }
@@ -137,16 +145,14 @@ class AuthImpl : AuthInterface {
         }
 
     override suspend fun sync(megaInfo: UserMegaInfo, id: String) {
-        Firebase.database.reference.child("user/${id}/userInfo")
-            .setValue(megaInfo.userInfo)
+        Firebase.database.reference.child("user/${id}/userInfo").setValue(megaInfo.userInfo)
         Firebase.database.reference.child("user/${id}/userAutomaticInfo")
             .setValue(megaInfo.userAutomaticInfo)
         Firebase.database.reference.child("user/${id}/userPutInInfo")
             .setValue(megaInfo.userPutInInfo)
         Firebase.database.reference.child("user/${id}/userSettingsInfo")
             .setValue(megaInfo.userSettingsInfo)
-        Firebase.database.reference.child("user/${id}/userDays")
-            .setValue(megaInfo.userDays)
+        Firebase.database.reference.child("user/${id}/userDays").setValue(megaInfo.userDays)
     }
 
     override suspend fun getEntireUser(): Flow<UserMegaInfo?> = flow {
@@ -181,8 +187,7 @@ class AuthImpl : AuthInterface {
 
     override suspend fun getCurrentUser(): UserMegaInfo? {
         return try {
-            val userRef =
-                Firebase.database.getReference("user/${Firebase.auth.currentUser!!.uid}")
+            val userRef = Firebase.database.getReference("user/${Firebase.auth.currentUser!!.uid}")
             val dataSnapshot = userRef.get().await()
             dataSnapshot.getValue(UserMegaInfo::class.java)
         } catch (e: Exception) {
@@ -190,11 +195,26 @@ class AuthImpl : AuthInterface {
         }
     }
 
-    override suspend fun addFriend(userId: String) {
-        Firebase.database.reference.child("user").child(Firebase.auth.currentUser!!.uid)
-            .child("userFriends").child(userId).setValue(userId)
+    override suspend fun requestFriend(sentToUser: String, sentByUser: String) {
+        Log.d("sending to user", sentToUser)
+        Firebase.database.reference.child("user").child(sentToUser).child("userFriends")
+            .child(sentByUser).setValue(UserFriends(sentByUser, false))
     }
 
+    override suspend fun addFriend(sentToUser: String, sentByUser: String) {
+        Firebase.database.reference.child("user").child(sentByUser)
+            .child("userFriends").child(sentToUser).setValue(UserFriends(sentByUser, true))
+
+        Firebase.database.reference.child("user").child(sentToUser)
+            .child("userFriends").child(sentByUser).setValue(UserFriends(sentToUser, true))
+    }
+    override suspend fun removeFriend(userId: String, userFriendList: List<UserFriends>) {
+        Firebase.database.reference.child("user").child(Firebase.auth.currentUser!!.uid)
+            .child("userFriends").child(userId).removeValue()
+
+        Firebase.database.reference.child("user").child(userId)
+            .child("userFriends").child(Firebase.auth.currentUser!!.uid).removeValue()
+    }
     override suspend fun getUserInfo(uid: String): UserInfo? {
         return try {
             val userInfoRef = Firebase.database.getReference("user/$uid/userInfo")
@@ -205,18 +225,18 @@ class AuthImpl : AuthInterface {
         }
     }
 
-    override suspend fun fetchUserFriends(): List<UserInfo> {
+    override suspend fun fetchUserFriends(): List<UserFriends> {
         return withContext(Dispatchers.IO) {
             val userFriendsRef =
                 Firebase.database.getReference("user/${Firebase.auth.currentUser!!.uid}/userFriends")
             val dataSnapshot = userFriendsRef.get().await()
-            val userFriendList = mutableListOf<UserInfo>()
+            val userFriendList = mutableListOf<UserFriends>()
             for (friendSnapshot in dataSnapshot.children) {
-                val friendUid = friendSnapshot.key.toString()
-                val friendInfo = getUserInfo(friendUid)
-                friendInfo?.let {
-                    userFriendList.add(it)
-                }
+                val friend = friendSnapshot.toUserFriends()
+                val status = friend.isFriend
+                val id = friend.uid
+                userFriendList.add(UserFriends(id, status))
+                Log.d("adding friend", "$id, $status")
             }
             userFriendList
         }
@@ -263,8 +283,7 @@ class AuthImpl : AuthInterface {
 
     override suspend fun fetchChallenges(userId: String): List<Challenge>? {
         return withContext(Dispatchers.IO) {
-            val challengesRef =
-                Firebase.database.getReference("user/${userId}/challenges")
+            val challengesRef = Firebase.database.getReference("user/${userId}/challenges")
             try {
                 val dataSnapshot = challengesRef.get().await()
                 val challengeList = mutableListOf<Challenge>()
@@ -300,14 +319,12 @@ class AuthImpl : AuthInterface {
     }
 
     override suspend fun setChallenges(challenges: List<Challenge>, userId: String) {
-        Firebase.database.reference.child("user/${userId}/challenges")
-            .setValue(challenges)
+        Firebase.database.reference.child("user/${userId}/challenges").setValue(challenges)
     }
 
     override suspend fun resetPassword(email: String): Boolean {
         return suspendCoroutine { continuation ->
-            Firebase.auth.sendPasswordResetEmail(email)
-                .addOnCompleteListener { task ->
+            Firebase.auth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
                     val isSuccessful = task.isSuccessful
                     continuation.resume(isSuccessful)
                 }
@@ -315,18 +332,10 @@ class AuthImpl : AuthInterface {
     }
 
     override suspend fun updateUserInfo(userInfo: UserInfo) {
-        Firebase.database.reference.child("user/${userInfo.uid}/userInfo")
-            .setValue(userInfo).addOnCompleteListener {
+        Firebase.database.reference.child("user/${userInfo.uid}/userInfo").setValue(userInfo)
+            .addOnCompleteListener {
                 Log.d("new user theme", userInfo.theme.toString())
             }
-    }
-
-    override suspend fun removeFriend(userId: String, userFriendList: List<UserInfo>) {
-        val friend = getUserInfo(userId)
-        if (userFriendList.contains(friend)) {
-            Firebase.database.reference.child("user").child(Firebase.auth.currentUser!!.uid)
-                .child("userFriends").child(userId).removeValue()
-        }
     }
 
     companion object {

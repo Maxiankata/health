@@ -5,6 +5,7 @@ import com.example.healthtracker.data.user.Achievement
 import com.example.healthtracker.data.user.StepsInfo
 import com.example.healthtracker.data.user.UserAutomaticInfo
 import com.example.healthtracker.data.user.UserDays
+import com.example.healthtracker.data.user.UserFriends
 import com.example.healthtracker.data.user.UserGoals
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.data.user.UserMegaInfo
@@ -48,6 +49,16 @@ class GsonTypeConverter {
     fun toUserAutomaticInfo(userAutomaticInfoString: String?): UserAutomaticInfo? {
         return gson.fromJson(userAutomaticInfoString, UserAutomaticInfo::class.java)
     }
+    @TypeConverter
+    fun fromUserFriends(userFriends: UserFriends?): String? {
+        return gson.toJson(userFriends)
+    }
+
+    @TypeConverter
+    fun toUserFriends(userFriends: String?): UserFriends? {
+        return gson.fromJson(userFriends, UserFriends::class.java)
+    }
+
 
     @TypeConverter
     fun fromUserPutInInfo(userPutInInfo: UserPutInInfo?): String? {
@@ -109,7 +120,15 @@ class GsonTypeConverter {
     fun fromUserInfoList(userInfoList: List<UserInfo>?): String? {
         return gson.toJson(userInfoList)
     }
-
+    @TypeConverter
+    fun fromUserFriendsList(userFriendsList: List<UserFriends>?): String? {
+        return gson.toJson(userFriendsList)
+    }
+    @TypeConverter
+    fun toUserFriendsList(userFriendsList: String?): List<UserFriends>? {
+        val listType = object : TypeToken<List<UserFriends>>() {}.type
+        return gson.fromJson(userFriendsList, listType)
+    }
     @TypeConverter
     fun toUserInfoList(userInfoListString: String?): List<UserInfo>? {
         val listType = object : TypeToken<List<UserInfo>>() {}.type

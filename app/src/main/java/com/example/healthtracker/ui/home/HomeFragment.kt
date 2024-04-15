@@ -19,7 +19,6 @@ import com.example.healthtracker.ui.home.running.RunningDialogFragment
 import com.example.healthtracker.ui.home.speeder.SpeederService
 import com.example.healthtracker.ui.home.speeder.SpeederServiceBoolean
 import com.example.healthtracker.ui.home.walking.StepCounterService
-import com.example.healthtracker.ui.stopSpeeder
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -143,7 +142,7 @@ class HomeFragment : Fragment() {
                     homeViewModel.waterIncrement(-1)
             }
 
-            SpeederServiceBoolean.isMyServiceRunningLive.observe(viewLifecycleOwner){
+            SpeederServiceBoolean.isMyServiceRunning.observe(viewLifecycleOwner){
                 if (it){
                     activityGrid.visibility = View.GONE
                     activityButton.visibility = View.VISIBLE

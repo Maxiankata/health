@@ -9,6 +9,7 @@ import com.example.healthtracker.data.GsonTypeConverter
 import com.example.healthtracker.data.user.Achievement
 import com.example.healthtracker.data.user.UserAutomaticInfo
 import com.example.healthtracker.data.user.UserDays
+import com.example.healthtracker.data.user.UserFriends
 import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.data.user.UserPutInInfo
 import com.example.healthtracker.data.user.UserSettingsInfo
@@ -20,7 +21,7 @@ data class UserData(
     @ColumnInfo(name = "userSettingsInfo") val userSettingsInfo: UserSettingsInfo?,
     @ColumnInfo(name = "userAutomaticInfo") val userAutomaticInfo: UserAutomaticInfo?,
     @ColumnInfo(name = "userPutInInfo") val userPutInInfo: UserPutInInfo?,
-    @ColumnInfo(name = "userFriends") val userFriends: List<UserInfo>?,
+    @ColumnInfo(name = "userFriends") val userFriends: List<UserFriends>?,
     @ColumnInfo(name = "userDays")
     @TypeConverters(GsonTypeConverter::class)
     val userDays:List<UserDays>?,

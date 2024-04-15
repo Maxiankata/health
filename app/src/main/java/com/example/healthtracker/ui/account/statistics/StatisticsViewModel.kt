@@ -19,11 +19,19 @@ class StatisticsViewModel(private val application: Application) : AndroidViewMod
     private val authImpl = AuthImpl.getInstance()
     private val _userDays = MutableLiveData<List<UserDays?>?>()
     val userDays: LiveData<List<UserDays?>?> get() = _userDays
+    val units= MutableLiveData<String?>()
+    fun getUserUnits(){
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                units.postValue(userDao.getUserSettings()?.units)
 
+            }
+        }
+    }
     fun getUserDays() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                _userDays.postValue(userDao.getEntireUser()?.userDays)
+                _userDays.postValue(userDao.getEntireUser().userDays)
             }
         }
     }

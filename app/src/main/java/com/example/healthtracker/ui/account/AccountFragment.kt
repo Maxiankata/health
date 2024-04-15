@@ -4,7 +4,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +19,7 @@ import com.example.healthtracker.R
 import com.example.healthtracker.databinding.FragmentAccountBinding
 import com.example.healthtracker.ui.account.friends.challenges.ChallengeDisplayDialog
 import com.example.healthtracker.ui.account.friends.popup.FriendsDialogFragment
+import com.example.healthtracker.ui.account.friends.requests.FriendRequestDialog
 import com.example.healthtracker.ui.base64ToBitmap
 import com.example.healthtracker.ui.isInternetAvailable
 import com.example.healthtracker.ui.login.LoginActivity
@@ -45,7 +45,6 @@ class AccountFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val dialog = FriendsDialogFragment()
         binding.apply {
             accountViewModel.getDays()
             accountViewModel.getWholeUser()
@@ -65,7 +64,7 @@ class AccountFragment : Fragment() {
                         append(it.userInfo.totalSteps.toString())
                     }
                     username.text = it.userInfo.username
-                    if(!it.userInfo.theme.isNullOrEmpty()){
+                    if (!it.userInfo.theme.isNullOrEmpty()) {
                         backgroundColor.setBackgroundColor(Color.parseColor(it.userInfo.theme))
                     }
                 }
@@ -99,18 +98,30 @@ class AccountFragment : Fragment() {
             achievements.setOnClickListener {
                 findNavController().navigate(R.id.action_navigation_notifications_to_achievementsFragment)
             }
-            friends.setOnClickListener {
-                dialog.show(requireActivity().supportFragmentManager, "friends dialog")
-            }
-            challengeDialogOpener.setOnClickListener {
-                val otherDialog = ChallengeDisplayDialog()
+            friendsPopup.setOnClickListener {
+                val dialog = FriendsDialogFragment()
                 if (isInternetAvailable(MyApplication.getContext())) {
-                    otherDialog.show(requireActivity().supportFragmentManager, "friends dialog")
+                    dialog.show(requireActivity().supportFragmentManager, "friends dialog")
                 } else {
                     Toast.makeText(
                         MyApplication.getContext(), R.string.no_internet, Toast.LENGTH_SHORT
                     ).show()
                 }
+            }
+            friendRequests.setOnClickListener {
+                val dialog = FriendRequestDialog()
+                dialog.show(requireActivity().supportFragmentManager, "requests dialog")
+//                if (isInternetAvailable(MyApplication.getContext())) {
+//                    dialog.show(requireActivity().supportFragmentManager, "requests dialog")
+//                } else {
+//                    Toast.makeText(
+//                        MyApplication.getContext(), R.string.no_internet, Toast.LENGTH_SHORT
+//                    ).show()
+//                }
+            }
+            challengeDialogOpener.setOnClickListener {
+                val dialog = ChallengeDisplayDialog()
+                dialog.show(requireActivity().supportFragmentManager, "challenge dialog")
             }
             profilePhoto.apply {
                 setBackgroundResource(R.drawable.circle_background)

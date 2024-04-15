@@ -9,6 +9,7 @@ import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
 import com.example.healthtracker.data.room.UserMegaInfoToRoomAdapter
 import com.example.healthtracker.data.user.UserAutomaticInfo
 import com.example.healthtracker.data.user.UserMegaInfo
+import com.example.healthtracker.ui.home.speeder.SpeederServiceBoolean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -29,6 +30,13 @@ class MainViewModel(private val application: Application):AndroidViewModel(appli
 //                    auth.sync(it)
 
                 }
+            }
+        }
+    }
+    fun syncTimer(){
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                SpeederServiceBoolean._activityTime.postValue(userDao.getAutomaticInfo()?.activeTime?:0)
             }
         }
     }

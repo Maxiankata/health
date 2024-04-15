@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 
 class FriendsDialogFragment : DialogFragment() {
     private var _binding: PopupFriendsBinding? = null
+
     private val binding get() = _binding
     private val friendListViewModel: FriendListViewModel by activityViewModels()
     private lateinit var friendListAdapter: FriendListAdapter
@@ -103,7 +104,6 @@ class FriendsDialogFragment : DialogFragment() {
             friendRecycler.apply {
                 layoutManager = LinearLayoutManager(requireContext())
                 adapter = friendListAdapter
-
             }
 
             searchSwitch.apply {
