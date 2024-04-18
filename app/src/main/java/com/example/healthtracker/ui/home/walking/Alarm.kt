@@ -33,8 +33,8 @@ class Alarm : AlarmScheduler {
     override fun schedule(item: AlarmItem) {
         val intent = Intent(context, AlarmReciever::class.java)
         val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, 23)
-        calendar.set(Calendar.MINUTE, 59)
+        calendar.set(Calendar.HOUR_OF_DAY, 8)
+        calendar.set(Calendar.MINUTE, 32)
         calendar.set(Calendar.SECOND, 30)
         val currentTime = System.currentTimeMillis()
         if (calendar.timeInMillis < currentTime) {

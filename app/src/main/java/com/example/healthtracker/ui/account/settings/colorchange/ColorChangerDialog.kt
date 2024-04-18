@@ -27,15 +27,10 @@ class ColorChangerDialog:DialogFragment() {
     }
     override fun onStart() {
         super.onStart()
-        val width = resources.displayMetrics.widthPixels * 0.9
+        val width = ViewGroup.LayoutParams.MATCH_PARENT
         val height = ViewGroup.LayoutParams.WRAP_CONTENT
-        val dialogWindow = dialog?.window
-        dialogWindow?.setLayout(width.toInt(), height)
-        dialogWindow?.setBackgroundDrawableResource(R.drawable.custom_rounded_background)
-        val horizontalMargin = resources.getDimensionPixelSize(R.dimen.horizontal_margin)
-        val params = dialogWindow?.attributes
-        params?.horizontalMargin = horizontalMargin.toFloat()
-        dialogWindow?.attributes = params
+        dialog?.window?.setLayout(width, height)
+        dialog?.window?.setBackgroundDrawableResource(R.drawable.custom_rounded_background)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

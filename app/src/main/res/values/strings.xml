@@ -13,7 +13,10 @@
     <string name="action_sign_in_short">Sign in</string>
     <string name="welcome">Welcome!</string>
     <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="invalid_password">Invalid password</string>
+    <string name="select_language">Select language</string>
+    <string name="english">english</string>
+    <string name="bulgarian">bulgarian</string>
     <string name="login_failed">Login failed</string>
     <string name="welcome_back">Welcome Back!</string>
     <string name="new_user">Register Here</string>
@@ -38,9 +41,9 @@
     <string name="account">Account</string>
     <string name="steps">Steps:</string>
     <string name="calories">Calories:</string>
-    <string name="daily_weight">Daily Weight</string>
-    <string name="sleep">Daily Sleep</string>
-    <string name="water">Cups of Water Drank</string>
+    <string name="daily_weight">Daily Weight: </string>
+    <string name="sleep">Daily Sleep: </string>
+    <string name="water">Cups of Water Drank: </string>
     <string name="searchFriend">Search friend</string>
     <string name="password_help">Password should be 6 or more symbols long</string>
     <string name="email_help">Input a real e-mail, so you can recover your password</string>
@@ -120,6 +123,10 @@
     <string name="hours">hours</string>
     <string name="requests">Requests</string>
     <string name="no_friend_requests">No friend requests</string>
+    <string name="email_sent">Email sent!</string>
+    <string name="email_sending_issue">There was an issue with sending the email.</string>
+    <string name="settings">Settings</string>
+    <string name="select_units">Select units</string>
     <string-array name="activities">
         <item>Walking</item>
         <item>Power Walking</item>

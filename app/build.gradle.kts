@@ -47,6 +47,7 @@ dependencies {
     implementation ("androidx.room:room-runtime:2.6.1")
     implementation("com.google.firebase:protolite-well-known-types:18.0.0")
     implementation("com.google.android.gms:play-services-location:21.2.0")
+    implementation("androidx.preference:preference-ktx:1.2.1")
     annotationProcessor ("androidx.room:room-compiler:2.6.1")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")

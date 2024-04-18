@@ -7,7 +7,8 @@
     android:layout_marginHorizontal="20dp"
     android:backgroundTint="@color/light_green"
     android:background="@drawable/friend_card_rounded_background"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
 
     <ImageView
         android:id="@+id/friend_request_photo"
@@ -76,7 +77,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/friend_request_mail"
         app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="40dp"
+        android:paddingEnd="10dp"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

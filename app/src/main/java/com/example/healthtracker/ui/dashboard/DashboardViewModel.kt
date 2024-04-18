@@ -19,6 +19,7 @@ class DashboardViewModel(private val application: Application) : AndroidViewMode
     private val authImpl = AuthImpl.getInstance()
     private var _userDay = MutableLiveData<UserDays?>()
     val userDay: LiveData<UserDays?> get() = _userDay
+    var units:String? = ""
     fun feedDays(feeder: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -29,6 +30,13 @@ class DashboardViewModel(private val application: Application) : AndroidViewMode
                         break
                     }
                 }
+            }
+        }
+    }
+    fun getUserUnits(){
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                units = userDao.getUserSettings()?.units
             }
         }
     }

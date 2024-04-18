@@ -1,20 +1,26 @@
 package com.example.healthtracker
 
+import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.room.Room
 import com.example.healthtracker.data.room.UserDB
+import com.example.healthtracker.data.room.UserDao
 import com.example.healthtracker.databinding.ActivityMainBinding
 import com.example.healthtracker.ui.home.speeder.SpeederServiceBoolean
 import com.example.healthtracker.ui.home.walking.AlarmItem
@@ -22,6 +28,7 @@ import com.example.healthtracker.ui.home.walking.Alarm
 import com.example.healthtracker.ui.startStepCounterService
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.time.LocalDateTime
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
@@ -42,6 +49,10 @@ class MainActivity : AppCompatActivity() {
             )
         )
         mainViewModel.syncTimer()
+        mainViewModel.settings.observe(this) {
+            Log.d("settings was changed", it.language.toString())
+            mainViewModel.updateLanguage(this)
+        }
         SpeederServiceBoolean._isMyServiceRunning.postValue(false)
         startStepCounterService()
         val item = AlarmItem(LocalDateTime.now(),"wipe it")

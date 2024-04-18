@@ -209,7 +209,7 @@ fun DataSnapshot.toWaterInfo(): WaterInfo {
 
 fun DataSnapshot.toUserSettingsInfo(): UserSettingsInfo {
     return UserSettingsInfo(
-        language = child("language").getValue(String::class.java) ?: "english",
+        language = child("language").getValue(String::class.java) ?: "en",
         units = child("units").getValue(String::class.java) ?: "kg",
         userGoals = child("userGoals").getValue(UserGoals::class.java) ?: UserGoals()
     )

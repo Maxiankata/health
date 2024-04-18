@@ -8,7 +8,10 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.example.healthtracker.R
 import com.example.healthtracker.databinding.FragmentForgotPasswordBinding
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -27,24 +30,23 @@ class ForgotPasswordFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
-            sendPassword.apply {
-                setOnClickListener {
-                    lifecycleScope.launch {
-                        if (forgotPasswordViewModel.resetPassword(emailInput.text.toString())) Toast.makeText(
-                            context,
-                            "Email sent!",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        else {
-                            Toast.makeText(
-                                context,
-                                "There was an issue with sending the email",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+            sendPassword.setOnClickListener {
+                lifecycleScope.launch {
+                    if (forgotPasswordViewModel.resetPassword(emailInput.text.toString())) {
+                        showToast(R.string.email_sent)
+                        delay(2000)
+                        findNavController().navigate(R.id.action_forgotPasswordFragment_to_loginFragment)
                     }
+                    else showToast(R.string.email_sending_issue)
                 }
+
             }
         }
+    }
+
+    private fun showToast(message: Int) {
+        Toast.makeText(
+            context, message, Toast.LENGTH_SHORT
+        ).show()
     }
 }

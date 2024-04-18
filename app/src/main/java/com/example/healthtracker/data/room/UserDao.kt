@@ -1,5 +1,6 @@
 package com.example.healthtracker.data.room
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -18,17 +19,20 @@ interface UserDao {
     fun saveUser(userMegaInfoEntity: UserData)
     @Query("SELECT * FROM UserData")
     fun getEntireUser(): UserData
-
-    @Query("SELECT * FROM UserData")
-    fun getEntireUserFlow(): Flow<UserData?>
-
+    @Query("UPDATE UserData SET UserInfo = :updatedUserInfo")
+    suspend fun updateUserInfo(updatedUserInfo: UserInfo)
     @Query("DELETE FROM UserData")
     fun dropUser()
+
+
     @Query("SELECT userInfo FROM UserData")
     fun getUserInfo(): UserInfo?
 
+
     @Query("SELECT userSettingsInfo FROM UserData ")
-    fun getUserSettings(): UserSettingsInfo?
+    fun getUserSettings(): UserSettingsInfo
+    @Query("SELECT userSettingsInfo FROM UserData ")
+    fun getUserSettingsLiveData(): LiveData<UserSettingsInfo>
 
     @Query("SELECT userAutomaticInfo FROM UserData")
     fun getAutomaticInfo(): UserAutomaticInfo?
@@ -42,9 +46,6 @@ interface UserDao {
     fun updateUserAutomaticInfo(updatedUserAutomaticInfo: UserAutomaticInfo)
     @Query("UPDATE UserData SET userSettingsInfo = :updatedUserSettingsInfo")
     fun updateUserSettings(updatedUserSettingsInfo: UserSettingsInfo)
-    @Query("UPDATE UserData SET UserInfo = :updatedUserInfo")
-    suspend fun updateUserInfo(updatedUserInfo: UserInfo)
-
     @Query("UPDATE UserData SET userAutomaticInfo = NULL")
     suspend fun wipeUserAutomaticInfo()
     @Query("UPDATE UserData SET userPutInInfo = NULL")
@@ -57,4 +58,7 @@ interface UserDao {
     suspend fun addFriend(updatedUserFriends:List<UserInfo>)
     @Query("UPDATE UserData SET challenges = :updatedChallenges")
     suspend fun updateChallenges(updatedChallenges: List<Challenge>)
+    @Query("SELECT * FROM UserData")
+    fun getEntireUserFlow(): Flow<UserData?>
+
 }

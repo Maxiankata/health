@@ -3,15 +3,17 @@ package com.example.healthtracker
 import android.content.Intent
 import android.content.RestrictionsManager.RESULT_ERROR
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
+import android.window.OnBackInvokedDispatcher
+import androidx.activity.OnBackPressedDispatcherOwner
+import androidx.appcompat.app.AppCompatActivity
 import com.yalantis.ucrop.UCrop
 import java.io.File
-import java.lang.StringBuilder
 import java.util.UUID
 
-class CropActivity : AppCompatActivity() {
+class CropActivity : AppCompatActivity(), OnBackPressedDispatcherOwner {
     lateinit var uri: Uri
     lateinit var result: String
 
@@ -37,6 +39,11 @@ class CropActivity : AppCompatActivity() {
             uri = Uri.parse(result)
 
         }
+    }
+
+    override fun getOnBackInvokedDispatcher(): OnBackInvokedDispatcher {
+        finish()
+        return super.getOnBackInvokedDispatcher()
     }
 
     @Override

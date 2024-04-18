@@ -11,6 +11,7 @@ import com.example.healthtracker.databinding.FragmentDashboardBinding
 import com.example.healthtracker.ui.calendarToString
 import com.example.healthtracker.ui.showBottomNav
 import java.util.Calendar
+import kotlin.math.round
 
 class DashboardFragment : Fragment() {
     private val dashboardViewModel: DashboardViewModel by viewModels()
@@ -20,6 +21,7 @@ class DashboardFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         requireActivity().showBottomNav()
+        dashboardViewModel.getUserUnits()
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -79,9 +81,26 @@ class DashboardFragment : Fragment() {
                             }
                         }
                         recordedWeight.apply {
+
+                            var weight = it.putInInfo?.weight ?: 0.0
+                            if (dashboardViewModel.units == "kg") {
+                                if (it.putInInfo?.units == "kg") {
+                                    weight = round(weight*10)/10
+                                } else if (it.putInInfo?.units == "lbs") {
+                                    weight = round((weight * 0.45) * 10) / 10
+                                }
+                            } else if (dashboardViewModel.units == "lbs") {
+                                if (it.putInInfo?.units == "lbs") {
+                                    weight = round(weight*10)/10
+                                } else if (it.putInInfo?.units == "kg") {
+                                    weight = round((weight * 2.54) * 10) / 10
+                                }
+
+                            }
                             text = buildString {
                                 append(getString(R.string.daily_weight))
-                                append(it.putInInfo?.weight)
+                                append(weight)
+
                             }
                         }
                     }

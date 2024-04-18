@@ -8,6 +8,10 @@ class ForgotPasswordViewModel(application: Application) :
     AndroidViewModel(application) {
     private val auth = AuthImpl.getInstance()
     suspend fun resetPassword(email: String): Boolean {
-        return auth.resetPassword(email)
+        return try {
+            auth.resetPassword(email)
+        }catch (e:Exception){
+            false
+        }
     }
 }
