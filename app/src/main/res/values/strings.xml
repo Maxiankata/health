@@ -39,8 +39,8 @@
     <string name="change_password_for">"Change password for "</string>
     <string name="code">00000</string>
     <string name="account">Account</string>
-    <string name="steps">Steps:</string>
-    <string name="calories">Calories:</string>
+    <string name="steps">Steps: </string>
+    <string name="calories">Calories: </string>
     <string name="daily_weight">Daily Weight: </string>
     <string name="sleep">Daily Sleep: </string>
     <string name="water">Cups of Water Drank: </string>

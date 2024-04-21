@@ -111,12 +111,12 @@ class AuthImpl : AuthInterface {
         }
     }
 
-    override suspend fun fetchSearchedFriends(string: String): MutableList<UserFriends> =
+    override suspend fun fetchSearchedFriends(string: String): MutableList<UserInfo> =
         suspendCoroutine { continuation ->
             val ref = Firebase.database.getReference("user/${Firebase.auth.currentUser!!.uid}")
             ref.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    val tempList = mutableListOf<UserFriends>()
+                    val tempList = mutableListOf<UserInfo>()
                     for (userSnapshot in dataSnapshot.children) {
                         val userInfoSnapshot = userSnapshot.child("userFriends")
                         val userFriends = userInfoSnapshot.getValue(UserFriends::class.java)
@@ -124,8 +124,7 @@ class AuthImpl : AuthInterface {
                             customCoroutineScope.launch {
                                 val name = getUserInfo(it.uid)?.username
                                 if (name == string) {
-                                    tempList.add(it)
-
+                                    getUserInfo(it.uid)?.let { it1 -> tempList.add(it1) }
                                 }
                             }
                         }
@@ -151,8 +150,10 @@ class AuthImpl : AuthInterface {
                         val userInfoSnapshot = userSnapshot.child("userInfo")
                         val userInfo = userInfoSnapshot.getValue(UserInfo::class.java)
                         userInfo?.let {
-                            if (it.username == string) {
-                                tempList.add(it)
+                            if (it.uid != Firebase.auth.currentUser!!.uid){
+                                if (it.username == string) {
+                                    tempList.add(it)
+                                }
                             }
                         }
                     }

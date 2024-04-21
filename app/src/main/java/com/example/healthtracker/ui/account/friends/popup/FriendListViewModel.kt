@@ -41,8 +41,10 @@ class FriendListViewModel : ViewModel() {
                 !friendsInfoList.any { friend -> friend.uid == user.uid }
             } as MutableList<UserInfo>
             val currentUser = auth.getCurrentUser()?.userInfo
+            Log.d("current user", currentUser?.username.toString())
             if (filteredUsers.contains(currentUser)) {
                 filteredUsers.remove(currentUser)
+                Log.d("removed current user", "")
             }
             _usersList.postValue(filteredUsers)
         }
@@ -50,7 +52,7 @@ class FriendListViewModel : ViewModel() {
 
     fun fetchSearchedFriends(string: String) {
         viewModelScope.launch {
-            val searchedUsers = auth.fetchSearchedUsers(string)
+            val searchedUsers = auth.fetchSearchedFriends(string)
             val filteredUsers = searchedUsers.filter { user ->
                 !friendsInfoList.any { friend -> friend.uid == user.uid }
             } as MutableList<UserInfo>

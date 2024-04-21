@@ -35,7 +35,7 @@ interface AuthInterface {
     suspend fun fetchAllUsersInfo(): MutableList<UserInfo>
     suspend fun saveBitmapToDatabase(bitmap: Bitmap)
     suspend fun fetchSearchedUsers(string: String):List<UserInfo>
-    suspend fun fetchSearchedFriends(string: String): MutableList<UserFriends>
+    suspend fun fetchSearchedFriends(string: String): MutableList<UserInfo>
     suspend fun removeFriend(userId: String, userFriendList: List<UserFriends>)
     suspend fun updateSettings(userSettingsInfo: UserSettingsInfo)
 }

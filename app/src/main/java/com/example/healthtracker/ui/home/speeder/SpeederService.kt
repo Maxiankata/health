@@ -100,7 +100,12 @@ class SpeederService : Service() {
                 )
                 autoInfo?.activeTime = activityTime.value
                     ?.let { autoInfo?.activeTime?.plus(it) }
-                autoInfo?.challengesPassed = autoInfo?.challengesPassed?.plus(1)
+                if (autoInfo?.challengesPassed==null){
+                    autoInfo?.challengesPassed = 0
+                    autoInfo?.challengesPassed = autoInfo?.challengesPassed?.plus(1)
+                }else{
+                    autoInfo.challengesPassed = autoInfo.challengesPassed?.plus(1)
+                }
                 if (autoInfo != null) {
                     userDao.updateUserAutomaticInfo(autoInfo)
                     Log.d("updated auto", userDao.getAutomaticInfo()?.activeTime.toString())

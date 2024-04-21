@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import com.example.healthtracker.AuthImpl
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.MyApplication
@@ -31,9 +32,9 @@ class  Alarm : AlarmScheduler {
     override fun schedule(item: AlarmItem) {
         val intent = Intent(context, AlarmReciever::class.java)
         val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, 17)
-        calendar.set(Calendar.MINUTE, 44)
-        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 11)
+        calendar.set(Calendar.SECOND, 30)
         val currentTime = System.currentTimeMillis()
         if (calendar.timeInMillis < currentTime) {
             calendar.add(Calendar.DAY_OF_MONTH, 1)
@@ -91,6 +92,7 @@ class AlarmReciever : BroadcastReceiver() {
             )
             val weight = userPutInInfo?.weight
             val sendToday = calendarToString(Calendar.getInstance())
+            Log.d("user challenges passed", userAutomaticInfo?.challengesPassed.toString())
             val day = UserDays(
                 userPutInInfo, userAutomaticInfo, userChallenges,
                 sendToday

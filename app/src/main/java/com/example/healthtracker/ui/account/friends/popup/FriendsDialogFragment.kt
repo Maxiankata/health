@@ -44,7 +44,6 @@ class FriendsDialogFragment : DialogFragment() {
         val height = ViewGroup.LayoutParams.WRAP_CONTENT
         dialog?.window?.setLayout(width, height)
         dialog?.window?.setBackgroundDrawableResource(R.drawable.custom_rounded_background)
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -66,11 +65,10 @@ class FriendsDialogFragment : DialogFragment() {
                     noFriendsText.visibility = VISIBLE
                 }
             }
-            val editText = textInputLayout.editText
-            editText?.setOnEditorActionListener { _, actionId, event ->
+            textInputLayout.editText?.setOnEditorActionListener { _, actionId, event ->
                 if (actionId == EditorInfo.IME_ACTION_DONE || (event != null && event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    val query = editText.text?.toString()
-                    editText.clearFocus()
+                    val query = textInputLayout.editText!!.text?.toString()
+                    textInputLayout.editText!!.clearFocus()
                     if (!query.isNullOrBlank()) {
                         FriendListViewModel.searchState.observe(viewLifecycleOwner) {
                             lifecycleScope.launch {
@@ -88,8 +86,8 @@ class FriendsDialogFragment : DialogFragment() {
                 }
                 false
             }
-            editText?.setOnFocusChangeListener { _, hasFocus ->
-                if (!hasFocus) editText.text?.clear()
+            textInputLayout.editText?.setOnFocusChangeListener { _, hasFocus ->
+                if (!hasFocus) textInputLayout.editText!!.text?.clear()
             }
             usernameInput.setOnFocusChangeListener { _, hasFocus ->
                 val color = if (hasFocus) (ContextCompat.getColor(
@@ -106,57 +104,88 @@ class FriendsDialogFragment : DialogFragment() {
                 adapter = friendListAdapter
             }
 
-            searchSwitch.apply {
-                setOnClickListener {
-                    try {
-                        friendListViewModel.switchSearchState()
-                    }catch (e:Exception){
-                        Log.d("List swap error", "Error switching list")
-                    }
+            textInputLayout.editText?.setOnEditorActionListener { _, actionId, event ->
+                if (actionId == EditorInfo.IME_ACTION_DONE || (event != null && event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    val query = textInputLayout.editText!!.text?.toString()
+                    textInputLayout.editText!!.clearFocus()
+                    if (!query.isNullOrBlank()) {
+                        FriendListViewModel.searchState.observe(viewLifecycleOwner) {
+                            lifecycleScope.launch {
+                                if (it) {
+                                    friendListViewModel.clearList()
+                                    friendListViewModel.fetchSearchedUsers(query)
+                                } else {
+                                    friendListViewModel.fetchUserFriends()
+                                    friendListViewModel.fetchSearchedFriends(query)
+                                }
+                            }
+                        }
+                    } else (Log.d("blank query", "luluu"))
+                    return@setOnEditorActionListener true
                 }
+                false
             }
-            FriendListViewModel.searchState.observeForever {
+            FriendListViewModel.searchState.observe(viewLifecycleOwner) {
                 if (it) {
-                    try {
-                        friendListViewModel.clearList()
-                        rotateView(searchSwitch, 45F)
-                        textInputLayout.helperText = getString(R.string.new_friend_mode_on)
-                    }catch (e: Exception) {
-                        Log.e("FetchFriendsError", "Error fetching friends", e)
-                    }
+                    friendListViewModel.clearList()
+                    textInputLayout.helperText = getString(R.string.new_friend_mode_on)
+                    rotateView(searchSwitch, 45F)
+                    textInputLayout.editText?.setOnEditorActionListener { _, actionId, event ->
+                        if (actionId == EditorInfo.IME_ACTION_DONE || (event != null && event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)) {
+                            val query = textInputLayout.editText!!.text?.toString()
+                            textInputLayout.editText!!.clearFocus()
+                            if (!query.isNullOrBlank()) {
+                                friendListViewModel.fetchSearchedUsers(query)
 
+                            } else (Log.d("blank query", "luluu"))
+                            return@setOnEditorActionListener true
+                        }
+                        false
+                    }
+                    searchSwitch.setOnClickListener {
+
+                        friendListViewModel.switchSearchState()
+                    }
                 } else {
-                    try {
-                        friendListViewModel.fetchUserFriends()
-                        rotateView(searchSwitch, 0F)
-                        textInputLayout.helperText = getString(R.string.friend_mode_on)
-                    } catch (e: Exception) {
-                        Log.e("FetchFriendsError", "Error fetching friends", e)
-                    }
+                    friendListViewModel.clearList()
+                    friendListViewModel.fetchUserFriends()
+                    rotateView(searchSwitch, 0F)
+                    textInputLayout.helperText = getString(R.string.friend_mode_on)
+                    textInputLayout.editText?.setOnEditorActionListener { _, actionId, event ->
+                        if (actionId == EditorInfo.IME_ACTION_DONE || (event != null && event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)) {
+                            val query = textInputLayout.editText!!.text?.toString()
+                            textInputLayout.editText!!.clearFocus()
+                            if (!query.isNullOrBlank()) {
+                                friendListViewModel.fetchUserFriends()
+                                friendListViewModel.fetchSearchedFriends(query)
 
+                            } else (Log.d("blank query", "luluu"))
+                            return@setOnEditorActionListener true
+                        }
+                        false
+                    }
+                    searchSwitch.setOnClickListener {
+                        friendListViewModel.switchSearchState()
+                    }
                 }
             }
             close.setOnClickListener {
                 dismiss()
             }
-
-        }
-
-        friendListAdapter.apply {
-            itemClickListener = object : FriendListAdapter.ItemClickListener<UserInfo> {
-                override fun onItemClicked(item: UserInfo, itemPosition: Int) {
-                    item.uid?.let {
-                        Log.d("uid", it)
+            friendListAdapter.apply{
+                itemClickListener = object : FriendListAdapter.ItemClickListener<UserInfo> {
+                    override fun onItemClicked(item: UserInfo, itemPosition: Int) {
+                        item.uid?.let {
+                            Log.d("uid", it)
+                        }
+                        findNavController().navigate(
+                            R.id.action_navigation_notifications_to_friendAccountFragment,
+                            bundleOf("uid" to item.uid)
+                        )
+                        dismiss()
                     }
-                    findNavController().navigate(
-                        R.id.action_navigation_notifications_to_friendAccountFragment,
-                        bundleOf("uid" to item.uid)
-                    )
-                    dismiss()
                 }
             }
         }
     }
-
-
 }

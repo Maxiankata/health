@@ -1,12 +1,12 @@
 package com.example.healthtracker.ui.dashboard
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.healthtracker.MainActivity
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.FragmentDashboardBinding
 import com.example.healthtracker.ui.calendarToString
@@ -28,6 +28,7 @@ class DashboardFragment : Fragment() {
         return binding.root
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
@@ -47,6 +48,7 @@ class DashboardFragment : Fragment() {
                         stepsTaken.apply {
                             text = buildString {
                                 append(getString(R.string.steps))
+                                append(" ")
                                 append(it.automaticInfo?.steps?.currentSteps ?: 0)
                                 append("/")
                                 append(it.automaticInfo?.steps?.stepsGoal)
@@ -63,6 +65,7 @@ class DashboardFragment : Fragment() {
                         waterGoal.apply {
                             text = buildString {
                                 append(getString(R.string.water))
+                                append(" ")
                                 append(it.putInInfo?.waterInfo?.currentWater ?: 0)
                                 append("/")
                                 append(it.putInInfo?.waterInfo?.waterGoal)
@@ -76,12 +79,8 @@ class DashboardFragment : Fragment() {
                                         ++challenges
                                     }
                                 }
-
                             }
-                            text = buildString {
-                                append(getString(R.string.challenges_passed))
-                                append(challenges)
-                            }
+                            text = "${getString(R.string.challenges_passed)} $challenges"
                         }
                         activeTime.apply {
                             text = buildString {
@@ -96,30 +95,33 @@ class DashboardFragment : Fragment() {
                         sleepyTime.apply {
                             text = buildString {
                                 append(getString(R.string.sleep))
-                                append(it.putInInfo?.sleepDuration)
+                                append(" ")
+                                append(
+                                    if (it.putInInfo?.sleepDuration.isNullOrEmpty()) {
+                                        getString(R.string.time_placeholder)
+                                    } else {
+                                        it.putInInfo?.sleepDuration
+                                    }
+                                )
                             }
                         }
                         recordedWeight.apply {
                             var weight = it.putInInfo?.weight ?: 0.0
                             if (dashboardViewModel.units == "kg") {
                                 if (it.putInInfo?.units == "kg") {
-                                    weight = round(weight*10)/10
+                                    weight = round(weight * 10) / 10
                                 } else if (it.putInInfo?.units == "lbs") {
                                     weight = round((weight * 0.45) * 10) / 10
                                 }
                             } else if (dashboardViewModel.units == "lbs") {
                                 if (it.putInInfo?.units == "lbs") {
-                                    weight = round(weight*10)/10
+                                    weight = round(weight * 10) / 10
                                 } else if (it.putInInfo?.units == "kg") {
                                     weight = round((weight * 2.54) * 10) / 10
                                 }
 
                             }
-                            text = buildString {
-                                append(getString(R.string.daily_weight))
-                                append(weight)
-
-                            }
+                            text =  "${getString(R.string.daily_weight)} $weight ${dashboardViewModel.units}"
                         }
                     }
                 }

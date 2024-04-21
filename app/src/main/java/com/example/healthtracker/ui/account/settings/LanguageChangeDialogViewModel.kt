@@ -13,6 +13,7 @@ import com.example.healthtracker.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.round
 
 class LanguageChangeDialogViewModel(private val application: MyApplication):AndroidViewModel(application) {
     val userDao = MainActivity.getDatabaseInstance().dao()
@@ -30,11 +31,13 @@ class LanguageChangeDialogViewModel(private val application: MyApplication):Andr
                     if (previousUnits != string) {
                         if (previousUnits == "kg") {
                             userPutInInfo?.weight = userPutInInfo?.weight?.times(2.2)
+                            userPutInInfo?.weight = round(userPutInInfo?.weight?.times(10) ?: 0.0) /10
                             if (userPutInInfo != null) {
                                 userDao.updateUserPutInInfo(userPutInInfo)
                             }
                         } else if (previousUnits == "lbs") {
                             userPutInInfo?.weight = userPutInInfo?.weight?.times(0.45)
+                            userPutInInfo?.weight = round(userPutInInfo?.weight?.times(10) ?: 0.0) /10
                             if (userPutInInfo != null) {
                                 userDao.updateUserPutInInfo(userPutInInfo)
                             }
