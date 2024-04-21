@@ -19,6 +19,7 @@ import com.example.healthtracker.ui.hideBottomNav
 import com.example.healthtracker.ui.isInternetAvailable
 import com.example.healthtracker.ui.login.LoginActivity
 import com.example.healthtracker.ui.navigateToActivity
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 
@@ -73,7 +74,9 @@ class SettingsFragment : Fragment() {
         builder.setPositiveButton(R.string.confirm) { dialogInterface: DialogInterface, i: Int ->
             if (isInternetAvailable(MyApplication.getContext())){
                 lifecycleScope.launch {
-                    settingsViewModel.deleteUser()
+                        val removeFriendsDeferred = async { settingsViewModel.removeFriends() }
+                        removeFriendsDeferred.await()
+                        settingsViewModel.deleteUser()
                     navigateToActivity(requireActivity(), LoginActivity::class.java)
                 }
                 dialogInterface.dismiss()

@@ -90,7 +90,7 @@ class ChallengeBuilderDialogFragment : DialogFragment() {
                         MyApplication.getContext(), R.string.empty_field, Toast.LENGTH_SHORT
                     ).show()
                 } else {
-                    Toast.makeText(MyApplication.getContext(), "both are fine", Toast.LENGTH_SHORT)
+                    Toast.makeText(MyApplication.getContext(), R.string.challenge_sent, Toast.LENGTH_SHORT)
                         .show()
                     val selectedItem = challengeTypeSpinner.selectedItem as SpinnerItem
                     val challengeTypeId = selectedItem.itemId

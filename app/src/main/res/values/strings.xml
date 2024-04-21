@@ -130,6 +130,14 @@
     <string name="active_time">"Active time: "</string>
     <string name="matching_passwords">Passwords should match</string>
     <string name="register_failed">Registration failed</string>
+    <string name="challenge_sent">Challenge sent!</string>
+    <string name="friend_request_sent">Friend request sent!</string>
+    <string name="first_achievement">Start of a journey..</string>
+    <string name="second_achievement">Job change reached!</string>
+    <string name="third_achievement">Class upgrade reached?!</string>
+    <string name="step_wizard">All hail the step wizard 🧙‍♂️!</string>
+    <string name="reach">Reach</string>
+    <string name="stepss">steps</string>
     <string-array name="activities">
         <item>Walking</item>
         <item>Power Walking</item>

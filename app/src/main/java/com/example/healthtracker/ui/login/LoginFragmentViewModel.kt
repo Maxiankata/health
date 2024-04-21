@@ -40,26 +40,30 @@ class LoginFragmentViewModel(private val application: Application) : AndroidView
         _button_clickable.postValue(true)
     }
     fun logIn(email: String, password: String, isInternetAvailable: Boolean) {
+        _button_clickable.postValue(false)
         _state.value = State.Loading(View.VISIBLE)
         if (!isInternetAvailable) {
-            _state.value = State.Notify("no wifi")
+            _state.value = State.Notify(getString(MyApplication.getContext(),R.string.no_internet))
+            _button_clickable.postValue(true)
             return
         }
         if (email.isEmpty()||password.isEmpty()){
             _state.postValue(State.Notify(getString(MyApplication.getContext(),R.string.empty_field)))
+            _button_clickable.postValue(true)
             return
         }
         viewModelScope.launch {
             try {
                 if(auth.logIn(email, password)){
-                    _button_clickable.postValue(false)
                     getUser()
                     delay(3000)
                     _state.postValue(State.LoggedIn(true))
                 }else{
+                    _button_clickable.postValue(true)
                     _state.postValue(State.Notify(getString(MyApplication.getContext(), R.string.invalid_password)))
                 }
             } catch (e: Exception) {
+                _button_clickable.postValue(true)
                 _state.postValue(State.Notify(e.message ?: "cant login lul"))
             }
         }

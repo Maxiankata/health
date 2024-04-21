@@ -131,10 +131,7 @@ class FriendAccountFragment : Fragment() {
                                 setImageResource(R.drawable.friend_add)
                                 setOnClickListener {
                                         user.uid?.let { it1 -> friendListViewModel.addFriend(it1) }
-                                        val message =
-                                            "${getString(R.string.friend)} ${user.username} ${
-                                                getString(R.string.added)
-                                            }"
+                                        val message = getString(R.string.friend_request_sent)
                                         showToast(message)
                                 }
                             }

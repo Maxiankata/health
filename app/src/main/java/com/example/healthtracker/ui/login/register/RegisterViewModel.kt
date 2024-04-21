@@ -38,6 +38,7 @@ class RegisterViewModel(private val application: Application) : AndroidViewModel
     fun register(
         email: String, password: String,confirmPassword:String, name: String, isInternetAvailable: Boolean
     ) {
+        _clickableButtons.postValue(false)
         _state.value = State.Loading(View.VISIBLE)
         if (!isInternetAvailable) {
             _state.value = State.Notify("no wifi")
@@ -51,6 +52,7 @@ class RegisterViewModel(private val application: Application) : AndroidViewModel
                     )
                 )
             )
+            _clickableButtons.postValue(true)
             return
         }
         if (password.count()<6){
@@ -61,6 +63,8 @@ class RegisterViewModel(private val application: Application) : AndroidViewModel
                     )
                 )
             )
+            _clickableButtons.postValue(true)
+
             return
         }
         if (password!=confirmPassword){
@@ -71,6 +75,7 @@ class RegisterViewModel(private val application: Application) : AndroidViewModel
                     )
                 )
             )
+            _clickableButtons.postValue(true)
             return
         }
 
@@ -81,6 +86,7 @@ class RegisterViewModel(private val application: Application) : AndroidViewModel
                     delay(2000)
                     _state.postValue(State.LoggedIn(true))
                 } else {
+
                     Log.d("state", "loading visibilit")
                     _state.postValue(
                         State.Notify(
@@ -90,8 +96,10 @@ class RegisterViewModel(private val application: Application) : AndroidViewModel
                             )
                         )
                     )
+                    _clickableButtons.postValue(true)
                 }
             } catch (e: Exception) {
+                _clickableButtons.postValue(true)
                 _state.postValue(State.Notify(e.message ?: "cant login lul"))
             }
         }
@@ -100,17 +108,17 @@ class RegisterViewModel(private val application: Application) : AndroidViewModel
     fun getUser() {
         viewModelScope.launch {
             async {
-            auth.getEntireUser().collect {
-                if (it != null) {
-                    withContext(Dispatchers.IO) {
-                        toRoomAdapter.adapt(it)?.let { it1 ->
-                            userDao.saveUser(it1)
-                            userDao.getEntireUser().let { it2 -> fromRoomAdapter.adapt(it2) }
-                            Log.d("user in register", userDao.getEntireUser().toString())
+                auth.getEntireUser().collect {
+                    if (it != null) {
+                        withContext(Dispatchers.IO) {
+                            toRoomAdapter.adapt(it)?.let { it1 ->
+                                userDao.saveUser(it1)
+                                userDao.getEntireUser().let { it2 -> fromRoomAdapter.adapt(it2) }
+                                Log.d("user in register", userDao.getEntireUser().toString())
+                            }
                         }
                     }
                 }
-            }
             }.await()
 
         }

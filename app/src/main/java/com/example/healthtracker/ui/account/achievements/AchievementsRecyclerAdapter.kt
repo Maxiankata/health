@@ -7,22 +7,24 @@ import android.view.View.GONE
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat.getString
 import androidx.recyclerview.widget.RecyclerView
+import com.example.healthtracker.MyApplication
 import com.example.healthtracker.R
 import com.example.healthtracker.data.user.Achievement
 
 class AchievementsRecyclerAdapter(val steps:Int, val items:List<Achievement>) :
     RecyclerView.Adapter<AchievementsRecyclerAdapter.AchievementsViewHolder>() {
-
+    val context = MyApplication.getContext()
     inner class AchievementsViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.achievement_name)
         val image: ImageView = view.findViewById(R.id.achievement_image)
         val description: TextView = view.findViewById(R.id.achievement_goal)
         fun bind(achievement: Achievement) {
             image.setImageResource(achievement.image)
-            name.text = achievement.name
+            name.text = getString(context,achievement.name)
             description.text = buildString {
-                append("Reach ${achievement.goal} steps")
+                append("${getString(context, R.string.reach)} ${achievement.goal} ${getString(context, R.string.stepss)}")
             }
             if (steps>=achievement.goal){
                 achievement.unlocked = true

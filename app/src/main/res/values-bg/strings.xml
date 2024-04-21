@@ -128,6 +128,16 @@
     <string name="email_sending_issue">Възникна проблем при изпращането на имейла.</string>
     <string name="select_units">Избери мерни единици</string>
     <string name="active_time">Активно време: </string>
+    <string name="matching_passwords">Паролите не съвпадат</string>
+    <string name="register_failed">Регистрацията не беше успешна</string>
+    <string name="challenge_sent">Изпратено предизвикателство!</string>
+    <string name="friend_request_sent">Изпратена покана за приятелство</string>
+    <string name="first_achievement">Начало на приключение..</string>
+    <string name="second_achievement">Достигнахте промяна в кариерата!</string>
+    <string name="third_achievement">Достигнахте надграждане на класа си?!</string>
+    <string name="step_wizard">Да живее стъпковия магьосник 🧙‍♂️!</string>
+    <string name="reach">Достигнете</string>
+    <string name="stepss">стъпки</string>
     <string-array name="activities">
         <item>Walking</item>
         <item>Power Walking</item>
