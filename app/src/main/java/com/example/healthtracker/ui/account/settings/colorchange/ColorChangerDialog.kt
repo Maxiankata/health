@@ -2,6 +2,7 @@ package com.example.healthtracker.ui.account.settings.colorchange
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +24,7 @@ class ColorChangerDialog:DialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = RgbPickerDialogBinding.inflate(inflater, container, false)
+        colorChangerViewModel.getUser()
         return binding.root
     }
     override fun onStart() {
@@ -37,8 +39,8 @@ class ColorChangerDialog:DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
             pick.setOnClickListener {
-                lifecycleScope.launch {
-                    colorChangerViewModel.getUser { user ->
+                Log.d("new rgb", setRgbColor())
+                    colorChangerViewModel.user.observe(viewLifecycleOwner){ user ->
                         if (user != null) {
                             val usurper = UserInfo(
                                 username = user.username,
@@ -50,8 +52,8 @@ class ColorChangerDialog:DialogFragment() {
                                 totalSteps = user.totalSteps
                             )
                             colorChangerViewModel.updateUser(usurper)
+                            Log.d("new rgb applied", user.theme.toString())
                         }
-                    }
                 }
                 dismiss()
             }

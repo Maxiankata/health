@@ -6,9 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.example.healthtracker.MainActivity
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.FragmentDashboardBinding
 import com.example.healthtracker.ui.calendarToString
+import com.example.healthtracker.ui.formatDurationFromLong
 import com.example.healthtracker.ui.showBottomNav
 import java.util.Calendar
 import kotlin.math.round
@@ -34,6 +36,7 @@ class DashboardFragment : Fragment() {
                 selectedDate.set(year, month, dayOfMonth)
                 val daySelection = calendarToString(selectedDate)
                 dashboardViewModel.feedDays(daySelection)
+
                 dashboardViewModel.userDay.observe(viewLifecycleOwner) {
                     if (it != null) {
                         date.apply {
@@ -51,7 +54,7 @@ class DashboardFragment : Fragment() {
                         }
                         caloriesBurned.apply {
                             text = buildString {
-                                append(getString(R.string.calories))
+                                append("${getString(R.string.calories)} ")
                                 append(it.automaticInfo?.steps?.currentCalories ?: 0)
                                 append("/")
                                 append(it.automaticInfo?.steps?.caloriesGoal)
@@ -80,8 +83,23 @@ class DashboardFragment : Fragment() {
                                 append(challenges)
                             }
                         }
+                        activeTime.apply {
+                            text = buildString {
+                                append(getString(R.string.active_time))
+                                append(it.automaticInfo?.activeTime?.let { it1 ->
+                                    formatDurationFromLong(
+                                        it1
+                                    )
+                                })
+                            }
+                        }
+                        sleepyTime.apply {
+                            text = buildString {
+                                append(getString(R.string.sleep))
+                                append(it.putInInfo?.sleepDuration)
+                            }
+                        }
                         recordedWeight.apply {
-
                             var weight = it.putInInfo?.weight ?: 0.0
                             if (dashboardViewModel.units == "kg") {
                                 if (it.putInInfo?.units == "kg") {

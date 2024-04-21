@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
@@ -25,6 +26,7 @@ import com.example.healthtracker.databinding.ActivityMainBinding
 import com.example.healthtracker.ui.home.speeder.SpeederServiceBoolean
 import com.example.healthtracker.ui.home.walking.AlarmItem
 import com.example.healthtracker.ui.home.walking.Alarm
+import com.example.healthtracker.ui.home.walking.StepCounterService
 import com.example.healthtracker.ui.startStepCounterService
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.time.LocalDateTime
@@ -48,11 +50,10 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
             )
         )
-        mainViewModel.syncTimer()
         mainViewModel.settings.observe(this) {
-            Log.d("settings was changed", it.language.toString())
             mainViewModel.updateLanguage(this)
         }
+
         SpeederServiceBoolean._isMyServiceRunning.postValue(false)
         startStepCounterService()
         val item = AlarmItem(LocalDateTime.now(),"wipe it")
@@ -60,30 +61,8 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.hide()
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-        buildNotification()
     }
-
-    private fun buildNotification() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = getString(R.string.friends)
-            val descriptionText = getString(R.string.new_friend)
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(channelID, name, importance).apply {
-                description = descriptionText
-            }
-            val notificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-            Log.d("NOTIFICATION CHANNEL BUILT", channel.toString())
-        }
-    }
-
-
-
     companion object {
-        var stepCounterService:Intent?=null
-        var speederService:Intent?=null
-
         private lateinit var db: UserDB
         fun getDatabaseInstance(): UserDB {
             val context = MyApplication.getContext()

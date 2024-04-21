@@ -91,24 +91,20 @@ class AuthImpl : AuthInterface {
 
     override suspend fun createAcc(email: String, password: String, username: String): Boolean {
         return try {
-            Firebase.auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val user = Firebase.auth.currentUser
-                        val userRef = Firebase.database.getReference("user")
-                        if (user != null) {
-                            val userer = UserMegaInfo(
-                                UserInfo(
-                                    username = username, mail = email, uid = user.uid
-                                )
-                            )
-                            userRef.child(user.uid).setValue(userer).addOnSuccessListener {
-                                Log.d("nice", "ince")
-                            }
-                        }
-                    }
+                val authResult = Firebase.auth.createUserWithEmailAndPassword(email, password).await()
+                val user = authResult.user
+                if (user != null) {
+                    val userRef = Firebase.database.getReference("user")
+                    val userer = UserMegaInfo(
+                        UserInfo(
+                            username = username, mail = email, uid = user.uid
+                        )
+                    )
+                    userRef.child(user.uid).setValue(userer).await()
+                    true
+                } else {
+                    false
                 }
-            true
         } catch (e: Exception) {
             e.printStackTrace()
             false
@@ -228,10 +224,10 @@ class AuthImpl : AuthInterface {
     }
     override suspend fun addFriend(sentToUser: String, sentByUser: String) {
         Firebase.database.reference.child("user").child(sentByUser)
-            .child("userFriends").child(sentToUser).setValue(UserFriends(sentByUser, true))
+            .child("userFriends").child(sentToUser).setValue(UserFriends(sentToUser, true))
 
         Firebase.database.reference.child("user").child(sentToUser)
-            .child("userFriends").child(sentByUser).setValue(UserFriends(sentToUser, true))
+            .child("userFriends").child(sentByUser).setValue(UserFriends(sentByUser, true))
     }
     override suspend fun removeFriend(userId: String, userFriendList: List<UserFriends>) {
         Firebase.database.reference.child("user").child(Firebase.auth.currentUser!!.uid)

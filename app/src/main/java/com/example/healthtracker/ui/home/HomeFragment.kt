@@ -40,31 +40,32 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-            homeViewModel.feedUser()
+        homeViewModel.feedUser()
         binding.apply {
             StepCounterService.steps.observe(viewLifecycleOwner) { steps ->
+                Log.d("steps", steps.toString())
                 if (steps == null) {
                     Log.d("wait for it :)", "i swear")
                 } else {
-                    lifecycleScope.launch {
-                        homeViewModel.user.observe(viewLifecycleOwner) {
-                            val user = it
-                            stepsCircularProgressBar.apply {
-                                val steppi = user?.userSettingsInfo?.userGoals?.stepGoal?.toFloat()
-                                setProgressWithAnimation(steps.toFloat())
-                                steppi?.let {
-                                    progressMax = steppi
-                                }
-                            }
-                            stepcount.apply {
-                                text = buildString {
-                                    append(getString(R.string.steps))
-                                    append(steps)
-                                }
-                            }
+                    stepsCircularProgressBar.apply {
+                        setProgressWithAnimation(steps.toFloat())
+                    }
+                    stepcount.apply {
+                        text = buildString {
+                            append(getString(R.string.steps))
+                            append(steps)
                         }
                     }
                 }
+            }
+            homeViewModel.user.observe(viewLifecycleOwner) {
+                stepsCircularProgressBar.apply {
+                    val steppi = it?.userSettingsInfo?.userGoals?.stepGoal?.toFloat()
+                    steppi?.let {
+                        progressMax = steppi
+                    }
+                }
+
             }
             StepCounterService.calories.observe(viewLifecycleOwner) { calories ->
                 if (calories == null) {
@@ -90,9 +91,15 @@ class HomeFragment : Fragment() {
 
             }
             StepCounterService.sleepDuration.observe(viewLifecycleOwner) { sleep ->
-                    sleepLogger.text = buildString {
-                        append("${getString(R.string.you_have_slept_for)} ${formatDurationFromLong(sleep)} ${getString(R.string.hours)}")
-                    }
+                sleepLogger.text = buildString {
+                    append(
+                        "${getString(R.string.you_have_slept_for)} ${formatDurationFromLong(sleep)} ${
+                            getString(
+                                R.string.hours
+                            )
+                        }"
+                    )
+                }
                 sleepSubmit.setOnClickListener {
                     homeViewModel.updateSleep(formatDurationFromLong(sleep))
                 }
@@ -136,25 +143,25 @@ class HomeFragment : Fragment() {
             }
 
             plus.setOnClickListener {
-                    homeViewModel.waterIncrement(1)
+                homeViewModel.waterIncrement(1)
             }
             minus.setOnClickListener {
-                    homeViewModel.waterIncrement(-1)
+                homeViewModel.waterIncrement(-1)
             }
 
-            SpeederServiceBoolean.isMyServiceRunning.observe(viewLifecycleOwner){
-                if (it){
+            SpeederServiceBoolean.isMyServiceRunning.observe(viewLifecycleOwner) {
+                if (it) {
                     activityGrid.visibility = View.GONE
                     activityButton.visibility = View.VISIBLE
-                }else{
+                } else {
                     activityGrid.visibility = View.VISIBLE
                     activityButton.visibility = View.GONE
                 }
             }
-            activityButton.apply{
+            activityButton.apply {
                 setOnClickListener {
                     val tag = SpeederService.speedIntent.getStringExtra("activity")
-                    RunningDialogFragment().show(requireActivity(). supportFragmentManager,tag)
+                    RunningDialogFragment().show(requireActivity().supportFragmentManager, tag)
                 }
                 val backgroundTintList = ColorStateList.valueOf(Color.YELLOW)
                 setBackgroundTintList(backgroundTintList)

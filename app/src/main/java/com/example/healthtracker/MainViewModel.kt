@@ -1,6 +1,7 @@
 package com.example.healthtracker
 
 import android.app.Application
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.res.Configuration
 import android.util.Log
@@ -11,8 +12,16 @@ import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
 import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
 import com.example.healthtracker.data.room.UserMegaInfoToRoomAdapter
+import com.example.healthtracker.data.user.UserFriends
 import com.example.healthtracker.data.user.UserSettingsInfo
 import com.example.healthtracker.ui.home.speeder.SpeederServiceBoolean
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -23,7 +32,8 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
     private val userDao = MainActivity.getDatabaseInstance().dao()
     private var fromRoomAdapter = RoomToUserMegaInfoAdapter()
     private var toRoomAdapter = UserMegaInfoToRoomAdapter()
-
+    private var _friendRequests = MutableLiveData<UserFriends>()
+    val friendRequests :LiveData<UserFriends> get() = _friendRequests
     private val _selectedLanguage = MutableLiveData<String>()
     val selectedLanguage: LiveData<String> get() = _selectedLanguage
 
@@ -34,20 +44,7 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
                 val user = userDao.getEntireUser()
                 user.let {
                     fromRoomAdapter.adapt(it)
-                }?.let {
-//                    auth.sync(it)
-
                 }
-            }
-        }
-    }
-
-    fun syncTimer() {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                SpeederServiceBoolean._activityTime.postValue(
-                    userDao.getAutomaticInfo()?.activeTime ?: 0
-                )
             }
         }
     }

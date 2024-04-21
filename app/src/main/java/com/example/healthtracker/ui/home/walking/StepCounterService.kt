@@ -37,15 +37,16 @@ class StepCounterService : Service(), SensorEventListener {
     companion object {
         val _steps = MutableLiveData<Int>()
         val steps: LiveData<Int> get() = _steps
-
         val _calories = MutableLiveData<Int>()
         val calories: LiveData<Int> get() = _calories
         var _sleepDuration = MutableLiveData<Long>()
+        val _activeTime = MutableLiveData<Long>()
         val sleepDuration: LiveData<Long> get() = _sleepDuration
         val channelId = "step_counter_channel"
 
         var stepIntent: Intent = Intent(MyApplication.getContext(), StepCounterService::class.java)
     }
+
     private var lastSensorEventTime: Long = 0
     private var isSleeping = false
     private var sleepStartTime: Long = 0
@@ -58,7 +59,6 @@ class StepCounterService : Service(), SensorEventListener {
     private var sensorManager: SensorManager? = null
 
     init {
-        _sleepDuration.postValue(0)
         calendar.timeInMillis = currentTimeMillis
         calendar.set(Calendar.MINUTE, 42)
         calendar.set(Calendar.SECOND, 0)
@@ -71,25 +71,34 @@ class StepCounterService : Service(), SensorEventListener {
         CoroutineScope(Dispatchers.IO).launch {
             userDao.getEntireUser().let {
                 callback(roomToUserMegaInfoAdapter.adapt(it))
-                Log.d("emitted user", roomToUserMegaInfoAdapter.adapt(it).userAutomaticInfo.toString())
+                Log.d(
+                    "emitted user",
+                    roomToUserMegaInfoAdapter.adapt(it).userAutomaticInfo.toString()
+                )
             }
         }
     }
 
-    private fun getStartingMetrics() {
+    fun getStartingMetrics() {
         getUser { user ->
             user?.let {
-                it.userAutomaticInfo?.steps?.currentSteps.let { it1 ->
-                    _steps.postValue(it1)
-                }
-                it.userAutomaticInfo?.steps?.currentCalories.let { it1 ->
-                    _calories.postValue(it1)
-                }
-                it.userPutInInfo?.sleepDuration?.let { duration ->
-                    if (duration.isNotEmpty()) {
-                        val sleep = parseDurationToLong(duration)
-                        _sleepDuration.postValue(sleep)
+                it.userAutomaticInfo?.let {it1->
+                    Log.d("captured pasting mechanism time", it1.toString())
+                    CoroutineScope(Dispatchers.Main).launch{
+                        _activeTime.postValue(it1.activeTime!!)
+                        Log.d("steps info from getter", it1.steps.toString())
+                        _calories.value = it1.steps?.currentCalories!!
+                        Log.d("UPDATED CALORIES", _calories.value.toString())//DO NOT DELETE DO NOT DO NOT
+                        _steps.value = it1.steps.currentSteps!!
+                        Log.d("UPDATED STEPS", _steps.value.toString())//DO NOT DELETE DO NOT DO NOT
+                        if (!it.userPutInInfo?.sleepDuration.isNullOrBlank()) {
+                            val sleep = parseDurationToLong(it.userPutInInfo?.sleepDuration!!)
+                            _sleepDuration.postValue(sleep)
+                        } else {
+                            _sleepDuration.postValue(0)
+                        }
                     }
+
                 }
             }
         }
@@ -103,27 +112,27 @@ class StepCounterService : Service(), SensorEventListener {
                 val renewedAutomaticInfo = UserAutomaticInfo(
                     challengesPassed = it?.challengesPassed ?: 0,
                     steps = it?.steps?.copy(
-                        currentSteps = _steps.value,
-                        currentCalories = _calories.value
-                    )
+                        currentSteps = _steps.value, currentCalories = _calories.value
+                    ),
+                    activeTime = it?.activeTime
                 )
                 userDao.updateUserAutomaticInfo(renewedAutomaticInfo)
 
 
             }
         }
-        }
+    }
 
 
     override fun onCreate() {
         super.onCreate()
+        getStartingMetrics()
         createNotificationChannel()
-            getStartingMetrics()
         handler = Handler(Looper.getMainLooper())
         handler?.post(object : Runnable {
             override fun run() {
-                    updateUserAutomaticInfo()
-                    checkForSleep()
+                updateUserAutomaticInfo()
+                checkForSleep()
                 handler?.postDelayed(this, 10000)
             }
         })
@@ -148,12 +157,12 @@ class StepCounterService : Service(), SensorEventListener {
         sleepStopTime = System.currentTimeMillis()
         _sleepDuration.postValue(sleepStopTime - sleepStartTime)
         CoroutineScope(Dispatchers.IO).launch {
-                val userPutInInfo = async {
-                    userDao.getPutInInfo()
-                }.await()
-                userPutInInfo?.sleepDuration = formatDurationFromLong(_sleepDuration.value!!)
-                userPutInInfo?.let {
-                    userDao.updateUserPutInInfo(it)
+            val userPutInInfo = async {
+                userDao.getPutInInfo()
+            }.await()
+            userPutInInfo?.sleepDuration = formatDurationFromLong(_sleepDuration.value!!)
+            userPutInInfo?.let {
+                userDao.updateUserPutInInfo(it)
             }
         }
     }
@@ -185,9 +194,8 @@ class StepCounterService : Service(), SensorEventListener {
         val currentSteps = _steps.value ?: 0
         val builder =
             NotificationCompat.Builder(this, channelId).setSmallIcon(R.drawable.running_icon)
-                .setContentTitle(getString(R.string.today_steps))
-                .setContentText("$currentSteps").setContentIntent(pendingIntent)
-                .setOngoing(true).setSound(null)
+                .setContentTitle(getString(R.string.today_steps)).setContentText("$currentSteps")
+                .setContentIntent(pendingIntent).setOngoing(true).setSound(null)
         return builder.build()
     }
 
@@ -198,12 +206,14 @@ class StepCounterService : Service(), SensorEventListener {
             )
         }
     }
+    private var isFirstCallback = true
 
     override fun onSensorChanged(event: SensorEvent) {
-        if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
+
+        if (!isFirstCallback && event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
             _steps.value?.plus(1)?.let {
                 _steps.postValue(it)
-                if (_steps.value!! %25==0){
+                if (_steps.value!! % 25 == 0) {
                     _calories.postValue(_calories.value?.plus(1))
                 }
                 updateNotification()
@@ -213,6 +223,7 @@ class StepCounterService : Service(), SensorEventListener {
                 stopSleepTracking()
             }
         }
+        isFirstCallback = false
     }
 
     fun nullifySteps() {

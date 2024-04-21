@@ -97,7 +97,7 @@
     <string name="empty_challenges">No new challenges for today</string>
     <string name="accept">Accept</string>
     <string name="decline">Decline</string>
-    <string name="challenges_passed">Challenges passed:</string>
+    <string name="challenges_passed">Challenges passed: </string>
     <string name="permissions_needed">The permissions requested are needed for the app to function.</string>
     <string name="kg">kg</string>
     <string name="apply">Apply changes</string>
@@ -127,6 +127,9 @@
     <string name="email_sending_issue">There was an issue with sending the email.</string>
     <string name="settings">Settings</string>
     <string name="select_units">Select units</string>
+    <string name="active_time">"Active time: "</string>
+    <string name="matching_passwords">Passwords should match</string>
+    <string name="register_failed">Registration failed</string>
     <string-array name="activities">
         <item>Walking</item>
         <item>Power Walking</item>

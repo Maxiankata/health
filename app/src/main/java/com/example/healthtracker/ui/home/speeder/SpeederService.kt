@@ -25,7 +25,6 @@ import com.example.healthtracker.ui.home.walking.StepCounterService
 import com.example.healthtracker.ui.parseDurationToLong
 import com.example.healthtracker.ui.stopSpeeder
 import com.example.healthtracker.ui.updateStepCalories
-import com.example.healthtracker.ui.updateTimer
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -50,6 +49,7 @@ class SpeederService : Service() {
         val speed: LiveData<Double> get() = _speed
         var speedIntent = Intent(MyApplication.getContext(), SpeederService::class.java)
         var multiplier: Double = 0.0
+        var activityTime = MutableLiveData<Long>()
     }
 
     private var divider: Int = 0
@@ -71,7 +71,7 @@ class SpeederService : Service() {
         startForeground(NOTIFICATION_ID, createNotification())
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         customCoroutineScope.launch {
-            multiplier = if (userDao.getUserSettings()?.units == "kg") {
+            multiplier = if (userDao.getUserSettings().units == "kg") {
                 3.6
             } else {
                 2.24
@@ -83,17 +83,24 @@ class SpeederService : Service() {
             weight = userDao.getPutInInfo()?.weight!!
         }
         val challengeExtra = speedIntent.getStringExtra("challenge").toString()
-        val challenge: Challenge? = if (challengeExtra == "null") null else Challenge.fromString(speedIntent.getStringExtra("challenge")!!)
+        val challenge: Challenge? = if (challengeExtra == "null") null else Challenge.fromString(
+            speedIntent.getStringExtra("challenge")!!
+        )
         if (challenge != null) speedIntent.putExtra("challenge_id", challenge.id.toString())
         timer = startCountdownFromString(time, onTick = { timeRemaining ->
             _time.postValue(timeRemaining)
             updateNotification()
         }, onFinish = {
-            updateTimer(parseDurationToLong(time))
+            activityTime.postValue(parseDurationToLong(time))
             customCoroutineScope.launch {
                 val autoInfo = userDao.getAutomaticInfo()
-                Log.d("newtimer", "added $time to spedeer time for it to become ${SpeederServiceBoolean._activityTime.value.toString()}")
-                autoInfo?.activeTime = SpeederServiceBoolean._activityTime.value
+                Log.d(
+                    "newtimer",
+                    "added $time to spedeer time for it to become ${activityTime.value.toString()}"
+                )
+                autoInfo?.activeTime = activityTime.value
+                    ?.let { autoInfo?.activeTime?.plus(it) }
+                autoInfo?.challengesPassed = autoInfo?.challengesPassed?.plus(1)
                 if (autoInfo != null) {
                     userDao.updateUserAutomaticInfo(autoInfo)
                     Log.d("updated auto", userDao.getAutomaticInfo()?.activeTime.toString())
@@ -223,7 +230,6 @@ class SpeederService : Service() {
         ) {
             return
         }
-
         val locationRequest = LocationRequest.Builder(1000).setIntervalMillis(1000)
             .setPriority(Priority.PRIORITY_HIGH_ACCURACY).setMaxUpdateDelayMillis(500).build()
         fusedLocationClient.requestLocationUpdates(
@@ -242,7 +248,9 @@ class SpeederService : Service() {
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
     }
-
+    private fun stopLocationUpdates() {
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+    }
     private fun createNotification(): Notification {
         val intent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
@@ -251,9 +259,7 @@ class SpeederService : Service() {
             .setSmallIcon(R.drawable.timer_icon).setContentIntent(pendingIntent).build()
     }
 
-    private fun stopLocationUpdates() {
-        fusedLocationClient.removeLocationUpdates(locationCallback)
-    }
+
 
     private fun updateNotification() {
         val notification = createNotification()

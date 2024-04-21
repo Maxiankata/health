@@ -9,15 +9,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.healthtracker.AuthImpl
 import com.example.healthtracker.MainActivity
-import com.example.healthtracker.MyApplication
 import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
 import com.example.healthtracker.data.room.UserMegaInfoToRoomAdapter
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.UserPutInInfo
 import com.example.healthtracker.data.user.WaterInfo
-import com.example.healthtracker.ui.home.walking.StepCounterService
-import com.example.healthtracker.ui.isInternetAvailable
-import com.example.healthtracker.ui.parseDurationToLong
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -29,7 +25,7 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
     private val _currentService: MutableLiveData<SensorEventListener> = MutableLiveData()
     val currentService: LiveData<SensorEventListener> get() = _currentService
 
-    private val _user = MutableLiveData<UserMegaInfo?>()
+    private val _user = MutableLiveData<UserMegaInfo>()
     private val _water = MutableLiveData<WaterInfo?>()
     private val roomToUserMegaInfoAdapter = RoomToUserMegaInfoAdapter()
     private val userMegaInfoToRoomAdapter = UserMegaInfoToRoomAdapter()
@@ -37,21 +33,28 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
     private val _weight = MutableLiveData<Double?>()
     val weight: LiveData<Double?> get() = _weight
     val water: LiveData<WaterInfo?> get() = _water
-    val user: LiveData<UserMegaInfo?>
+    val user: LiveData<UserMegaInfo>
         get() = _user
     private val _sleep = MutableLiveData<String>()
-    val sleep : LiveData<String> get() = _sleep
+    val sleep: LiveData<String> get() = _sleep
     fun feedUser() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val user = userDao.getEntireUser().let { roomToUserMegaInfoAdapter.adapt(it) }
-                _water.postValue(user.userPutInInfo?.waterInfo)
-                _user.postValue(user)
-                _weight.postValue(user.userPutInInfo?.weight)
+                userDao.getEntireUserFlow().collect { user ->
+                    if (user != null) {
+                        _water.postValue(user.userPutInInfo?.waterInfo)
+                        _user.postValue(
+                            roomToUserMegaInfoAdapter.adapt(user)
+                        )
+                        _weight.postValue(user.userPutInInfo?.weight)
+                    }
+                }
+
             }
         }
     }
-    fun updateSleep(sleep:String) {
+
+    fun updateSleep(sleep: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val userPutIn = async {

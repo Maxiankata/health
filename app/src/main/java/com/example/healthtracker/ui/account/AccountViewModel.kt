@@ -17,8 +17,10 @@ import com.example.healthtracker.data.user.UserInfo
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.ui.bitmapToBase64
 import com.example.healthtracker.ui.isInternetAvailable
+import com.example.healthtracker.ui.nullifyStepCounter
 import com.example.healthtracker.ui.stopSpeeder
 import com.example.healthtracker.ui.stopStepCounterService
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -36,20 +38,20 @@ class AccountViewModel(private val application: Application) : AndroidViewModel(
             withContext(Dispatchers.IO) {
                 userDao.dropUser()
                 auth.signOut()
+                nullifyStepCounter()
                 stopStepCounterService()
                 stopSpeeder()
             }
         }
     }
 
-    fun getDays() {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                Log.d("userdays in account", userDao.getEntireUser().userDays.toString())
+    private fun getUser(callback: (UserMegaInfo?) -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            userDao.getEntireUser().let {
+                callback(roomToUserMegaInfoAdapter.adapt(it))
             }
         }
     }
-
     private fun sync() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -78,11 +80,8 @@ class AccountViewModel(private val application: Application) : AndroidViewModel(
                                 newImageInfo
                             )
                         }
-                        val image = bitmapToBase64(bitmap)
-                        Log.d("SAVED IMAGE TO LOCAL", image)
                         if (isInternetAvailable(application.applicationContext)) {
                             auth.saveBitmapToDatabase(bitmap)
-                            Log.d("SAVED IMAGE TO NETWORK", image)
                         } else {
                             Toast.makeText(
                                 application.applicationContext,
@@ -96,16 +95,8 @@ class AccountViewModel(private val application: Application) : AndroidViewModel(
     }
 
     fun getWholeUser() {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                userDao.getEntireUser()?.let {
-                    _user.postValue(
-                        roomToUserMegaInfoAdapter.adapt(
-                            it
-                        )
-                    )
-                }
-            }
+        getUser {
+            _user.postValue(it)
         }
     }
 }

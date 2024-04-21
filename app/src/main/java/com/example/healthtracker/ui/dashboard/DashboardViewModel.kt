@@ -33,6 +33,7 @@ class DashboardViewModel(private val application: Application) : AndroidViewMode
             }
         }
     }
+
     fun getUserUnits(){
         viewModelScope.launch {
             withContext(Dispatchers.IO){

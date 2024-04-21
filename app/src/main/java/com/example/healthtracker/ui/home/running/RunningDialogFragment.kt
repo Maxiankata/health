@@ -24,6 +24,7 @@ import com.example.healthtracker.ui.stopSpeeder
 import java.text.DecimalFormat
 import java.time.Duration
 import java.util.Timer
+import kotlin.math.round
 
 class RunningDialogFragment : DialogFragment() {
     private var _binding: RunningDialogBinding? = null
@@ -129,10 +130,14 @@ class RunningDialogFragment : DialogFragment() {
             }
 
             SpeederService.speed.observe(viewLifecycleOwner){
-                if (runningDialogViewModel.userMetric.value=="kg"){
-                    speed.text = "${limitSpeed(it)} kph"
-                }else{
-                    speed.text = "${limitSpeed(it)} mph"
+                Log.d("speed", it.toString())
+                speed.text = buildString {
+                    append("${round(it*10) /10}")
+                    if (runningDialogViewModel.userMetric.value=="kg"){
+                        append("kph")
+                    }else{
+                        append("mph")
+                    }
                 }
             }
             SpeederService.time.observe(viewLifecycleOwner) {
@@ -161,9 +166,4 @@ class RunningDialogFragment : DialogFragment() {
             }
         }
     }
-    private fun limitSpeed(value: Double): Double {
-        val df = DecimalFormat("#.#")
-        return df.format(value).toDouble()
-    }
-
 }

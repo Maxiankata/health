@@ -34,6 +34,11 @@ class LoginFragmentViewModel(private val application: Application) : AndroidView
     val state: LiveData<State>
         get() = _state
 
+    private val _button_clickable = MutableLiveData<Boolean>()
+    val button_clickable : LiveData<Boolean> get() = _button_clickable
+    init {
+        _button_clickable.postValue(true)
+    }
     fun logIn(email: String, password: String, isInternetAvailable: Boolean) {
         _state.value = State.Loading(View.VISIBLE)
         if (!isInternetAvailable) {
@@ -47,10 +52,11 @@ class LoginFragmentViewModel(private val application: Application) : AndroidView
         viewModelScope.launch {
             try {
                 if(auth.logIn(email, password)){
+                    _button_clickable.postValue(false)
                     getUser()
+                    delay(3000)
                     _state.postValue(State.LoggedIn(true))
                 }else{
-                    Log.d("state", "loading visibilit")
                     _state.postValue(State.Notify(getString(MyApplication.getContext(), R.string.invalid_password)))
                 }
             } catch (e: Exception) {

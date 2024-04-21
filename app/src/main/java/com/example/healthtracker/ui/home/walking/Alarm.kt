@@ -5,7 +5,6 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import com.example.healthtracker.AuthImpl
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.MyApplication
@@ -19,7 +18,6 @@ import com.example.healthtracker.ui.calendarToString
 import com.example.healthtracker.ui.getStepsValue
 import com.example.healthtracker.ui.home.speeder.SpeederServiceBoolean
 import com.example.healthtracker.ui.nullifyStepCounter
-import com.example.healthtracker.ui.nullifyTimer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -27,15 +25,15 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.util.Calendar
 
-class Alarm : AlarmScheduler {
+class  Alarm : AlarmScheduler {
     val context = MyApplication.getContext()
     private val alarmManager: AlarmManager = context.getSystemService(AlarmManager::class.java)
     override fun schedule(item: AlarmItem) {
         val intent = Intent(context, AlarmReciever::class.java)
         val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, 8)
-        calendar.set(Calendar.MINUTE, 32)
-        calendar.set(Calendar.SECOND, 30)
+        calendar.set(Calendar.HOUR_OF_DAY, 17)
+        calendar.set(Calendar.MINUTE, 44)
+        calendar.set(Calendar.SECOND, 0)
         val currentTime = System.currentTimeMillis()
         if (calendar.timeInMillis < currentTime) {
             calendar.add(Calendar.DAY_OF_MONTH, 1)
@@ -75,22 +73,22 @@ class AlarmReciever : BroadcastReceiver() {
             val userPutInInfo = user.userPutInInfo
             val userAutomaticInfo = user.userAutomaticInfo
             val userSettings = userDao.getUserSettings()
-            userAutomaticInfo?.steps?.stepsGoal = userSettings?.userGoals?.stepGoal
-            userAutomaticInfo?.steps?.caloriesGoal =  userSettings?.userGoals?.calorieGoal
-            userAutomaticInfo?.activeTime = SpeederServiceBoolean.activityTime.value
-            userPutInInfo?.waterInfo?.waterGoal =  userSettings?.userGoals?.waterGoal
-            userPutInInfo?.units = userSettings?.units
+            userAutomaticInfo?.steps?.stepsGoal = userSettings.userGoals?.stepGoal
+            userAutomaticInfo?.steps?.caloriesGoal = userSettings.userGoals?.calorieGoal
+            userPutInInfo?.waterInfo?.waterGoal = userSettings.userGoals?.waterGoal
+            userPutInInfo?.units = userSettings.units
             val userChallenges = user.challenges as ArrayList<Challenge>?
             val userDays = user.userDays as ArrayList<UserDays>
             val newUserInfo = UserInfo(
                 uid = user.userInfo.uid,
                 mail = user.userInfo.mail,
-                theme =user.userInfo.theme,
+                theme = user.userInfo.theme,
                 bgImage = user.userInfo.bgImage,
                 image = user.userInfo.image,
                 totalSteps = user.userInfo.totalSteps?.plus(getStepsValue()),
-                username = user.userInfo.username
-                )
+                username = user.userInfo.username,
+
+            )
             val weight = userPutInInfo?.weight
             val sendToday = calendarToString(Calendar.getInstance())
             val day = UserDays(
@@ -111,7 +109,6 @@ class AlarmReciever : BroadcastReceiver() {
             userDao.updateUserAutomaticInfo(UserAutomaticInfo())
             userDao.updateUserPutInInfo(UserPutInInfo(weight = weight))
             nullifyStepCounter()
-            nullifyTimer()
         }
     }
 }

@@ -27,13 +27,11 @@ import kotlinx.coroutines.runBlocking
 class FriendListAdapter : RecyclerView.Adapter<FriendListAdapter.FriendListViewHolder>() {
     private var items = ArrayList<UserInfo>()
     var itemClickListener: ItemClickListener<UserInfo>? = null
-    private val friendListViewModel = FriendListViewModel()
 
     inner class FriendListViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val name: TextView = view.findViewById(R.id.friend_name)
         private val email: TextView = view.findViewById(R.id.friend_mail)
         private val image: ImageView = view.findViewById(R.id.friend_photo)
-        private val cardButton: ImageView = view.findViewById(R.id.card_button)
         private val friendCardContainer: View = view.findViewById(R.id.friend_card_container)
 
         @SuppressLint("ResourceAsColor")
@@ -58,17 +56,6 @@ class FriendListAdapter : RecyclerView.Adapter<FriendListAdapter.FriendListViewH
                     itemClickListener?.onItemClicked(userInfo, adapterPosition)
 
                 }
-            }
-            FriendListViewModel.searchState.observeForever {
-                if (it) {
-                    cardButton.apply {
-                        setImageResource(R.drawable.friend_add)
-                        Log.d("FRIEND", "ICON SHOULD BE HERE")
-                        setOnClickListener {
-                                    userInfo.uid?.let { it1 -> friendListViewModel.addFriend(it1) }
-                        }
-                    }
-                } else cardButton.visibility = View.GONE
             }
         }
     }

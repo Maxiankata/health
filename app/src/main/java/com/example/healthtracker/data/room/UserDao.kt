@@ -36,7 +36,6 @@ interface UserDao {
 
     @Query("SELECT userAutomaticInfo FROM UserData")
     fun getAutomaticInfo(): UserAutomaticInfo?
-
     @Query("SELECT userPutInInfo FROM UserData")
     fun getPutInInfo(): UserPutInInfo?
 

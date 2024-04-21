@@ -1,9 +1,11 @@
 package com.example.healthtracker.ui.account
 
+import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +23,7 @@ import com.example.healthtracker.ui.account.friends.challenges.ChallengeDisplayD
 import com.example.healthtracker.ui.account.friends.popup.FriendsDialogFragment
 import com.example.healthtracker.ui.account.friends.requests.FriendRequestDialog
 import com.example.healthtracker.ui.base64ToBitmap
+import com.example.healthtracker.ui.home.walking.StepCounterService
 import com.example.healthtracker.ui.isInternetAvailable
 import com.example.healthtracker.ui.login.LoginActivity
 import com.example.healthtracker.ui.navigateToActivity
@@ -46,7 +49,6 @@ class AccountFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
-            accountViewModel.getDays()
             accountViewModel.getWholeUser()
             accountViewModel.user.observe(viewLifecycleOwner) { user ->
                 user?.let {
@@ -69,6 +71,7 @@ class AccountFragment : Fragment() {
                     }
                 }
             }
+
             val pickImage = registerForActivityResult(StartActivityForResult()) { result ->
                 fun onActivityResult(data: Intent?) {
                     data?.data?.let { uri ->
@@ -110,14 +113,13 @@ class AccountFragment : Fragment() {
             }
             friendRequests.setOnClickListener {
                 val dialog = FriendRequestDialog()
-                dialog.show(requireActivity().supportFragmentManager, "requests dialog")
-//                if (isInternetAvailable(MyApplication.getContext())) {
-//                    dialog.show(requireActivity().supportFragmentManager, "requests dialog")
-//                } else {
-//                    Toast.makeText(
-//                        MyApplication.getContext(), R.string.no_internet, Toast.LENGTH_SHORT
-//                    ).show()
-//                }
+                if (isInternetAvailable(MyApplication.getContext())) {
+                    dialog.show(requireActivity().supportFragmentManager, "requests dialog")
+                } else {
+                    Toast.makeText(
+                        MyApplication.getContext(), R.string.no_internet, Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
             challengeDialogOpener.setOnClickListener {
                 val dialog = ChallengeDisplayDialog()
@@ -138,8 +140,7 @@ class AccountFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         val contentResolver = requireContext().contentResolver
-
-        if (resultCode == -1 && requestCode == 101) {
+        if (resultCode == RESULT_OK && requestCode == 101) {
             val result: String? = data?.getStringExtra("RESULT")
             val resultUri: Uri? = Uri.parse(result)
             if (resultUri != null && result != "") {

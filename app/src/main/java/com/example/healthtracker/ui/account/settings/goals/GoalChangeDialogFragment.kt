@@ -3,6 +3,7 @@ package com.example.healthtracker.ui.account.settings.goals
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
@@ -83,6 +84,11 @@ class GoalChangeDialogFragment:DialogFragment() {
                             }
                         }
                     }
+                    sleepSubmit.apply {
+                        visibility = GONE
+                    }
+                    sleepGoalEdit.visibility=GONE
+                    sleepGoal.visibility= GONE
                     sleepSubmit.setOnClickListener{
                         if (sleepGoalEdit.text.isNullOrEmpty()) {
                             Toast.makeText(MyApplication.getContext(),getString(R.string.empty_field), Toast.LENGTH_SHORT).show()

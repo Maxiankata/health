@@ -30,15 +30,20 @@ class RegisterViewModel(private val application: Application) : AndroidViewModel
     val state: LiveData<State>
         get() = _state
 
-    suspend fun register(
-        email: String, password: String, name: String, isInternetAvailable: Boolean
+    private val _clickableButtons = MutableLiveData<Boolean>()
+    val clickableButtons : LiveData<Boolean> get() = _clickableButtons
+    init {
+        _clickableButtons.postValue(true)
+    }
+    fun register(
+        email: String, password: String,confirmPassword:String, name: String, isInternetAvailable: Boolean
     ) {
         _state.value = State.Loading(View.VISIBLE)
         if (!isInternetAvailable) {
             _state.value = State.Notify("no wifi")
             return
         }
-        if (email.isEmpty() || password.isEmpty()) {
+        if (email.isEmpty() || password.isEmpty() || name.isEmpty() || confirmPassword.isEmpty()) {
             _state.postValue(
                 State.Notify(
                     ContextCompat.getString(
@@ -48,18 +53,40 @@ class RegisterViewModel(private val application: Application) : AndroidViewModel
             )
             return
         }
+        if (password.count()<6){
+            _state.postValue(
+                State.Notify(
+                    ContextCompat.getString(
+                        MyApplication.getContext(), R.string.password_help
+                    )
+                )
+            )
+            return
+        }
+        if (password!=confirmPassword){
+            _state.postValue(
+                State.Notify(
+                    ContextCompat.getString(
+                        MyApplication.getContext(), R.string.matching_passwords
+                    )
+                )
+            )
+            return
+        }
+
         viewModelScope.launch {
             try {
                 if (auth.createAcc(email, password, name)) {
                     getUser()
-                        _state.postValue(State.LoggedIn(true))
+                    delay(2000)
+                    _state.postValue(State.LoggedIn(true))
                 } else {
                     Log.d("state", "loading visibilit")
                     _state.postValue(
                         State.Notify(
                             ContextCompat.getString(
                                 MyApplication.getContext(),
-                                R.string.invalid_password
+                                R.string.register_failed
                             )
                         )
                     )
@@ -73,7 +100,6 @@ class RegisterViewModel(private val application: Application) : AndroidViewModel
     fun getUser() {
         viewModelScope.launch {
             async {
-
             auth.getEntireUser().collect {
                 if (it != null) {
                     withContext(Dispatchers.IO) {

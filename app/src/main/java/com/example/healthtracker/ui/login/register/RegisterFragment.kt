@@ -52,21 +52,25 @@ class RegisterFragment : Fragment() {
                     findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
                 }
             }
+            registerViewModel.clickableButtons.observe(viewLifecycleOwner){ state->
+                signInButton.isEnabled = state
+                usernameInput.isEnabled = state
+                passwordInput.isEnabled = state
+                registerButton.isEnabled = state
+                confirmPasswordInput.isEnabled = state
+                emailInput.isEnabled = state
+            }
             registerButton.setOnClickListener {
                 requireActivity().showLoading()
-                if (passwordInput.text.toString()
-                        .isNotEmpty() && confirmPasswordInput.text.toString() == passwordInput.text.toString() && emailInput.text.toString()
-                        .isNotEmpty()
-                ) {
                     lifecycleScope.launch {
                         registerViewModel.register(
                             emailInput.text.toString(),
                             passwordInput.text.toString(),
+                            confirmPasswordInput.text.toString(),
                             usernameInput.text.toString(),
                             isInternetAvailable(MyApplication.getContext())
                         )
                         registerViewModel.getUser()
-                    }
                 }
             }
         }

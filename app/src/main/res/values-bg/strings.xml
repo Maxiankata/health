@@ -24,7 +24,7 @@
     <string name="name_placeholder">Контейнер за име</string>
     <string name="action_sign_out">Излез от профила си</string>
     <string name="friends">Приятели</string>
-    <string name="total_steps">"Общ брой на стъпките: "</string>
+    <string name="total_steps">Общ брой на стъпките: </string>
     <string name="achievements">Постижения</string>
     <string name="enter_your_email">Въведи имейла си</string>
     <string name="send_renewal_code">Изпрати код за смяна</string>
@@ -35,8 +35,8 @@
     <string name="reset_password">Смени парола</string>
     <string name="code">00000</string>
     <string name="account">Акаунт</string>
-    <string name="steps">Стъпки:</string>
-    <string name="calories">Калории:</string>
+    <string name="steps">Стъпки: </string>
+    <string name="calories">Калории: </string>
     <string name="daily_weight">Тегло за деня: </string>
     <string name="sleep">Сън за деня: </string>
     <string name="water">Изпити чаши с вода: </string>
@@ -71,11 +71,11 @@
     <string name="start">Стартирай</string>
     <string name="time_placeholder">00:00:00</string>
     <string name="stop">Спри</string>
-    <string name="date">Дата:</string>
-    <string name="step_goal">Цел за стъпки:</string>
-    <string name="calorie_goal">Цел за калории:</string>
-    <string name="water_goal">Цел за изпита вода:</string>
-    <string name="sleep_goal">Цел за сън:</string>
+    <string name="date">Дата: </string>
+    <string name="step_goal">Цел за стъпки: </string>
+    <string name="calorie_goal">Цел за калории: </string>
+    <string name="water_goal">Цел за изпита вода: </string>
+    <string name="sleep_goal">Цел за сън: </string>
     <string name="submit">Приеми</string>
     <string name="are_you_sure">Сигурен ли си?</string>
     <string name="challenge_duration">Времетраене на предизвикателството</string>
@@ -93,14 +93,14 @@
     <string name="empty_challenges">Няма нови предизвикателства за днес</string>
     <string name="accept">Приеми</string>
     <string name="decline">Откажи</string>
-    <string name="challenges_passed">Преминати предизвикателства:</string>
+    <string name="challenges_passed">Преминати предизвикателства: </string>
     <string name="permissions_needed">Изискваните права са нужни за работата на приложението.</string>
     <string name="kg">кг</string>
     <string name="apply">Приеми промените</string>
     <string name="language">Език</string>
     <string name="units">Мерни единици</string>
     <string name="lbs">lbs</string>
-    <string name="today_steps">Днешни стъпки:</string>
+    <string name="today_steps">Днешни стъпки: </string>
     <string name="progress">Развитие</string>
     <string name="friend_mode_on">Режим на текущи приятели е включен</string>
     <string name="new_friend_mode_on">Режим на нови приятели е включен</string>
@@ -127,6 +127,7 @@
     <string name="email_sent">Имейл изпратен!</string>
     <string name="email_sending_issue">Възникна проблем при изпращането на имейла.</string>
     <string name="select_units">Избери мерни единици</string>
+    <string name="active_time">Активно време: </string>
     <string-array name="activities">
         <item>Walking</item>
         <item>Power Walking</item>

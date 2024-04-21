@@ -235,10 +235,10 @@ fun DataSnapshot.toUserGoals(): UserGoals {
 
 fun DataSnapshot.toStepsInfo(): StepsInfo {
     return StepsInfo(
+        stepsGoal = child("stepsGoal").getValue(Int::class.java),
+        caloriesGoal = child("caloriesGoal").getValue(Int::class.java),
         currentSteps = child("currentSteps").getValue(Int::class.java),
         currentCalories = child("currentCalories").getValue(Int::class.java),
-        stepsGoal = child("stepsGoal").getValue(Int::class.java),
-        caloriesGoal = child("caloriesGoal").getValue(Int::class.java)
     )
 }
 
@@ -304,15 +304,6 @@ fun nullifyStepCounter() {
     StepCounterService._calories.postValue(0)
 }
 
-fun updateTimer(time: Long) {
-    Log.d("time to be updated", time.toString())
-    SpeederServiceBoolean._activityTime.value =
-        SpeederServiceBoolean._activityTime.value?.plus(time)
-}
-
-fun nullifyTimer() {
-    SpeederServiceBoolean._activityTime.postValue(0)
-}
 
 fun updateStepCalories(calories: Int) {
     StepCounterService._calories.postValue(StepCounterService._calories.value?.plus(calories))
@@ -323,14 +314,12 @@ fun formatDurationFromLong(milliseconds: Long): String {
     val hours = totalSeconds / 3600
     val minutes = (totalSeconds % 3600) / 60
     val seconds = totalSeconds % 60
-
     return String.format("%02d:%02d:%02d", hours, minutes, seconds)
 }
 
 fun parseDurationToLong(duration: String): Long {
     val parts = duration.split(":")
     require(parts.size == 3) { "Invalid duration format: $duration" }
-
     val hours = parts[0].toLong()
     val minutes = parts[1].toLong()
     val seconds = parts[2].toLong()
@@ -344,18 +333,6 @@ fun durationToString(duration: Duration): String {
     val seconds = duration.seconds % 60
     return String.format("%02d:%02d:%02d", hours, minutes, seconds)
 }
-
-fun stringToDuration(str: String): Duration? {
-    val parts = str.split(":")
-    if (parts.size != 3) {
-        return null
-    }
-    val hours = parts[0].toLongOrNull() ?: return null
-    val minutes = parts[1].toLongOrNull() ?: return null
-    val seconds = parts[2].toLongOrNull() ?: return null
-    return Duration.ofHours(hours).plusMinutes(minutes).plusSeconds(seconds)
-}
-
 @SuppressLint("SimpleDateFormat")
 fun calendarToString(calendar: Calendar): String {
     val dateFormat = SimpleDateFormat("dd/MM/yyyy")

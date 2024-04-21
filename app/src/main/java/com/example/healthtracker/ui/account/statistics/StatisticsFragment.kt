@@ -120,7 +120,7 @@ class StatisticsFragment : Fragment() {
                                 AASeriesElement().name(getString(R.string.sleep))
                                     .color("#84419C") //swap with R.color.lightgreen
                                     .data(sleepList.toTypedArray()),
-                                AASeriesElement().name(getString(R.string.active))
+                                AASeriesElement().name(getString(R.string.active_time))
                                     .color("#FFFF00") //swap with R.color.lightgreen
                                     .data(activeList.toTypedArray()),
                             )
