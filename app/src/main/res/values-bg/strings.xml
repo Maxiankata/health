@@ -152,6 +152,8 @@
     <string name="for_word">за</string>
     <string name="with">с</string>
     <string name="and">и</string>
+    <string name="declined">Отхвърлен</string>
+    <string name="accepted">Приет</string>
     <string-array name="activities">
         <item>Walking</item>
         <item>Power Walking</item>

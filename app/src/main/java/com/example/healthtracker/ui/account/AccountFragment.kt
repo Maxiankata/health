@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,7 +22,6 @@ import com.example.healthtracker.ui.account.friends.challenges.ChallengeDisplayD
 import com.example.healthtracker.ui.account.friends.popup.FriendsDialogFragment
 import com.example.healthtracker.ui.account.friends.requests.FriendRequestDialog
 import com.example.healthtracker.ui.base64ToBitmap
-import com.example.healthtracker.ui.home.walking.StepCounterService
 import com.example.healthtracker.ui.isInternetAvailable
 import com.example.healthtracker.ui.login.LoginActivity
 import com.example.healthtracker.ui.navigateToActivity
@@ -53,7 +51,7 @@ class AccountFragment : Fragment() {
             accountViewModel.user.observe(viewLifecycleOwner) { user ->
                 user?.let {
                     it.userInfo.image?.let { image ->
-                        if (image.isNullOrBlank()) {
+                        if (image.isBlank()) {
                             profilePhoto.setImageResource(R.drawable.profile_photo_placeholder)
                             profilePhoto.setBackgroundResource(R.drawable.circle_background)
                         } else {

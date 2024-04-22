@@ -10,9 +10,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
-import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
-import com.example.healthtracker.data.room.UserMegaInfoToRoomAdapter
-import com.example.healthtracker.data.user.UserFriends
 import com.example.healthtracker.data.user.UserSettingsInfo
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -25,45 +22,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
-class MainViewModel(private val application: Application) : AndroidViewModel(application) {
-    private val auth = AuthImpl.getInstance()
+class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val userDao = MainActivity.getDatabaseInstance().dao()
-    private var fromRoomAdapter = RoomToUserMegaInfoAdapter()
-    private var toRoomAdapter = UserMegaInfoToRoomAdapter()
-    private var _friendRequests = MutableLiveData<UserFriends?>()
-    val friendRequests: LiveData<UserFriends?> get() = _friendRequests
-    private val _selectedLanguage = MutableLiveData<String>()
-    val selectedLanguage: LiveData<String> get() = _selectedLanguage
-
     val settings: LiveData<UserSettingsInfo> = userDao.getUserSettingsLiveData()
-    fun syncCloud() {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val user = userDao.getEntireUser()
-                user.let {
-                    fromRoomAdapter.adapt(it)
-                }
-            }
-        }
-    }
-
-    val pathReference =
-        Firebase.database.reference.child("user").child(Firebase.auth.currentUser!!.uid)
-            .child("userFriends")
     var burnerBoolean = false
-    val valueEventListener = object : ValueEventListener {
-        override fun onDataChange(dataSnapshot: DataSnapshot) {
-            if (burnerBoolean) {
-                val value = dataSnapshot.value
-                Log.d("new friend", value.toString())
-            }
-            burnerBoolean = true
-        }
-
-        override fun onCancelled(databaseError: DatabaseError) {
-            Log.w(TAG, "Failed to read value.", databaseError.toException())
-        }
-    }
     private val dataChangedLiveData = MutableLiveData<Boolean>()
 
     init {
@@ -113,7 +75,7 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
         }
     }
 
-    fun getSelectedLanguage(context: Context): String {
+    private fun getSelectedLanguage(context: Context): String {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
         return prefs.getString("selected_language", "en") ?: "en"
     }

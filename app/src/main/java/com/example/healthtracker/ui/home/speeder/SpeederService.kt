@@ -68,8 +68,8 @@ class SpeederService : Service() {
     private val ENDING_NOTIFICATION_ID = 420
     private val CHANNEL_ID = "speeder_channel"
     var weight: Double = 0.0
-    var burnedCals = 0
-    var averageSpeeder = 4.20
+    private var burnedCals = 0
+    private var averageSpeeder = 4.20
     var units = ""
     val functionalMultiplier = 3.6
     override fun onCreate() {
@@ -90,10 +90,10 @@ class SpeederService : Service() {
         val time = speedIntent.getStringExtra("time") ?: "00:00:00"
         timey = time
         customCoroutineScope.launch {
-            weight = if(userDao.getUserSettings().units=="kg") {
+            weight = if (userDao.getUserSettings().units == "kg") {
                 userDao.getPutInInfo()?.weight!!
-            }else{
-                userDao.getPutInInfo()?.weight!!*0.45
+            } else {
+                userDao.getPutInInfo()?.weight!! * 0.45
             }
         }
         val challengeExtra = speedIntent.getStringExtra("challenge").toString()
@@ -120,20 +120,20 @@ class SpeederService : Service() {
                 }
             }
             val averageSpeed = divided / divider
-            CoroutineScope(Dispatchers.IO).launch{
-                averageSpeeder = if (userDao.getUserSettings().units=="kg"){
+            CoroutineScope(Dispatchers.IO).launch {
+                averageSpeeder = if (userDao.getUserSettings().units == "kg") {
                     round(averageSpeed * 10) / 10
-                }else{
-                    round(averageSpeed * 0.62 * 10)/10
+                } else {
+                    round(averageSpeed * 0.62 * 10) / 10
                 }
             }
-            var MET: Double
+            val MET: Double
             when (ActivityEnum.valueOf(
                 speedIntent.getStringExtra("activity") ?: ActivityEnum.WALKING.name
             )) {
                 ActivityEnum.RUNNING -> {
                     MET = when (averageSpeed) {
-                        in 0.0..5.10->5.0
+                        in 0.0..5.10 -> 5.0
                         in 5.11..10.19 -> 10.0
                         in 10.20..11.39 -> 11.0
                         in 11.4..12.92 -> 12.5
@@ -148,7 +148,7 @@ class SpeederService : Service() {
 
                 ActivityEnum.JOGGING -> {
                     MET = when (averageSpeed) {
-                        in 0.00..4.42-> 4.0
+                        in 0.00..4.42 -> 4.0
                         in 4.43..8.84 -> 8.0
                         in 8.85..10.49 -> 10.0
                         in 10.5..12.09 -> 11.5
@@ -162,7 +162,7 @@ class SpeederService : Service() {
 
                 ActivityEnum.WALKING -> {
                     MET = when (averageSpeed) {
-                        in 0.0..3.19->2.0
+                        in 0.0..3.19 -> 2.0
                         in 3.2..4.39 -> 3.0
                         in 4.4..5.19 -> 3.5
                         in 5.2..6.39 -> 4.0
@@ -176,10 +176,10 @@ class SpeederService : Service() {
 
                 ActivityEnum.CYCLING -> {
                     MET = when (averageSpeed) {
-                        in 0.0..15.99-> 4.0
+                        in 0.0..15.99 -> 4.0
                         in 16.0..19.19 -> 6.0
                         in 19.20..22.39 -> 8.0
-                        in 22.4..25.6->10.0
+                        in 22.4..25.6 -> 10.0
                         else -> 12.0
                     }
                     val newCals =
@@ -294,8 +294,7 @@ class SpeederService : Service() {
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent =
             PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
-        val activity = speedIntent.getStringExtra("activity")?.let { ActivityEnum.valueOf(it) }
-        val string = when (activity) {
+        val string = when (speedIntent.getStringExtra("activity")?.let { ActivityEnum.valueOf(it) }) {
             ActivityEnum.RUNNING -> getString(R.string.ran)
             ActivityEnum.JOGGING -> getString(R.string.jogged)
             ActivityEnum.WALKING -> getString(R.string.walked)
@@ -313,7 +312,8 @@ class SpeederService : Service() {
                         R.string.calories_plain
                     )
                 }"
-            ).setSmallIcon(R.drawable.wizard).setContentIntent(pendingIntent).setAutoCancel(true).build()
+            ).setSmallIcon(R.drawable.wizard).setContentIntent(pendingIntent).setAutoCancel(true)
+            .build()
     }
 
     private fun showEndingNotification() {

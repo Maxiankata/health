@@ -144,7 +144,6 @@ class FriendAccountFragment : Fragment() {
                     val caloriesList = mutableListOf<Int>()
                     val watersList = mutableListOf<Int>()
                     if (days != null) {
-                        Log.d("second isnt null", days.toString())
                         for (userday in days) {
                             datetimeList.add(userday.dateTime)
                             val steps = userday.automaticInfo?.steps?.currentSteps ?: 0

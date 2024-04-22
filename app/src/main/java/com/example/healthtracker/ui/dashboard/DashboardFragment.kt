@@ -32,7 +32,7 @@ class DashboardFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
-            calendar.setOnDateChangeListener { view, year, month, dayOfMonth ->
+            calendar.setOnDateChangeListener { _, year, month, dayOfMonth ->
                 val selectedDate = Calendar.getInstance()
                 selectedDate.set(year, month, dayOfMonth)
                 val daySelection = calendarToString(selectedDate)
@@ -114,7 +114,8 @@ class DashboardFragment : Fragment() {
                                 }
 
                             }
-                            text =  "${getString(R.string.daily_weight)} $weight ${dashboardViewModel.units}"
+                            text =
+                                "${getString(R.string.daily_weight)} $weight ${dashboardViewModel.units}"
                         }
                     }
                 }

@@ -9,7 +9,7 @@ import com.example.healthtracker.data.user.UserGoals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class GoalChangeDialogViewModel(private val application: MyApplication) : AndroidViewModel(application) {
+class GoalChangeDialogViewModel(application: MyApplication) : AndroidViewModel(application) {
 
     private val userDao = MainActivity.getDatabaseInstance().dao()
 
@@ -20,7 +20,7 @@ class GoalChangeDialogViewModel(private val application: MyApplication) : Androi
 
     suspend fun getUserGoals(): UserGoals? {
         return withContext(Dispatchers.IO) {
-            val user = userDao.getEntireUser()?.userSettingsInfo?.userGoals
+            val user = userDao.getEntireUser().userSettingsInfo?.userGoals
             _userGoals.postValue(user)
             user
         }
@@ -29,11 +29,9 @@ class GoalChangeDialogViewModel(private val application: MyApplication) : Androi
     suspend fun updateGoal(userGoals: UserGoals) {
         withContext(Dispatchers.IO) {
             val userSettingsInfo = userDao.getUserSettings()
-            if (userSettingsInfo != null) {
-                userSettingsInfo.userGoals = userGoals
-                _userGoals.postValue(userGoals)
-                userDao.updateUserSettings(userSettingsInfo)
-            }
+            userSettingsInfo.userGoals = userGoals
+            _userGoals.postValue(userGoals)
+            userDao.updateUserSettings(userSettingsInfo)
         }
     }
 }

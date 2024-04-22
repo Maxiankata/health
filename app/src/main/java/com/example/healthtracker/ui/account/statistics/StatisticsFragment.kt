@@ -2,7 +2,6 @@ package com.example.healthtracker.ui.account.statistics
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,8 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.FragmentStatisticsBinding
-import com.example.healthtracker.ui.formatDurationFromLong
-import com.example.healthtracker.ui.parseDurationToLong
 import com.example.healthtracker.ui.setRoundedCorners
 import com.example.healthtracker.ui.showBottomNav
 import com.github.aachartmodel.aainfographics.aachartcreator.AAChartModel
@@ -62,14 +59,14 @@ class StatisticsFragment : Fragment() {
                         if (statisticsViewModel.units.value == "kg") {
                             if (userday.putInInfo?.units == "kg") {
                                 weightList.add(weight)
-                            }else if (userday.putInInfo?.units == "lbs") {
-                                weightList.add(round((weight*0.45)*10)/10)
+                            } else if (userday.putInInfo?.units == "lbs") {
+                                weightList.add(round((weight * 0.45) * 10) / 10)
                             }
                         } else if (statisticsViewModel.units.value == "lbs") {
                             if (userday.putInInfo?.units == "lbs") {
                                 weightList.add(weight)
-                            }else if (userday.putInInfo?.units == "kg") {
-                                weightList.add(round((weight*2.54)*10)/10)
+                            } else if (userday.putInInfo?.units == "kg") {
+                                weightList.add(round((weight * 2.54) * 10) / 10)
                             }
                         }
 //                        val sleep = (userday.putInInfo?.sleepDuration ?: "00:00:00")

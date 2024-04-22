@@ -1,16 +1,12 @@
 package com.example.healthtracker.ui.home
 
 import android.app.Application
-import android.hardware.SensorEventListener
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.healthtracker.AuthImpl
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
-import com.example.healthtracker.data.room.UserMegaInfoToRoomAdapter
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.UserPutInInfo
 import com.example.healthtracker.data.user.WaterInfo
@@ -19,24 +15,17 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class HomeViewModel(private val application: Application) : AndroidViewModel(application) {
+class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val userDao = MainActivity.getDatabaseInstance().dao()
-
-    private val _currentService: MutableLiveData<SensorEventListener> = MutableLiveData()
-    val currentService: LiveData<SensorEventListener> get() = _currentService
-
     private val _user = MutableLiveData<UserMegaInfo>()
     private val _water = MutableLiveData<WaterInfo?>()
     private val roomToUserMegaInfoAdapter = RoomToUserMegaInfoAdapter()
-    private val userMegaInfoToRoomAdapter = UserMegaInfoToRoomAdapter()
-    private val auth = AuthImpl.getInstance()
     private val _weight = MutableLiveData<Double?>()
     val weight: LiveData<Double?> get() = _weight
     val water: LiveData<WaterInfo?> get() = _water
     val user: LiveData<UserMegaInfo>
         get() = _user
-    private val _sleep = MutableLiveData<String>()
-    val sleep: LiveData<String> get() = _sleep
+
     fun feedUser() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -99,7 +88,6 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
                                 val newPutInInfo =
                                     UserPutInInfo(waterInfo = newerWater, weight = userWeight)
                                 userDao.updateUserPutInInfo(newPutInInfo)
-                                Log.d("Water check", _water.value.toString())
 
                             } else if (_water.value!!.currentWater!!.plus(incrementation) < goal) {
                                 val newerWater = WaterInfo(
@@ -111,7 +99,6 @@ class HomeViewModel(private val application: Application) : AndroidViewModel(app
                                 val newPutInInfo =
                                     UserPutInInfo(waterInfo = newerWater, weight = userWeight)
                                 userDao.updateUserPutInInfo(newPutInInfo)
-                                Log.d("Water check", _water.value.toString())
 
                             }
                     }

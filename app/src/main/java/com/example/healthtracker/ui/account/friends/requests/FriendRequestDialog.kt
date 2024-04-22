@@ -7,15 +7,11 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.healthtracker.MainActivity
 import com.example.healthtracker.MyApplication
 import com.example.healthtracker.R
 import com.example.healthtracker.databinding.RequestDialogBinding
-import com.example.healthtracker.ui.account.friends.popup.FriendListAdapter
-import com.example.healthtracker.ui.account.friends.popup.FriendListViewModel
 import com.example.healthtracker.ui.account.friends.popup.RequestRecyclerAdapter
 
 class FriendRequestDialog : DialogFragment() {
@@ -49,9 +45,9 @@ class FriendRequestDialog : DialogFragment() {
             friendRequestViewModel.requestList.observe(viewLifecycleOwner) {
                 if (!it.isNullOrEmpty()) {
                     friendRequestRecyclerAdapter.updateItems(it)
-                    emptyList.visibility=GONE
-                }else{
-                    emptyList.visibility=VISIBLE
+                    emptyList.visibility = GONE
+                } else {
+                    emptyList.visibility = VISIBLE
                 }
             }
 

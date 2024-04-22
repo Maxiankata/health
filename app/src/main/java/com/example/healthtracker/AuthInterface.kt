@@ -14,8 +14,6 @@ interface AuthInterface {
     suspend fun getUserInfo(uid: String): UserInfo?
     suspend fun updateUserInfo(userInfo: UserInfo)
     suspend fun deleteCurrentUser()
-
-
     fun signOut()
     suspend fun getCurrentUser(): UserMegaInfo?
     suspend fun getEntireUser(): Flow<UserMegaInfo?>

@@ -9,7 +9,6 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.compose.ui.text.toLowerCase
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import com.example.healthtracker.MyApplication
@@ -24,15 +23,13 @@ import com.example.healthtracker.ui.startSpeeder
 import com.example.healthtracker.ui.stopSpeeder
 import java.time.Duration
 import java.util.Locale
-import java.util.Timer
 import kotlin.math.round
 
 class RunningDialogFragment : DialogFragment() {
     private var _binding: RunningDialogBinding? = null
     private val binding get() = _binding!!
-    private val timer = Timer()
     private lateinit var dialogTag: ActivityEnum
-    private val runningDialogViewModel : RunningDialogViewModel by viewModels()
+    private val runningDialogViewModel: RunningDialogViewModel by viewModels()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -64,15 +61,15 @@ class RunningDialogFragment : DialogFragment() {
         runningDialogViewModel.getMetric()
         binding.apply {
             cancel.setBackgroundColor(YELLOW)
-            SpeederServiceBoolean.isMyServiceRunning.observe(viewLifecycleOwner){
-                if (it){
-                    start.visibility=GONE
+            SpeederServiceBoolean.isMyServiceRunning.observe(viewLifecycleOwner) {
+                if (it) {
+                    start.visibility = GONE
                     cancel.setOnClickListener {
                         stopSpeeder()
                         timer.setProgressWithAnimation(0F)
                     }
-                }else{
-                    start.visibility= VISIBLE
+                } else {
+                    start.visibility = VISIBLE
                     cancel.setOnClickListener {
                         dismiss()
                     }
@@ -94,7 +91,7 @@ class RunningDialogFragment : DialogFragment() {
                         MyApplication.getContext(), R.string.empty_field, Toast.LENGTH_SHORT
                     ).show()
                 } else {
-                    timePicker.visibility = View.VISIBLE
+                    timePicker.visibility = VISIBLE
                     editTextHours.apply {
                         clearFocus()
                         text.clear()
@@ -112,25 +109,26 @@ class RunningDialogFragment : DialogFragment() {
                 }
             }
             timePicker.text = getString(R.string.empty_timer)
-            SpeederServiceBoolean.isMyServiceRunning.observe(viewLifecycleOwner
-            ){
+            SpeederServiceBoolean.isMyServiceRunning.observe(
+                viewLifecycleOwner
+            ) {
                 if (!it) {
-                    speed.visibility = View.GONE
+                    speed.visibility = GONE
                     timePicker.text = getString(R.string.complete)
-                    editTextHours.visibility = View.VISIBLE
-                    editTextMinutes.visibility = View.VISIBLE
-                    editTextSeconds.visibility = View.VISIBLE
-                    timePicker.visibility = View.GONE
+                    editTextHours.visibility = VISIBLE
+                    editTextMinutes.visibility = VISIBLE
+                    editTextSeconds.visibility = VISIBLE
+                    timePicker.visibility = GONE
                 } else {
-                    speed.visibility = View.VISIBLE
-                    timePicker.visibility = View.VISIBLE
-                    editTextHours.visibility = View.GONE
-                    editTextMinutes.visibility = View.GONE
-                    editTextSeconds.visibility = View.GONE
+                    speed.visibility = VISIBLE
+                    timePicker.visibility = VISIBLE
+                    editTextHours.visibility = GONE
+                    editTextMinutes.visibility = GONE
+                    editTextSeconds.visibility = GONE
                 }
             }
 
-            SpeederService.speed.observe(viewLifecycleOwner){ speeder->
+            SpeederService.speed.observe(viewLifecycleOwner) { speeder ->
                 runningDialogViewModel.userMetric.observe(viewLifecycleOwner) {
                     speed.text = buildString {
                         append("${round(speeder * 10) / 10}")
@@ -148,19 +146,22 @@ class RunningDialogFragment : DialogFragment() {
                 timer.setProgressWithAnimation(parseDurationToLong(it).toFloat())
                 timer.progressBarColor = YELLOW
             }
-            when(dialogTag){
+            when (dialogTag) {
                 ActivityEnum.RUNNING -> {
                     topIcon.setImageResource(R.drawable.running_icon)
                     topText.setText(R.string.running)
                 }
+
                 ActivityEnum.JOGGING -> {
                     topIcon.setImageResource(R.drawable.jogging_icon)
                     topText.setText(R.string.jogging)
                 }
+
                 ActivityEnum.WALKING -> {
                     topIcon.setImageResource(R.drawable.power_walking_icon)
                     topText.setText(R.string.power_walking)
                 }
+
                 ActivityEnum.CYCLING -> {
                     topIcon.setImageResource(R.drawable.cycling_icon)
                     topText.setText(R.string.cycling)

@@ -152,6 +152,8 @@
     <string name="for_word">for</string>
     <string name="with">with</string>
     <string name="and">and</string>
+    <string name="declined">Declined</string>
+    <string name="accepted">Accepted</string>
     <string-array name="activities">
         <item>Walking</item>
         <item>Power Walking</item>

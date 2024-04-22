@@ -30,6 +30,7 @@ import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.UserPutInInfo
 import com.example.healthtracker.data.user.UserSettingsInfo
 import com.example.healthtracker.data.user.WaterInfo
+import com.example.healthtracker.ui.account.friends.challenges.Challenge
 import com.example.healthtracker.ui.home.speeder.ActivityEnum
 import com.example.healthtracker.ui.home.speeder.SpeederService
 import com.example.healthtracker.ui.home.speeder.SpeederServiceBoolean
@@ -154,7 +155,8 @@ fun DataSnapshot.toUserMegaInfo(): UserMegaInfo {
         userFriends = child("userFriends").toUserFriendsList(),
         userPutInInfo = child("userPutInInfo").toUserPutInInfo(),
         userSettingsInfo = child("userSettingsInfo").toUserSettingsInfo(),
-        userDays = child("userDays").toUserDaysList()
+        userDays = child("userDays").toUserDaysList(),
+        challenges = child("challenges").toChallengesList()
     )
 }
 
@@ -216,7 +218,17 @@ fun DataSnapshot.toUserDays(): UserDays {
         automaticInfo = child("automaticInfo").toUserAutomaticInfo(),
         dateTime = child("dateTime").getValue(String::class.java)!!
     )
+}
 
+fun DataSnapshot.toChallenge(): Challenge {
+    return Challenge(
+        id = child("id").getValue(Int::class.java)!!,
+        assigner = child("assigner").getValue(String::class.java)!!,
+        challengeCompletion = child("challengeCompletion").getValue(Boolean::class.java)!!,
+        challengeType = child("challengeType").getValue(ActivityEnum::class.java)!!,
+        image = child("image").getValue(String::class.java)!!,
+        challengeDuration = child("challengeDuration").getValue(String::class.java)!!
+    )
 }
 
 fun DataSnapshot.toUserGoals(): UserGoals {
@@ -251,6 +263,14 @@ fun DataSnapshot.toUserDaysList(): List<UserDays> {
         userDaysList.add(childSnapshot.toUserDays())
     }
     return userDaysList
+}
+
+fun DataSnapshot.toChallengesList(): List<Challenge> {
+    val challengesList = mutableListOf<Challenge>()
+    for (childSnapshot in children) {
+        challengesList.add(childSnapshot.toChallenge())
+    }
+    return challengesList
 }
 
 fun isInternetAvailable(context: Context): Boolean {

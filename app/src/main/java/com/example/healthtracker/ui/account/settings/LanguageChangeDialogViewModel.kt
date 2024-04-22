@@ -1,7 +1,6 @@
 package com.example.healthtracker.ui.account.settings
 
 import android.content.Context
-import android.util.Log
 import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,11 +14,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.round
 
-class LanguageChangeDialogViewModel(private val application: MyApplication):AndroidViewModel(application) {
+class LanguageChangeDialogViewModel(application: MyApplication) : AndroidViewModel(application) {
     val userDao = MainActivity.getDatabaseInstance().dao()
     val auth = AuthImpl.getInstance()
     private val mainViewModel = MainViewModel(application)
-    fun updateUnits(string: String){
+    fun updateUnits(string: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 if (string.isNotEmpty()) {
@@ -31,13 +30,15 @@ class LanguageChangeDialogViewModel(private val application: MyApplication):Andr
                     if (previousUnits != string) {
                         if (previousUnits == "kg") {
                             userPutInInfo?.weight = userPutInInfo?.weight?.times(2.2)
-                            userPutInInfo?.weight = round(userPutInInfo?.weight?.times(10) ?: 0.0) /10
+                            userPutInInfo?.weight =
+                                round(userPutInInfo?.weight?.times(10) ?: 0.0) / 10
                             if (userPutInInfo != null) {
                                 userDao.updateUserPutInInfo(userPutInInfo)
                             }
                         } else if (previousUnits == "lbs") {
                             userPutInInfo?.weight = userPutInInfo?.weight?.times(0.45)
-                            userPutInInfo?.weight = round(userPutInInfo?.weight?.times(10) ?: 0.0) /10
+                            userPutInInfo?.weight =
+                                round(userPutInInfo?.weight?.times(10) ?: 0.0) / 10
                             if (userPutInInfo != null) {
                                 userDao.updateUserPutInInfo(userPutInInfo)
                             }
@@ -47,20 +48,22 @@ class LanguageChangeDialogViewModel(private val application: MyApplication):Andr
             }
         }
     }
-    fun updateLanguage(string: String, context:Context){
+
+    fun updateLanguage(string: String, context: Context) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                if (string.isNotEmpty()){
+                if (string.isNotEmpty()) {
                     val userSettings = userDao.getUserSettings()
-                    if (string==getString(context,R.string.english)){
+                    if (string == getString(context, R.string.english)) {
                         userSettings.language = "en"
                         userDao.updateUserSettings(userSettings)
-                        mainViewModel.updatePrefLanguage(context,
+                        mainViewModel.updatePrefLanguage(
+                            context,
                             userSettings.language!!
                         )
                         auth.updateSettings(userDao.getUserSettings())
                     }
-                    if (string ==getString(context,R.string.bulgarian)){
+                    if (string == getString(context, R.string.bulgarian)) {
                         userSettings.language = "bg"
                         userDao.updateUserSettings(userSettings)
                         mainViewModel.updatePrefLanguage(context, userSettings.language!!)

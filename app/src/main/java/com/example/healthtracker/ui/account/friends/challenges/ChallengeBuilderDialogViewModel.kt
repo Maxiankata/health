@@ -23,15 +23,10 @@ class ChallengeBuilderDialogViewModel(private val application: MyApplication) : 
                 }
                 renewedChallengesList.add(challenge)
                 authImpl.setChallenges(renewedChallengesList, userId)
-                withContext(Dispatchers.IO){
-                    userDao.updateChallenges(renewedChallengesList)
-                }
+
             }else{
                 renewedChallengesList.add(challenge)
                 authImpl.setChallenges(renewedChallengesList, userId)
-                withContext(Dispatchers.IO){
-                    userDao.updateChallenges(renewedChallengesList)
-                }
             }
         }
     }

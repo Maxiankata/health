@@ -8,6 +8,7 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.healthtracker.MyApplication
@@ -20,7 +21,7 @@ class ChallengeDisplayDialog : DialogFragment() {
     private var _binding: ChallengesDialogBinding? = null
     private val binding get() = _binding!!
     val recyclerAdapter = ChallengesListAdapter()
-    private val challengesDisplayDialogViewModel = ChallengesDisplayDialogViewModel(MyApplication())
+    private val challengesDisplayDialogViewModel : ChallengesDisplayDialogViewModel by viewModels()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -54,7 +55,6 @@ class ChallengeDisplayDialog : DialogFragment() {
             challengeRecycler.apply {
                 adapter = recyclerAdapter
                 layoutManager = LinearLayoutManager(requireContext())
-
             }
             refresh.setOnClickListener {
                 if (isInternetAvailable(MyApplication.getContext())) {
@@ -66,7 +66,6 @@ class ChallengeDisplayDialog : DialogFragment() {
                 }
             }
             closeButton.setOnClickListener {
-                challengesDisplayDialogViewModel.clearChallenges()
                 dismiss()
             }
         }
@@ -74,7 +73,6 @@ class ChallengeDisplayDialog : DialogFragment() {
     }
 
     override fun onDestroyView() {
-        challengesDisplayDialogViewModel.clearChallenges()
         super.onDestroyView()
         _binding = null
     }

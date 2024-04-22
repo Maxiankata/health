@@ -12,6 +12,7 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat.getString
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -97,19 +98,18 @@ class RequestRecyclerAdapter :
                 accept.visibility = GONE
                 status.apply {
                     visibility = VISIBLE
-                    text = "accepted"
+                    text = getString(context, R.string.accepted)
                 }
             }
             decline.setOnClickListener {
                 customCoroutineScope.launch {
                     currentUserList.value?.let { it1 -> auth.removeFriend(userFriends.uid, it1) }
-                    Log.d("removing friend at",userFriends.uid )
                 }
                 decline.visibility = GONE
                 accept.visibility = GONE
                 status.apply {
                     visibility = VISIBLE
-                    text = "declined"
+                    text = getString(context, R.string.declined)
                 }
             }
         }

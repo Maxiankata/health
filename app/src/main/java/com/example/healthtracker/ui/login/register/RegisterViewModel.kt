@@ -1,7 +1,6 @@
 package com.example.healthtracker.ui.login.register
 
 import android.app.Application
-import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
@@ -14,14 +13,12 @@ import com.example.healthtracker.MyApplication
 import com.example.healthtracker.R
 import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
 import com.example.healthtracker.data.room.UserMegaInfoToRoomAdapter
-import com.example.healthtracker.ui.login.LoginFragmentViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class RegisterViewModel(private val application: Application) : AndroidViewModel(application) {
+class RegisterViewModel(application: Application) : AndroidViewModel(application) {
     private val auth = AuthImpl.getInstance()
     private val userDao = MainActivity.getDatabaseInstance().dao()
     private var toRoomAdapter = UserMegaInfoToRoomAdapter()
@@ -31,12 +28,18 @@ class RegisterViewModel(private val application: Application) : AndroidViewModel
         get() = _state
 
     private val _clickableButtons = MutableLiveData<Boolean>()
-    val clickableButtons : LiveData<Boolean> get() = _clickableButtons
+    val clickableButtons: LiveData<Boolean> get() = _clickableButtons
+
     init {
         _clickableButtons.postValue(true)
     }
+
     fun register(
-        email: String, password: String,confirmPassword:String, name: String, isInternetAvailable: Boolean
+        email: String,
+        password: String,
+        confirmPassword: String,
+        name: String,
+        isInternetAvailable: Boolean
     ) {
         _clickableButtons.postValue(false)
         _state.value = State.Loading(View.VISIBLE)
@@ -55,7 +58,7 @@ class RegisterViewModel(private val application: Application) : AndroidViewModel
             _clickableButtons.postValue(true)
             return
         }
-        if (password.count()<6){
+        if (password.count() < 6) {
             _state.postValue(
                 State.Notify(
                     ContextCompat.getString(
@@ -67,7 +70,7 @@ class RegisterViewModel(private val application: Application) : AndroidViewModel
 
             return
         }
-        if (password!=confirmPassword){
+        if (password != confirmPassword) {
             _state.postValue(
                 State.Notify(
                     ContextCompat.getString(
@@ -83,15 +86,12 @@ class RegisterViewModel(private val application: Application) : AndroidViewModel
             try {
                 if (auth.createAcc(email, password, name)) {
                     getUser()
-                     _state.postValue(State.LoggedIn(true))
+                    _state.postValue(State.LoggedIn(true))
                 } else {
-
-                    Log.d("state", "loading visibilit")
                     _state.postValue(
                         State.Notify(
                             ContextCompat.getString(
-                                MyApplication.getContext(),
-                                R.string.register_failed
+                                MyApplication.getContext(), R.string.register_failed
                             )
                         )
                     )
@@ -113,7 +113,6 @@ class RegisterViewModel(private val application: Application) : AndroidViewModel
                             toRoomAdapter.adapt(it)?.let { it1 ->
                                 userDao.saveUser(it1)
                                 userDao.getEntireUser().let { it2 -> fromRoomAdapter.adapt(it2) }
-                                Log.d("user in register", userDao.getEntireUser().toString())
                             }
                         }
                     }

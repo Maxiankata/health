@@ -17,7 +17,6 @@ import com.example.healthtracker.data.user.UserPutInInfo
 import com.example.healthtracker.ui.account.friends.challenges.Challenge
 import com.example.healthtracker.ui.calendarToString
 import com.example.healthtracker.ui.getStepsValue
-import com.example.healthtracker.ui.home.speeder.SpeederServiceBoolean
 import com.example.healthtracker.ui.isInternetAvailable
 import com.example.healthtracker.ui.nullifyStepCounter
 import kotlinx.coroutines.CoroutineScope
@@ -27,14 +26,14 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.util.Calendar
 
-class  Alarm : AlarmScheduler {
+class Alarm : AlarmScheduler {
     val context = MyApplication.getContext()
     private val alarmManager: AlarmManager = context.getSystemService(AlarmManager::class.java)
     override fun schedule(item: AlarmItem) {
         val intent = Intent(context, AlarmReciever::class.java)
         val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, 22)
-        calendar.set(Calendar.MINUTE, 23)
+        calendar.set(Calendar.HOUR_OF_DAY, 23)
+        calendar.set(Calendar.MINUTE, 59)
         calendar.set(Calendar.SECOND, 30)
         val currentTime = System.currentTimeMillis()
         if (calendar.timeInMillis < currentTime) {
@@ -102,7 +101,7 @@ class AlarmReciever : BroadcastReceiver() {
                 userDao.updateDays(userDays)
                 userDao.updateUserInfo(newUserInfo)
             }.await()
-            if (isInternetAvailable(MyApplication.getContext())){
+            if (isInternetAvailable(MyApplication.getContext())) {
                 val syncer = roomToUserMegaInfoAdapter.adapt(userDao.getEntireUser())
                 authImpl.sync(syncer, syncer.userInfo.uid!!)
                 authImpl.clearChallenges()

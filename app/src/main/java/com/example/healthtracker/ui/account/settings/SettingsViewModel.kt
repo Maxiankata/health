@@ -1,12 +1,10 @@
 package com.example.healthtracker.ui.account.settings
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.healthtracker.AuthImpl
 import com.example.healthtracker.MainActivity
-import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
 import com.example.healthtracker.ui.stopSpeeder
 import com.example.healthtracker.ui.stopStepCounterService
 import kotlinx.coroutines.Dispatchers

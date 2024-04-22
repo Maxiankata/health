@@ -10,16 +10,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class RunningDialogViewModel(private val application: Application) : AndroidViewModel(application) {
+class RunningDialogViewModel(application: Application) : AndroidViewModel(application) {
     private val userDao = MainActivity.getDatabaseInstance().dao()
     private val _userMetric = MutableLiveData<String>()
-    val userMetric :LiveData<String> get() = _userMetric
+    val userMetric: LiveData<String> get() = _userMetric
 
-    fun getMetric(){
+    fun getMetric() {
         viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                val metric = userDao.getUserSettings()?.units
-                if (!metric.isNullOrEmpty()){
+            withContext(Dispatchers.IO) {
+                val metric = userDao.getUserSettings().units
+                if (!metric.isNullOrEmpty()) {
                     _userMetric.postValue(metric!!)
                 }
             }

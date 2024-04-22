@@ -43,10 +43,7 @@ class HomeFragment : Fragment() {
         homeViewModel.feedUser()
         binding.apply {
             StepCounterService.steps.observe(viewLifecycleOwner) { steps ->
-                Log.d("steps", steps.toString())
-                if (steps == null) {
-                    Log.d("wait for it :)", "i swear")
-                } else {
+                if (steps != null) {
                     stepsCircularProgressBar.apply {
                         setProgressWithAnimation(steps.toFloat())
                     }
@@ -91,7 +88,6 @@ class HomeFragment : Fragment() {
 
             }
             StepCounterService.sleepDuration.observe(viewLifecycleOwner) { sleep ->
-                Log.d("sleep is", formatDurationFromLong(sleep))
                 sleepLogger.text = buildString {
                     append(
                         "${getString(R.string.you_have_slept_for)} ${formatDurationFromLong(sleep)} ${
@@ -211,8 +207,6 @@ class HomeFragment : Fragment() {
                                     lifecycleScope.launch {
                                         var middleItem =
                                             (layoutManager.findFirstCompletelyVisibleItemPosition() + layoutManager.findLastCompletelyVisibleItemPosition()) / 2
-
-
                                         if (middleItem == -1) {
                                             delay(100)
                                             middleItem =
@@ -274,7 +268,6 @@ class HomeFragment : Fragment() {
                                 try {
                                     val middleItem =
                                         (layoutManager.findFirstCompletelyVisibleItemPosition() + layoutManager.findLastCompletelyVisibleItemPosition()) / 2
-                                    Log.d("middle item lookout", middleItem.toString())
                                     secondWeightRecyclerAdapter.updateMiddleItemSize(middleItem)
                                     subUnits = middleItem
                                 } catch (e: Exception) {
@@ -296,7 +289,6 @@ class HomeFragment : Fragment() {
             applyChanges.setOnClickListener {
                 if (mainUnits != 0 || subUnits != 0) {
                     val weight: Double = mainUnits + (subUnits.toDouble() / 10)
-                    Log.d("current selected weight is", weight.toString())
                     homeViewModel.updateWeight(weight)
                 }
             }
@@ -308,7 +300,7 @@ class HomeFragment : Fragment() {
         _binding = null
     }
 
-    fun scrollToDouble(weighte: Double) {
+    private fun scrollToDouble(weighte: Double) {
         val weight: Double = weighte
         val integer: Int = weight.toInt()
         val decimal: Int = ((weight - integer) * 10).toInt()

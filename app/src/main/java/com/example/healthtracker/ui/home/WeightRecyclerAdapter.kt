@@ -2,20 +2,16 @@ package com.example.healthtracker.ui.home
 
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
-import android.annotation.SuppressLint
-import android.util.Log
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.healthtracker.R
-import com.example.healthtracker.data.user.UserInfo
 
-class WeightRecyclerAdapter(private val numbers:MutableList<Int>):RecyclerView.Adapter<WeightRecyclerAdapter.WeightViewHolder>() {
+class WeightRecyclerAdapter(private val numbers: MutableList<Int>) :
+    RecyclerView.Adapter<WeightRecyclerAdapter.WeightViewHolder>() {
     private var middleItemPosition = -1
 
     inner class WeightViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -53,6 +49,7 @@ class WeightRecyclerAdapter(private val numbers:MutableList<Int>):RecyclerView.A
 
 
     }
+
     fun updateMiddleItemSize(middlePosition: Int) {
         if (middlePosition != middleItemPosition) {
             if (middleItemPosition != -1) {
@@ -63,14 +60,17 @@ class WeightRecyclerAdapter(private val numbers:MutableList<Int>):RecyclerView.A
             notifyItemChanged(middleItemPosition, numbers[middleItemPosition])
         }
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WeightViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.weigh_card,parent,false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.weigh_card, parent, false)
         return WeightViewHolder(view)
     }
+
     override fun getItemCount() = numbers.size
-    public fun getItem(position:Int):String{
+    fun getItem(position: Int): String {
         return numbers[position].toString()
     }
+
     override fun onBindViewHolder(holder: WeightViewHolder, position: Int) {
         val item = numbers[position]
         holder.bind(item, position == middleItemPosition, position)

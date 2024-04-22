@@ -2,7 +2,6 @@ package com.example.healthtracker.ui.account
 
 import android.app.Application
 import android.graphics.Bitmap
-import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -10,7 +9,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.healthtracker.AuthImpl
 import com.example.healthtracker.MainActivity
-import com.example.healthtracker.MyApplication
 import com.example.healthtracker.R
 import com.example.healthtracker.data.room.RoomToUserMegaInfoAdapter
 import com.example.healthtracker.data.user.UserInfo
@@ -47,11 +45,10 @@ class AccountViewModel(private val application: Application) : AndroidViewModel(
 
     private fun getUser(callback: (UserMegaInfo?) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            userDao.getEntireUser().let {
-                callback(roomToUserMegaInfoAdapter.adapt(it))
-            }
+            callback(roomToUserMegaInfoAdapter.adapt(userDao.getEntireUser()))
         }
     }
+
     private fun sync() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {

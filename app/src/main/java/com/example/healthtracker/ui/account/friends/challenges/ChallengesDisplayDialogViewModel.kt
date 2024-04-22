@@ -1,7 +1,6 @@
 package com.example.healthtracker.ui.account.friends.challenges
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -15,21 +14,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ChallengesDisplayDialogViewModel(private val application: Application) :
+class ChallengesDisplayDialogViewModel(application: Application) :
     AndroidViewModel(application) {
     companion object {
         var _challenges = MutableLiveData<List<Challenge>?>()
         fun refeedChallenges() {
-                CoroutineScope(Dispatchers.IO).launch{
-                    val userDao = MainActivity.getDatabaseInstance().dao()
-                    val challenges = userDao.getEntireUser(
-                    ).challenges
-                    _challenges.postValue(challenges)
-                }
-
+            CoroutineScope(Dispatchers.IO).launch {
+                val userDao = MainActivity.getDatabaseInstance().dao()
+                val challenges = userDao.getEntireUser(
+                ).challenges
+                _challenges.postValue(challenges)
+            }
         }
     }
-
     val challenges: LiveData<List<Challenge>?> get() = _challenges
     private val userDao = MainActivity.getDatabaseInstance().dao()
     private val authImpl = AuthImpl.getInstance()
@@ -41,22 +38,23 @@ class ChallengesDisplayDialogViewModel(private val application: Application) :
                 if (challenges != null) {
                     withContext(Dispatchers.IO) {
                         userDao.updateChallenges(challenges)
-
-                    }                    }
+                    }
+                }
                 _challenges.postValue(challenges)
             }
         }
     }
-    fun clearChallenges(){
+
+    fun clearChallenges() {
         viewModelScope.launch {
             _challenges.postValue(null)
         }
     }
+
     fun feedChallenges() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val challenges = userDao.getEntireUser(
-                ).challenges
+                val challenges = userDao.getEntireUser().challenges
                 _challenges.postValue(challenges)
             }
         }

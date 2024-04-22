@@ -67,25 +67,24 @@ class SettingsFragment : Fragment() {
     }
 
 
-    private fun deletionConfirmation(){
+    private fun deletionConfirmation() {
         val builder = AlertDialog.Builder(context)
-        builder.setTitle(R.string.are_you_sure)
-            .setMessage(R.string.deletion_confirmation)
-        builder.setPositiveButton(R.string.confirm) { dialogInterface: DialogInterface, i: Int ->
-            if (isInternetAvailable(MyApplication.getContext())){
+        builder.setTitle(R.string.are_you_sure).setMessage(R.string.deletion_confirmation)
+        builder.setPositiveButton(R.string.confirm) { dialogInterface: DialogInterface, _: Int ->
+            if (isInternetAvailable(MyApplication.getContext())) {
                 lifecycleScope.launch {
-                        val removeFriendsDeferred = async { settingsViewModel.removeFriends() }
-                        removeFriendsDeferred.await()
-                        settingsViewModel.deleteUser()
+                    val removeFriendsDeferred = async { settingsViewModel.removeFriends() }
+                    removeFriendsDeferred.await()
+                    settingsViewModel.deleteUser()
                     navigateToActivity(requireActivity(), LoginActivity::class.java)
                 }
                 dialogInterface.dismiss()
-            }else{
+            } else {
                 Toast.makeText(context, R.string.no_internet, Toast.LENGTH_SHORT).show()
             }
 
         }
-        builder.setNegativeButton(R.string.cancel) { dialogInterface: DialogInterface, i: Int ->
+        builder.setNegativeButton(R.string.cancel) { dialogInterface: DialogInterface, _: Int ->
             dialogInterface.dismiss()
         }
         val dialog: AlertDialog = builder.create()

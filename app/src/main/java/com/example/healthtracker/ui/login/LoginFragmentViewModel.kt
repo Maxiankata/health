@@ -35,31 +35,47 @@ class LoginFragmentViewModel(private val application: Application) : AndroidView
         get() = _state
 
     private val _button_clickable = MutableLiveData<Boolean>()
-    val button_clickable : LiveData<Boolean> get() = _button_clickable
+    val button_clickable: LiveData<Boolean> get() = _button_clickable
+
     init {
         _button_clickable.postValue(true)
     }
+
     fun logIn(email: String, password: String, isInternetAvailable: Boolean) {
         _button_clickable.postValue(false)
         _state.value = State.Loading(View.VISIBLE)
         if (!isInternetAvailable) {
-            _state.value = State.Notify(getString(MyApplication.getContext(),R.string.no_internet))
+            _state.value = State.Notify(getString(MyApplication.getContext(), R.string.no_internet))
             _button_clickable.postValue(true)
             return
         }
-        if (email.isEmpty()||password.isEmpty()){
-            _state.postValue(State.Notify(getString(MyApplication.getContext(),R.string.empty_field)))
+        if (email.isEmpty() || password.isEmpty()) {
+            _state.postValue(
+                State.Notify(
+                    getString(
+                        MyApplication.getContext(),
+                        R.string.empty_field
+                    )
+                )
+            )
             _button_clickable.postValue(true)
             return
         }
         viewModelScope.launch {
             try {
-                if(auth.logIn(email, password)){
+                if (auth.logIn(email, password)) {
                     getUser()
                     _state.postValue(State.LoggedIn(true))
-                }else{
+                } else {
                     _button_clickable.postValue(true)
-                    _state.postValue(State.Notify(getString(MyApplication.getContext(), R.string.invalid_password)))
+                    _state.postValue(
+                        State.Notify(
+                            getString(
+                                MyApplication.getContext(),
+                                R.string.invalid_password
+                            )
+                        )
+                    )
                 }
             } catch (e: Exception) {
                 _button_clickable.postValue(true)
@@ -106,9 +122,7 @@ class LoginFragmentViewModel(private val application: Application) : AndroidView
         if (!checkPermissions(fragment)) {
             delay(5000)
             ActivityCompat.requestPermissions(
-                fragment.requireActivity(),
-                permissions,
-                PERMISSION_REQUEST_CODE
+                fragment.requireActivity(), permissions, PERMISSION_REQUEST_CODE
             )
         }
     }
@@ -117,8 +131,7 @@ class LoginFragmentViewModel(private val application: Application) : AndroidView
         var allPermissionsGranted = true
         for (permission in permissions) {
             if (ContextCompat.checkSelfPermission(
-                    fragment.requireContext(),
-                    permission
+                    fragment.requireContext(), permission
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
                 allPermissionsGranted = false
@@ -130,14 +143,14 @@ class LoginFragmentViewModel(private val application: Application) : AndroidView
 
     fun logout() {
         viewModelScope.launch {
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
                 try {
                     userDao.getUserInfo()?.uid?.let {
-                        auth.sync(fromRoomAdapter.adapt(userDao.getEntireUser()),
-                            it
+                        auth.sync(
+                            fromRoomAdapter.adapt(userDao.getEntireUser()), it
                         )
                     }
-                }catch (e:Exception){
+                } catch (e: Exception) {
                     Log.d("oopsie", "")
                 }
                 userDao.dropUser()
@@ -149,6 +162,6 @@ class LoginFragmentViewModel(private val application: Application) : AndroidView
     sealed interface State {
         data class LoggedIn(val flag: Boolean) : State
         data class Notify(val message: String, val visibility: Int = View.GONE) : State
-        data class Loading(val loadingVisibility: Int): State
+        data class Loading(val loadingVisibility: Int) : State
     }
 }

@@ -3,9 +3,11 @@ package com.example.healthtracker.ui.login
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -62,6 +64,15 @@ class LoginFragment : Fragment() {
                 passwordInput.isEnabled = state
                 registerButton.isEnabled = state
                 forgotPassword.isEnabled = state
+            }
+            passwordInput.setOnEditorActionListener { _, actionId, event ->
+                if (actionId == EditorInfo.IME_ACTION_DONE ||
+                    event != null && event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER
+                ) {
+                    signInButton.performClick()
+                    return@setOnEditorActionListener true
+                }
+                return@setOnEditorActionListener false
             }
             loginFragmentViewModel.requestPermissionsUntilGranted(this@LoginFragment)
             signInButton.apply {

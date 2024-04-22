@@ -31,8 +31,7 @@ class ExplicableRoundedCorners(
         bounds.set(0f, 0f, view?.width?.toFloat() ?: 0f, view?.height?.toFloat() ?: 0f)
         val path = Path()
         path.addRoundRect(
-            bounds,
-            floatArrayOf(
+            bounds, floatArrayOf(
                 topLeftRadius,
                 topLeftRadius,
                 topRightRadius,
@@ -41,24 +40,17 @@ class ExplicableRoundedCorners(
                 bottomRightRadius,
                 bottomLeftRadius,
                 bottomLeftRadius
-            ),
-            Path.Direction.CW
+            ), Path.Direction.CW
         )
         outline?.setPath(path)
     }
 }
 
 fun View.setExplicableRoundedCorners(
-    topLeftRadius: Float,
-    topRightRadius: Float,
-    bottomRightRadius: Float,
-    bottomLeftRadius: Float
+    topLeftRadius: Float, topRightRadius: Float, bottomRightRadius: Float, bottomLeftRadius: Float
 ) {
     outlineProvider = ExplicableRoundedCorners(
-        topLeftRadius,
-        topRightRadius,
-        bottomRightRadius,
-        bottomLeftRadius
+        topLeftRadius, topRightRadius, bottomRightRadius, bottomLeftRadius
     )
     clipToOutline = true
 }

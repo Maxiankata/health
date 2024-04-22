@@ -14,6 +14,6 @@ class UserMegaInfoToRoomAdapter : Adapter<UserMegaInfo,UserData>{
 
 class RoomToUserMegaInfoAdapter:Adapter<UserData,UserMegaInfo>{
     override fun adapt(t: UserData): UserMegaInfo {
-        return UserMegaInfo(t.userInfo,t.userAutomaticInfo,t.userFriends,t.userPutInInfo,t.userSettingsInfo,t.userDays)
+        return UserMegaInfo(t.userInfo,t.userAutomaticInfo,t.userFriends,t.userPutInInfo,t.userSettingsInfo,t.userDays, t.challenges, t.achievements)
     }
 }
