@@ -2,6 +2,7 @@ package com.example.healthtracker.ui.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,11 +46,14 @@ class LoginFragment : Fragment() {
                 showLog(it.message)
                 requireActivity().setLoadingVisibility(it.loadingVisibility)
                 if (it.shouldNavigate) {
-                    val intent =
-                        Intent(context, MainActivity::class.java)
-                    startActivity(intent)
-
-                    activity?.finish()
+                    try {
+                        val intent = Intent(context, MainActivity::class.java)
+                        startActivity(intent)
+                        activity?.finish()
+                    }catch (e:Exception){
+                        Log.d("oopsie oopsie", "")
+                        loginFragmentViewModel.logout()
+                    }
                 }
             }
             loginFragmentViewModel.button_clickable.observe(viewLifecycleOwner) { state ->

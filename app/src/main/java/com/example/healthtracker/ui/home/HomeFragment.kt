@@ -91,6 +91,7 @@ class HomeFragment : Fragment() {
 
             }
             StepCounterService.sleepDuration.observe(viewLifecycleOwner) { sleep ->
+                Log.d("sleep is", formatDurationFromLong(sleep))
                 sleepLogger.text = buildString {
                     append(
                         "${getString(R.string.you_have_slept_for)} ${formatDurationFromLong(sleep)} ${

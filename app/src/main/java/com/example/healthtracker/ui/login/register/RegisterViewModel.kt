@@ -83,8 +83,7 @@ class RegisterViewModel(private val application: Application) : AndroidViewModel
             try {
                 if (auth.createAcc(email, password, name)) {
                     getUser()
-                    delay(2000)
-                    _state.postValue(State.LoggedIn(true))
+                     _state.postValue(State.LoggedIn(true))
                 } else {
 
                     Log.d("state", "loading visibilit")

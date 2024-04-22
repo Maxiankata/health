@@ -73,7 +73,8 @@ class AccountViewModel(private val application: Application) : AndroidViewModel(
                                 bitmapToBase64(bitmap),
                                 it.mail,
                                 it.theme,
-                                it.bgImage
+                                it.bgImage,
+                                it.totalSteps
                             )
                         it.let {
                             userDao.updateUserInfo(

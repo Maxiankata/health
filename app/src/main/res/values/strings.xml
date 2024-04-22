@@ -138,6 +138,20 @@
     <string name="step_wizard">All hail the step wizard 🧙‍♂️!</string>
     <string name="reach">Reach</string>
     <string name="stepss">steps</string>
+    <string name="completed_activity">Completed activity</string>
+    <string name="last_activity">Last activity of</string>
+    <string name="with_duration">with duration of</string>
+    <string name="burned">burned</string>
+    <string name="calories_plain">calories</string>
+    <string name="and_speed">and average speed of</string>
+    <string name="ran">ran</string>
+    <string name="jogged">jogged</string>
+    <string name="walked">walked</string>
+    <string name="cycled">cycled</string>
+    <string name="you">You</string>
+    <string name="for_word">for</string>
+    <string name="with">with</string>
+    <string name="and">and</string>
     <string-array name="activities">
         <item>Walking</item>
         <item>Power Walking</item>

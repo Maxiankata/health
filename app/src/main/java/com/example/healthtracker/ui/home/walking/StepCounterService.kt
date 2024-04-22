@@ -83,22 +83,19 @@ class StepCounterService : Service(), SensorEventListener {
         getUser { user ->
             user?.let {
                 it.userAutomaticInfo?.let {it1->
-                    Log.d("captured pasting mechanism time", it1.toString())
                     CoroutineScope(Dispatchers.Main).launch{
                         _activeTime.postValue(it1.activeTime!!)
-                        Log.d("steps info from getter", it1.steps.toString())
                         _calories.value = it1.steps?.currentCalories!!
-                        Log.d("UPDATED CALORIES", _calories.value.toString())//DO NOT DELETE DO NOT DO NOT
                         _steps.value = it1.steps.currentSteps!!
-                        Log.d("UPDATED STEPS", _steps.value.toString())//DO NOT DELETE DO NOT DO NOT
-                        if (!it.userPutInInfo?.sleepDuration.isNullOrBlank()) {
-                            val sleep = parseDurationToLong(it.userPutInInfo?.sleepDuration!!)
-                            _sleepDuration.postValue(sleep)
-                        } else {
-                            _sleepDuration.postValue(0)
-                        }
                     }
-
+                }
+                it.userPutInInfo?.let {it1->
+                    if (!it1.sleepDuration.isNullOrBlank()) {
+                        val sleep = parseDurationToLong(it1.sleepDuration!!)
+                        _sleepDuration.postValue(sleep)
+                    }else{
+                        _sleepDuration.postValue(0)
+                    }
                 }
             }
         }
@@ -189,8 +186,7 @@ class StepCounterService : Service(), SensorEventListener {
 
     private fun createNotification(): Notification {
         val notificationIntent = Intent(this, MainActivity::class.java)
-        val pendingIntent =
-            PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
         val currentSteps = _steps.value ?: 0
         val builder =
             NotificationCompat.Builder(this, channelId).setSmallIcon(R.drawable.running_icon)
@@ -209,7 +205,7 @@ class StepCounterService : Service(), SensorEventListener {
     private var isFirstCallback = true
 
     override fun onSensorChanged(event: SensorEvent) {
-
+        lastSensorEventTime = System.currentTimeMillis()
         if (!isFirstCallback && event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
             _steps.value?.plus(1)?.let {
                 _steps.postValue(it)
@@ -218,7 +214,6 @@ class StepCounterService : Service(), SensorEventListener {
                 }
                 updateNotification()
             }
-            lastSensorEventTime = System.currentTimeMillis()
             if (isSleeping) {
                 stopSleepTracking()
             }

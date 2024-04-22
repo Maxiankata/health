@@ -72,14 +72,7 @@ class DashboardFragment : Fragment() {
                             }
                         }
                         challengesPassed.apply {
-                            var challenges = 0
-                            if (it.challenges != null) {
-                                for (challenge in it.challenges) {
-                                    if (challenge.challengeCompletion) {
-                                        ++challenges
-                                    }
-                                }
-                            }
+                            val challenges = it.automaticInfo?.challengesPassed
                             text = "${getString(R.string.challenges_passed)} $challenges"
                         }
                         activeTime.apply {

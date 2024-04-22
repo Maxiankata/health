@@ -9,6 +9,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.compose.ui.text.toLowerCase
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import com.example.healthtracker.MyApplication
@@ -21,8 +22,8 @@ import com.example.healthtracker.ui.home.speeder.SpeederServiceBoolean
 import com.example.healthtracker.ui.parseDurationToLong
 import com.example.healthtracker.ui.startSpeeder
 import com.example.healthtracker.ui.stopSpeeder
-import java.text.DecimalFormat
 import java.time.Duration
+import java.util.Locale
 import java.util.Timer
 import kotlin.math.round
 
@@ -36,8 +37,8 @@ class RunningDialogFragment : DialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = RunningDialogBinding.inflate(inflater, container, false)
-        Log.d("tag is", tag.toString())
-        dialogTag = when (tag) {
+        Log.d("tag is", tag?.lowercase().toString())
+        dialogTag = when (tag?.lowercase(Locale.ROOT)) {
             "running" -> ActivityEnum.RUNNING
             "walking" -> ActivityEnum.WALKING
             "jogging" -> ActivityEnum.JOGGING
@@ -106,7 +107,7 @@ class RunningDialogFragment : DialogFragment() {
                         clearFocus()
                         text.clear()
                     }
-                    startSpeeder(stringDuration, dialogTag, challenge = null)
+                    startSpeeder(stringDuration, dialogTag, challengeId = null)
 
                 }
             }
@@ -129,14 +130,15 @@ class RunningDialogFragment : DialogFragment() {
                 }
             }
 
-            SpeederService.speed.observe(viewLifecycleOwner){
-                Log.d("speed", it.toString())
-                speed.text = buildString {
-                    append("${round(it*10) /10}")
-                    if (runningDialogViewModel.userMetric.value=="kg"){
-                        append("kph")
-                    }else{
-                        append("mph")
+            SpeederService.speed.observe(viewLifecycleOwner){ speeder->
+                runningDialogViewModel.userMetric.observe(viewLifecycleOwner) {
+                    speed.text = buildString {
+                        append("${round(speeder * 10) / 10}")
+                        if (it == "kg") {
+                            append("kph")
+                        } else {
+                            append("mph")
+                        }
                     }
                 }
             }
@@ -165,5 +167,10 @@ class RunningDialogFragment : DialogFragment() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        _binding = null
+        super.onDestroy()
     }
 }

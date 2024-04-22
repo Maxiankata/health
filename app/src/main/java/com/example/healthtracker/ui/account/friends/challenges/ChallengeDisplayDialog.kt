@@ -50,7 +50,6 @@ class ChallengeDisplayDialog : DialogFragment() {
                 binding.emptyChallenges.visibility= VISIBLE
             }
         }
-
         binding.apply {
             challengeRecycler.apply {
                 adapter = recyclerAdapter
@@ -67,6 +66,7 @@ class ChallengeDisplayDialog : DialogFragment() {
                 }
             }
             closeButton.setOnClickListener {
+                challengesDisplayDialogViewModel.clearChallenges()
                 dismiss()
             }
         }
@@ -74,6 +74,7 @@ class ChallengeDisplayDialog : DialogFragment() {
     }
 
     override fun onDestroyView() {
+        challengesDisplayDialogViewModel.clearChallenges()
         super.onDestroyView()
         _binding = null
     }

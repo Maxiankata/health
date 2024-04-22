@@ -11,13 +11,10 @@ import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
-import android.os.Build
 import android.util.Base64
-import android.util.Log
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.RelativeLayout
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import com.example.healthtracker.MyApplication
@@ -33,7 +30,6 @@ import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.data.user.UserPutInInfo
 import com.example.healthtracker.data.user.UserSettingsInfo
 import com.example.healthtracker.data.user.WaterInfo
-import com.example.healthtracker.ui.account.friends.challenges.Challenge
 import com.example.healthtracker.ui.home.speeder.ActivityEnum
 import com.example.healthtracker.ui.home.speeder.SpeederService
 import com.example.healthtracker.ui.home.speeder.SpeederServiceBoolean
@@ -151,7 +147,6 @@ fun UserMegaInfo.toUserData(): UserData {
 }
 
 
-@RequiresApi(Build.VERSION_CODES.O)
 fun DataSnapshot.toUserMegaInfo(): UserMegaInfo {
     return UserMegaInfo(
         userInfo = child("userInfo").toUserInfo(),
@@ -178,7 +173,7 @@ fun DataSnapshot.toUserInfo(): UserInfo {
 fun DataSnapshot.toUserFriends(): UserFriends {
     return UserFriends(
         uid = child("uid").getValue(String::class.java) ?: "",
-        isFriend  = child("friend").getValue(Boolean::class.java) ?: true
+        isFriend = child("friend").getValue(Boolean::class.java) ?: true
     )
 }
 
@@ -250,7 +245,6 @@ fun DataSnapshot.toUserFriendsList(): List<UserFriends> {
     return userFriendsList
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 fun DataSnapshot.toUserDaysList(): List<UserDays> {
     val userDaysList = mutableListOf<UserDays>()
     for (childSnapshot in children) {
@@ -279,10 +273,10 @@ fun stopStepCounterService() {
     MyApplication.getContext().stopService(StepCounterService.stepIntent)
 }
 
-fun startSpeeder(time: String, activity: ActivityEnum, challenge: Challenge?) {
+fun startSpeeder(time: String, activity: ActivityEnum, challengeId: Int?) {
     val intent: Intent =
         SpeederService.speedIntent.putExtra("time", time).putExtra("activity", activity.name)
-            .putExtra("challenge", challenge.toString())
+            .putExtra("challenge", challengeId.toString())
 
     MyApplication.getContext().startForegroundService(intent)
 }
@@ -309,13 +303,6 @@ fun updateStepCalories(calories: Int) {
     StepCounterService._calories.postValue(StepCounterService._calories.value?.plus(calories))
 }
 
-fun formatDurationFromLong(milliseconds: Long): String {
-    val totalSeconds = milliseconds / 1000
-    val hours = totalSeconds / 3600
-    val minutes = (totalSeconds % 3600) / 60
-    val seconds = totalSeconds % 60
-    return String.format("%02d:%02d:%02d", hours, minutes, seconds)
-}
 
 fun parseDurationToLong(duration: String): Long {
     val parts = duration.split(":")
@@ -327,12 +314,21 @@ fun parseDurationToLong(duration: String): Long {
     return (hours * 3600 + minutes * 60 + seconds) * 1000
 }
 
+fun formatDurationFromLong(milliseconds: Long): String {
+    val totalSeconds = milliseconds / 1000
+    val hours = totalSeconds / 3600
+    val minutes = (totalSeconds % 3600) / 60
+    val seconds = totalSeconds % 60
+    return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+}
+
 fun durationToString(duration: Duration): String {
     val hours = duration.toHours()
     val minutes = duration.toMinutes() % 60
     val seconds = duration.seconds % 60
     return String.format("%02d:%02d:%02d", hours, minutes, seconds)
 }
+
 @SuppressLint("SimpleDateFormat")
 fun calendarToString(calendar: Calendar): String {
     val dateFormat = SimpleDateFormat("dd/MM/yyyy")

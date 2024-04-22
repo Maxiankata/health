@@ -107,7 +107,14 @@ class ChallengesListAdapter :
             challenger.text = buildString {
                 append("${getString(context, R.string.by)}: ${challenge.assigner}")
             }
-            challengerIcon.setImageBitmap(base64ToBitmap(challenge.image))
+            if(challenge.image.isNotEmpty()){
+                challengerIcon.setImageBitmap(base64ToBitmap(challenge.image))
+            }else{
+                challengerIcon.setImageResource(R.drawable.profile_photo_placeholder)
+            }
+            challengerIcon.apply {
+                setBackgroundResource(R.drawable.circle_background)
+            }
             SpeederServiceBoolean.isMyServiceRunning.observeForever {
                 if (it) {
                     val id = SpeederService.speedIntent.getStringExtra("challenge_id")
@@ -121,8 +128,8 @@ class ChallengesListAdapter :
                                 }"
                             )
                         }
-                        val parseColor = Color.parseColor("#FFFF00")
-                        status.setTextColor(parseColor)
+                        val activeColor = Color.parseColor("#FFFF00")
+                        status.setTextColor(activeColor)
                         accept.visibility = View.GONE
                         decline.apply {
                             text = getString(context, R.string.cancel)
@@ -132,9 +139,6 @@ class ChallengesListAdapter :
                         }
                     }
                 } else {
-                    decline.visibility = View.VISIBLE
-                    accept.visibility = View.VISIBLE
-                    decline.text = getString(context, R.string.decline)
                     if (challenge.challengeCompletion) {
                         status.text = buildString {
                             append(
@@ -150,7 +154,9 @@ class ChallengesListAdapter :
                         val parseColor = Color.parseColor("#00FF00")
                         status.setTextColor(parseColor)
                     } else {
-                        Log.d("status is complete", "hehe")
+                        decline.visibility = View.VISIBLE
+                        accept.visibility = View.VISIBLE
+                        decline.text = getString(context, R.string.decline)
                         status.text = buildString {
                             append(
                                 "${getString(context, R.string.status)}: ${
@@ -165,7 +171,7 @@ class ChallengesListAdapter :
                         accept.setOnClickListener {
                             if (!isServiceRunning()) {
                                 startSpeeder(
-                                    challenge.challengeDuration, challenge.challengeType, challenge
+                                    challenge.challengeDuration, challenge.challengeType, challenge.id
                                 )
                             } else {
                                 Toast.makeText(
@@ -183,14 +189,8 @@ class ChallengesListAdapter :
                         decline.setOnClickListener {
                             customCoroutineScope.launch {
                                 val challenges = getChallenges().toMutableList()
-                                Log.d("challenges", challenges.toString())
                                 for (item in challenges) {
                                     if (item.id == challenge.id) {
-                                        Log.d("removing item at", item.id.toString())
-                                        Log.d(
-                                            "Removed item",
-                                            "${item.id} , ${item.assigner}, ${item.challengeType}"
-                                        )
                                         challenges.remove(item)
                                         updateChallenges(challenges)
                                         break

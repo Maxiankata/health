@@ -56,7 +56,6 @@ class LoginFragmentViewModel(private val application: Application) : AndroidView
             try {
                 if(auth.logIn(email, password)){
                     getUser()
-                    delay(3000)
                     _state.postValue(State.LoggedIn(true))
                 }else{
                     _button_clickable.postValue(true)
@@ -105,7 +104,7 @@ class LoginFragmentViewModel(private val application: Application) : AndroidView
 
     private suspend fun requestPermissions(fragment: Fragment) {
         if (!checkPermissions(fragment)) {
-            delay(3000)
+            delay(5000)
             ActivityCompat.requestPermissions(
                 fragment.requireActivity(),
                 permissions,
@@ -127,6 +126,24 @@ class LoginFragmentViewModel(private val application: Application) : AndroidView
             }
         }
         return allPermissionsGranted
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                try {
+                    userDao.getUserInfo()?.uid?.let {
+                        auth.sync(fromRoomAdapter.adapt(userDao.getEntireUser()),
+                            it
+                        )
+                    }
+                }catch (e:Exception){
+                    Log.d("oopsie", "")
+                }
+                userDao.dropUser()
+                auth.signOut()
+            }
+        }
     }
 
     sealed interface State {

@@ -60,16 +60,16 @@
 
         app:layout_constraintTop_toTopOf="@id/water_submit" />
 
-    <TextView
-        android:id="@+id/sleep_goal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="15dp"
-        android:text="@string/sleep_goal"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="@+id/sleep_submit"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/sleep_submit" />
+<!--    <TextView-->
+<!--        android:id="@+id/sleep_goal"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_margin="15dp"-->
+<!--        android:text="@string/sleep_goal"-->
+<!--        android:textSize="24sp"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/sleep_submit"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="@id/sleep_submit" />-->
     <Button
         android:id="@+id/calorie_submit"
         android:layout_width="wrap_content"
@@ -102,15 +102,15 @@
         android:text="@string/submit"
         />
 
-    <Button
-        android:id="@+id/sleep_submit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/water_submit"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="15dp"
-        android:text="@string/submit"
-        />
+<!--    <Button-->
+<!--        android:id="@+id/sleep_submit"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/water_submit"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        android:layout_margin="15dp"-->
+<!--        android:text="@string/submit"-->
+<!--        />-->
     <EditText
         android:backgroundTint="@color/light_green"
         android:imeOptions="actionDone"
@@ -150,16 +150,16 @@
         android:imeOptions="actionDone"
         />
 
-    <EditText
-        android:id="@+id/sleep_goal_edit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/sleep_submit"
-        app:layout_constraintTop_toTopOf="@id/sleep_submit"
-        app:layout_constraintBottom_toBottomOf="@id/sleep_submit"
-        android:layout_marginHorizontal="10dp"
-        android:inputType="numberDecimal"
-        android:textSize="24sp"
-        android:imeOptions="actionDone"
-        />
+<!--    <EditText-->
+<!--        android:id="@+id/sleep_goal_edit"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:layout_constraintEnd_toStartOf="@id/sleep_submit"-->
+<!--        app:layout_constraintTop_toTopOf="@id/sleep_submit"-->
+<!--        app:layout_constraintBottom_toBottomOf="@id/sleep_submit"-->
+<!--        android:layout_marginHorizontal="10dp"-->
+<!--        android:inputType="numberDecimal"-->
+<!--        android:textSize="24sp"-->
+<!--        android:imeOptions="actionDone"-->
+<!--        />-->
 </androidx.constraintlayout.widget.ConstraintLayout>

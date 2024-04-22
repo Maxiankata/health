@@ -113,7 +113,6 @@ class ChallengeBuilderDialogFragment : DialogFragment() {
                             image = assigner.second!!,
                             id = id.toInt()
                         )
-                        Log.d("challenge id", id.toInt().toString())
                         lifecycleScope.launch {
                             challengeBuilderDialogViewModel.sendChallenge(userId, challenge)
                         }

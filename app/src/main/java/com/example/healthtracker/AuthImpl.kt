@@ -23,7 +23,6 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -60,9 +59,12 @@ class AuthImpl : AuthInterface {
                 Log.d("new user theme", userInfo.theme.toString())
             }
     }
+
     override suspend fun updateSettings(userSettingsInfo: UserSettingsInfo) {
-        Firebase.database.reference.child("user/${Firebase.auth.currentUser?.uid}/userSettingsInfo").setValue(userSettingsInfo)
+        Firebase.database.reference.child("user/${Firebase.auth.currentUser?.uid}/userSettingsInfo")
+            .setValue(userSettingsInfo)
     }
+
     override suspend fun deleteCurrentUser() {
         Firebase.database.getReference("user/${Firebase.auth.currentUser?.uid}").setValue(null)
         Firebase.auth.currentUser?.delete()?.addOnCompleteListener { task ->
@@ -87,24 +89,25 @@ class AuthImpl : AuthInterface {
     override fun signOut() {
         Firebase.auth.signOut()
     }
+
     private val customCoroutineScope = CoroutineScope(Dispatchers.IO)
 
     override suspend fun createAcc(email: String, password: String, username: String): Boolean {
         return try {
-                val authResult = Firebase.auth.createUserWithEmailAndPassword(email, password).await()
-                val user = authResult.user
-                if (user != null) {
-                    val userRef = Firebase.database.getReference("user")
-                    val userer = UserMegaInfo(
-                        UserInfo(
-                            username = username, mail = email, uid = user.uid
-                        )
+            val authResult = Firebase.auth.createUserWithEmailAndPassword(email, password).await()
+            val user = authResult.user
+            if (user != null) {
+                val userRef = Firebase.database.getReference("user")
+                val userer = UserMegaInfo(
+                    UserInfo(
+                        username = username, mail = email, uid = user.uid
                     )
-                    userRef.child(user.uid).setValue(userer).await()
-                    true
-                } else {
-                    false
-                }
+                )
+                userRef.child(user.uid).setValue(userer).await()
+                true
+            } else {
+                false
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             false
@@ -150,7 +153,7 @@ class AuthImpl : AuthInterface {
                         val userInfoSnapshot = userSnapshot.child("userInfo")
                         val userInfo = userInfoSnapshot.getValue(UserInfo::class.java)
                         userInfo?.let {
-                            if (it.uid != Firebase.auth.currentUser!!.uid){
+                            if (it.uid != Firebase.auth.currentUser!!.uid) {
                                 if (it.username == string) {
                                     tempList.add(it)
                                 }
@@ -175,6 +178,8 @@ class AuthImpl : AuthInterface {
             .setValue(megaInfo.userPutInInfo)
         Firebase.database.reference.child("user/${id}/userSettingsInfo")
             .setValue(megaInfo.userSettingsInfo)
+        Firebase.database.reference.child("user/${id}/challenges")
+            .setValue(megaInfo.challenges)
         Firebase.database.reference.child("user/${id}/userDays").setValue(megaInfo.userDays)
     }
 
@@ -223,6 +228,7 @@ class AuthImpl : AuthInterface {
         Firebase.database.reference.child("user").child(sentToUser).child("userFriends")
             .child(sentByUser).setValue(UserFriends(sentByUser, false))
     }
+
     override suspend fun addFriend(sentToUser: String, sentByUser: String) {
         Firebase.database.reference.child("user").child(sentByUser)
             .child("userFriends").child(sentToUser).setValue(UserFriends(sentToUser, true))
@@ -230,6 +236,7 @@ class AuthImpl : AuthInterface {
         Firebase.database.reference.child("user").child(sentToUser)
             .child("userFriends").child(sentByUser).setValue(UserFriends(sentByUser, true))
     }
+
     override suspend fun removeFriend(userId: String, userFriendList: List<UserFriends>) {
         Firebase.database.reference.child("user").child(Firebase.auth.currentUser!!.uid)
             .child("userFriends").child(userId).removeValue()
@@ -338,12 +345,11 @@ class AuthImpl : AuthInterface {
     override suspend fun resetPassword(email: String): Boolean {
         return suspendCoroutine { continuation ->
             Firebase.auth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
-                    val isSuccessful = task.isSuccessful
-                    continuation.resume(isSuccessful)
-                }
+                val isSuccessful = task.isSuccessful
+                continuation.resume(isSuccessful)
+            }
         }
     }
-
 
 
     companion object {
@@ -388,7 +394,6 @@ class AuthImpl : AuthInterface {
                 }
             })
         }
-
 
 
 }

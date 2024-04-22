@@ -46,7 +46,7 @@ class GoalChangeDialogFragment:DialogFragment() {
                     stepGoalEdit.hint = userGoals.stepGoal.toString()
                     calorieGoalEdit.hint = userGoals.calorieGoal.toString()
                     waterGoalEdit.hint = userGoals.waterGoal.toString()
-                    sleepGoal.hint = userGoals.sleepGoal.toString()
+//                    sleepGoal.hint = userGoals.sleepGoal.toString()
                     stepSubmit.setOnClickListener {
                         if (stepGoalEdit.text.isNullOrEmpty()) {  //put an empty string check ""
                             Toast.makeText(MyApplication.getContext(),getString(R.string.empty_field), Toast.LENGTH_SHORT).show()
@@ -84,24 +84,24 @@ class GoalChangeDialogFragment:DialogFragment() {
                             }
                         }
                     }
-                    sleepSubmit.apply {
-                        visibility = GONE
-                    }
-                    sleepGoalEdit.visibility=GONE
-                    sleepGoal.visibility= GONE
-                    sleepSubmit.setOnClickListener{
-                        if (sleepGoalEdit.text.isNullOrEmpty()) {
-                            Toast.makeText(MyApplication.getContext(),getString(R.string.empty_field), Toast.LENGTH_SHORT).show()
-
-                        }else{
-                            lifecycleScope.launch {
-                                val stepGoal = sleepGoalEdit.text.toString()
-                                val usererGoals = userGoals
-                                usererGoals.sleepGoal= stepGoal.toDouble()
-                                goalChangeDialogViewModel.updateGoal(usererGoals)
-                            }
-                        }
-                    }
+//                    sleepSubmit.apply {
+//                        visibility = GONE
+//                    }
+//                    sleepGoalEdit.visibility=GONE
+//                    sleepGoal.visibility= GONE
+//                    sleepSubmit.setOnClickListener{
+//                        if (sleepGoalEdit.text.isNullOrEmpty()) {
+//                            Toast.makeText(MyApplication.getContext(),getString(R.string.empty_field), Toast.LENGTH_SHORT).show()
+//
+//                        }else{
+//                            lifecycleScope.launch {
+//                                val stepGoal = sleepGoalEdit.text.toString()
+//                                val usererGoals = userGoals
+//                                usererGoals.sleepGoal= stepGoal.toDouble()
+//                                goalChangeDialogViewModel.updateGoal(usererGoals)
+//                            }
+//                        }
+//                    }
                 }
             }
         }

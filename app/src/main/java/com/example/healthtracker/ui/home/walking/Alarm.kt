@@ -18,6 +18,7 @@ import com.example.healthtracker.ui.account.friends.challenges.Challenge
 import com.example.healthtracker.ui.calendarToString
 import com.example.healthtracker.ui.getStepsValue
 import com.example.healthtracker.ui.home.speeder.SpeederServiceBoolean
+import com.example.healthtracker.ui.isInternetAvailable
 import com.example.healthtracker.ui.nullifyStepCounter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,8 +33,8 @@ class  Alarm : AlarmScheduler {
     override fun schedule(item: AlarmItem) {
         val intent = Intent(context, AlarmReciever::class.java)
         val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, 11)
+        calendar.set(Calendar.HOUR_OF_DAY, 22)
+        calendar.set(Calendar.MINUTE, 23)
         calendar.set(Calendar.SECOND, 30)
         val currentTime = System.currentTimeMillis()
         if (calendar.timeInMillis < currentTime) {
@@ -65,7 +66,7 @@ class  Alarm : AlarmScheduler {
 }
 
 class AlarmReciever : BroadcastReceiver() {
-    private val authImpl = AuthImpl()
+    private val authImpl = AuthImpl.getInstance()
     override fun onReceive(context: Context?, intent: Intent?) {
         val userDao = MainActivity.getDatabaseInstance().dao()
         val roomToUserMegaInfoAdapter = RoomToUserMegaInfoAdapter()
@@ -88,7 +89,6 @@ class AlarmReciever : BroadcastReceiver() {
                 image = user.userInfo.image,
                 totalSteps = user.userInfo.totalSteps?.plus(getStepsValue()),
                 username = user.userInfo.username,
-
             )
             val weight = userPutInInfo?.weight
             val sendToday = calendarToString(Calendar.getInstance())
@@ -102,9 +102,11 @@ class AlarmReciever : BroadcastReceiver() {
                 userDao.updateDays(userDays)
                 userDao.updateUserInfo(newUserInfo)
             }.await()
-            val syncer = roomToUserMegaInfoAdapter.adapt(userDao.getEntireUser())
-            authImpl.sync(syncer, syncer.userInfo.uid!!)
-            authImpl.clearChallenges()
+            if (isInternetAvailable(MyApplication.getContext())){
+                val syncer = roomToUserMegaInfoAdapter.adapt(userDao.getEntireUser())
+                authImpl.sync(syncer, syncer.userInfo.uid!!)
+                authImpl.clearChallenges()
+            }
             userDao.wipeUserAutomaticInfo()
             userDao.wipeUserPutInInfo()
             userDao.wipeChallenges()

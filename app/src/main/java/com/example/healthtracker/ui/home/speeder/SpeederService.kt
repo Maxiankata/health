@@ -11,7 +11,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.CountDownTimer
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LiveData
@@ -21,7 +20,10 @@ import com.example.healthtracker.MainActivity
 import com.example.healthtracker.MyApplication
 import com.example.healthtracker.R
 import com.example.healthtracker.ui.account.friends.challenges.Challenge
+import com.example.healthtracker.ui.account.friends.challenges.ChallengesDisplayDialogViewModel
+import com.example.healthtracker.ui.formatDurationFromLong
 import com.example.healthtracker.ui.home.walking.StepCounterService
+import com.example.healthtracker.ui.isInternetAvailable
 import com.example.healthtracker.ui.parseDurationToLong
 import com.example.healthtracker.ui.stopSpeeder
 import com.example.healthtracker.ui.updateStepCalories
@@ -35,6 +37,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.round
 
 class SpeederService : Service() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -62,8 +65,13 @@ class SpeederService : Service() {
     }
 
     private val NOTIFICATION_ID = 123
+    private val ENDING_NOTIFICATION_ID = 420
     private val CHANNEL_ID = "speeder_channel"
     var weight: Double = 0.0
+    var burnedCals = 0
+    var averageSpeeder = 4.20
+    var units = ""
+    val functionalMultiplier = 3.6
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
@@ -72,53 +80,61 @@ class SpeederService : Service() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         customCoroutineScope.launch {
             multiplier = if (userDao.getUserSettings().units == "kg") {
+                units = "kph"
                 3.6
             } else {
+                units = "mph"
                 2.24
             }
         }
         val time = speedIntent.getStringExtra("time") ?: "00:00:00"
         timey = time
         customCoroutineScope.launch {
-            weight = userDao.getPutInInfo()?.weight!!
+            weight = if(userDao.getUserSettings().units=="kg") {
+                userDao.getPutInInfo()?.weight!!
+            }else{
+                userDao.getPutInInfo()?.weight!!*0.45
+            }
         }
         val challengeExtra = speedIntent.getStringExtra("challenge").toString()
-        val challenge: Challenge? = if (challengeExtra == "null") null else Challenge.fromString(
-            speedIntent.getStringExtra("challenge")!!
-        )
-        if (challenge != null) speedIntent.putExtra("challenge_id", challenge.id.toString())
+        val challengeId: Int? =
+            if (challengeExtra == "null") null else speedIntent.getStringExtra("challenge")?.toInt()
+        if (challengeId != null) speedIntent.putExtra("challenge_id", challengeId.toString())
         timer = startCountdownFromString(time, onTick = { timeRemaining ->
             _time.postValue(timeRemaining)
             updateNotification()
         }, onFinish = {
+            updateNotification()
             activityTime.postValue(parseDurationToLong(time))
             customCoroutineScope.launch {
                 val autoInfo = userDao.getAutomaticInfo()
-                Log.d(
-                    "newtimer",
-                    "added $time to spedeer time for it to become ${activityTime.value.toString()}"
-                )
-                autoInfo?.activeTime = activityTime.value
-                    ?.let { autoInfo?.activeTime?.plus(it) }
-                if (autoInfo?.challengesPassed==null){
+                autoInfo?.activeTime = activityTime.value?.let { autoInfo?.activeTime?.plus(it) }
+                if (autoInfo?.challengesPassed == null) {
                     autoInfo?.challengesPassed = 0
                     autoInfo?.challengesPassed = autoInfo?.challengesPassed?.plus(1)
-                }else{
+                } else {
                     autoInfo.challengesPassed = autoInfo.challengesPassed?.plus(1)
                 }
                 if (autoInfo != null) {
                     userDao.updateUserAutomaticInfo(autoInfo)
-                    Log.d("updated auto", userDao.getAutomaticInfo()?.activeTime.toString())
                 }
             }
             val averageSpeed = divided / divider
+            CoroutineScope(Dispatchers.IO).launch{
+                averageSpeeder = if (userDao.getUserSettings().units=="kg"){
+                    round(averageSpeed * 10) / 10
+                }else{
+                    round(averageSpeed * 0.62 * 10)/10
+                }
+            }
             var MET: Double
             when (ActivityEnum.valueOf(
                 speedIntent.getStringExtra("activity") ?: ActivityEnum.WALKING.name
             )) {
                 ActivityEnum.RUNNING -> {
                     MET = when (averageSpeed) {
-                        in 0.0..10.19 -> 10.0
+                        in 0.0..5.10->5.0
+                        in 5.11..10.19 -> 10.0
                         in 10.20..11.39 -> 11.0
                         in 11.4..12.92 -> 12.5
                         in 12.93..15.03 -> 14.0
@@ -127,11 +143,13 @@ class SpeederService : Service() {
                     val newCals =
                         calculateBurnedCalories(MET, weight, parseDurationToLong(time) / 60000)
                     updateStepCalories(newCals.toInt())
+                    burnedCals = newCals.toInt()
                 }
 
                 ActivityEnum.JOGGING -> {
                     MET = when (averageSpeed) {
-                        in 0.0..8.84 -> 8.0
+                        in 0.00..4.42-> 4.0
+                        in 4.43..8.84 -> 8.0
                         in 8.85..10.49 -> 10.0
                         in 10.5..12.09 -> 11.5
                         else -> 13.5
@@ -139,11 +157,13 @@ class SpeederService : Service() {
                     val newCals =
                         calculateBurnedCalories(MET, weight, parseDurationToLong(time) / 60000)
                     updateStepCalories(newCals.toInt())
+                    burnedCals = newCals.toInt()
                 }
 
                 ActivityEnum.WALKING -> {
                     MET = when (averageSpeed) {
-                        in 0.0..4.39 -> 3.0
+                        in 0.0..3.19->2.0
+                        in 3.2..4.39 -> 3.0
                         in 4.4..5.19 -> 3.5
                         in 5.2..6.39 -> 4.0
                         else -> 4.5
@@ -151,33 +171,32 @@ class SpeederService : Service() {
                     val newCals =
                         calculateBurnedCalories(MET, weight, parseDurationToLong(time) / 60000)
                     updateStepCalories(newCals.toInt())
+                    burnedCals = newCals.toInt()
                 }
 
                 ActivityEnum.CYCLING -> {
                     MET = when (averageSpeed) {
-                        in 0.0..19.19 -> 6.0
+                        in 0.0..15.99-> 4.0
+                        in 16.0..19.19 -> 6.0
                         in 19.20..22.39 -> 8.0
-                        else -> 10.0
+                        in 22.4..25.6->10.0
+                        else -> 12.0
                     }
                     val newCals =
                         calculateBurnedCalories(MET, weight, parseDurationToLong(time) / 60000)
                     updateStepCalories(newCals.toInt())
+                    burnedCals = newCals.toInt()
                 }
             }
             customCoroutineScope.launch {
                 withContext(Dispatchers.IO) {
-                    if (challenge != null) {
+                    if (challengeId != null) {
                         val user = userDao.getEntireUser()
                         val challenges = user.challenges?.toMutableList()
                         if (challenges != null) {
                             for (item in challenges) {
-                                if (item.id == challenge.id) {
+                                if (item.id == challengeId) {
                                     item.challengeCompletion = true
-                                    Log.d("removing item at", item.id.toString())
-                                    Log.d(
-                                        "Removed item",
-                                        "${item.id} , ${item.assigner}, ${item.challengeType}"
-                                    )
                                     challenges.remove(item)
                                     challenges.add(
                                         Challenge(
@@ -196,10 +215,14 @@ class SpeederService : Service() {
                         user.challenges = challenges
                         user.challenges?.let {
                             userDao.updateChallenges(it)
-                            authImpl.setChallenges(it, user.userId)
+                            if (isInternetAvailable(this@SpeederService)) {
+                                authImpl.setChallenges(it, user.userId)
+                            }
+                            ChallengesDisplayDialogViewModel.refeedChallenges()
                         }
                     }
                 }
+                showEndingNotification()
                 SpeederServiceBoolean._isMyServiceRunning.postValue(false)
                 stopSpeeder()
             }
@@ -209,7 +232,7 @@ class SpeederService : Service() {
             override fun onLocationResult(p0: LocationResult) {
                 for (location in p0.locations) {
                     divider++
-                    divided += location.speed * multiplier
+                    divided += location.speed * functionalMultiplier
                     _speed.postValue(location.speed * multiplier)
                 }
             }
@@ -253,18 +276,52 @@ class SpeederService : Service() {
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
     }
+
     private fun stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
+
     private fun createNotification(): Notification {
-        val intent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        val notificationIntent = Intent(this, MainActivity::class.java)
+        val pendingIntent =
+            PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
         return NotificationCompat.Builder(this, StepCounterService.channelId)
             .setContentTitle(speedIntent.getStringExtra("activity")).setContentText(_time.value)
             .setSmallIcon(R.drawable.timer_icon).setContentIntent(pendingIntent).build()
     }
 
+    private fun createEndingNotification(): Notification {
+        val notificationIntent = Intent(this, MainActivity::class.java)
+        val pendingIntent =
+            PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
+        val activity = speedIntent.getStringExtra("activity")?.let { ActivityEnum.valueOf(it) }
+        val string = when (activity) {
+            ActivityEnum.RUNNING -> getString(R.string.ran)
+            ActivityEnum.JOGGING -> getString(R.string.jogged)
+            ActivityEnum.WALKING -> getString(R.string.walked)
+            ActivityEnum.CYCLING -> getString(R.string.cycled)
+            null -> "did nothing"
+        }
+        return NotificationCompat.Builder(this, StepCounterService.channelId)
+            .setContentTitle(getString(R.string.completed_activity)).setContentText(
+                "${getString(R.string.you)} $string ${getString(R.string.for_word)} $timey ${
+                    getString(
+                        R.string.with
+                    )
+                } $averageSpeeder $units ${getString(R.string.and)} ${getString(R.string.burned)} $burnedCals ${
+                    getString(
+                        R.string.calories_plain
+                    )
+                }"
+            ).setSmallIcon(R.drawable.wizard).setContentIntent(pendingIntent).setAutoCancel(true).build()
+    }
 
+    private fun showEndingNotification() {
+        val notification = createEndingNotification()
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(ENDING_NOTIFICATION_ID, notification)
+    }
 
     private fun updateNotification() {
         val notification = createNotification()
@@ -281,11 +338,7 @@ class SpeederService : Service() {
         val totalTimeInMillis = ((hours * 3600) + (minutes * 60) + seconds) * 1000
         return object : CountDownTimer(totalTimeInMillis, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                val hoursLeft = millisUntilFinished / (1000 * 60 * 60)
-                val minutesLeft = (millisUntilFinished % (1000 * 60 * 60)) / (1000 * 60)
-                val secondsLeft = (millisUntilFinished % (1000 * 60)) / 1000
-                val formattedTimeLeft =
-                    String.format("%02d:%02d:%02d", hoursLeft, minutesLeft, secondsLeft)
+                val formattedTimeLeft = formatDurationFromLong(millisUntilFinished)
                 onTick(formattedTimeLeft)
             }
 

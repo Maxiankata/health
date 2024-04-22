@@ -1,15 +1,10 @@
 package com.example.healthtracker
 
 import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.res.Configuration
-import android.os.Build
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -76,7 +71,9 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
     }
 
     private fun listenToDataChanges() {
-        val pathReference = Firebase.database.reference.child("user").child(Firebase.auth.currentUser!!.uid).child("userFriends")
+        val pathReference =
+            Firebase.database.reference.child("user").child(Firebase.auth.currentUser!!.uid)
+                .child("userFriends")
         val valueEventListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (burnerBoolean) {
@@ -84,6 +81,7 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
                 }
                 burnerBoolean = true
             }
+
             override fun onCancelled(databaseError: DatabaseError) {
                 Log.w(TAG, "Failed to read value.", databaseError.toException())
             }
@@ -94,9 +92,11 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
     fun observeDataChanges(): LiveData<Boolean> {
         return dataChangedLiveData
     }
+
     fun resetNotificationFlag() {
         dataChangedLiveData.postValue(false)
     }
+
     fun updateLanguage(context: Context) {
         viewModelScope.launch {
             applyLocale(context)
