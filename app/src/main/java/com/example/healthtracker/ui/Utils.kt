@@ -12,6 +12,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
 import android.util.Base64
+import android.util.Log
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.RelativeLayout
@@ -284,7 +285,12 @@ fun isInternetAvailable(context: Context): Boolean {
         NetworkCapabilities.TRANSPORT_CELLULAR
     ))
 }
-
+fun setCalendarTo8pm(){
+    StepCounterService.calendar.set(Calendar.MINUTE, 0)
+    StepCounterService.calendar.set(Calendar.SECOND, 0)
+    StepCounterService.calendar.set(Calendar.HOUR_OF_DAY, 20)
+    Log.d("reset time in millis", StepCounterService.calendar.timeInMillis.toString())
+}
 fun startStepCounterService() {
     ContextCompat.startForegroundService(MyApplication.getContext(), StepCounterService.stepIntent)
 }

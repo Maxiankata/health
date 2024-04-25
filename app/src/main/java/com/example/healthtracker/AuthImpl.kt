@@ -12,6 +12,7 @@ import com.example.healthtracker.ui.bitmapToBase64
 import com.example.healthtracker.ui.home.speeder.ActivityEnum
 import com.example.healthtracker.ui.toUserDays
 import com.example.healthtracker.ui.toUserFriends
+import com.example.healthtracker.ui.toUserInfo
 import com.example.healthtracker.ui.toUserMegaInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -111,20 +112,19 @@ class AuthImpl : AuthInterface {
         }
     }
 
-    override suspend fun fetchSearchedFriends(string: String): MutableList<UserInfo> =
+    override suspend fun fetchSearchedUsers(string: String): MutableList<UserInfo> =
         suspendCoroutine { continuation ->
-            val ref = Firebase.database.getReference("user/${Firebase.auth.currentUser!!.uid}")
+            val ref: DatabaseReference = Firebase.database.getReference("user")
             ref.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     val tempList = mutableListOf<UserInfo>()
                     for (userSnapshot in dataSnapshot.children) {
-                        val userInfoSnapshot = userSnapshot.child("userFriends")
-                        val userFriends = userInfoSnapshot.getValue(UserFriends::class.java)
-                        userFriends?.let {
-                            customCoroutineScope.launch {
-                                val name = getUserInfo(it.uid)?.username
-                                if (name == string) {
-                                    getUserInfo(it.uid)?.let { it1 -> tempList.add(it1) }
+                        val userInfoSnapshot = userSnapshot.child("userInfo")
+                        val userInfo = userInfoSnapshot.toUserInfo()
+                        userInfo.let {
+                            if (it.uid != Firebase.auth.currentUser!!.uid) {
+                                if (it.username?.lowercase() == string.lowercase()) {
+                                    tempList.add(it)
                                 }
                             }
                         }
@@ -137,29 +137,30 @@ class AuthImpl : AuthInterface {
                     continuation.resumeWithException(databaseError.toException())
                 }
             })
-
         }
 
-    override suspend fun fetchSearchedUsers(string: String): MutableList<UserInfo> =
+    override suspend fun fetchSearchedFriends(string: String): MutableList<UserInfo> =
         suspendCoroutine { continuation ->
-            val ref: DatabaseReference = Firebase.database.getReference("user")
+            val ref: DatabaseReference =
+                Firebase.database.getReference("user/${Firebase.auth.currentUser!!.uid}/userFriends")
             ref.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     val tempList = mutableListOf<UserInfo>()
                     for (userSnapshot in dataSnapshot.children) {
-                        val userInfoSnapshot = userSnapshot.child("userInfo")
-                        val userInfo = userInfoSnapshot.getValue(UserInfo::class.java)
-                        userInfo?.let {
-                            if (it.uid != Firebase.auth.currentUser!!.uid) {
-                                if (it.username == string) {
-                                    tempList.add(it)
+                        val userFriend = userSnapshot.toUserFriends()
+                        if (userFriend.uid != Firebase.auth.currentUser!!.uid) {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                val user = getUserInfo(userFriend.uid)
+                                user?.let {
+                                    if (string.lowercase() == user.username?.lowercase()) {
+                                        tempList.add(user)
+                                    }
                                 }
                             }
                         }
                     }
                     continuation.resume(tempList)
                 }
-
                 override fun onCancelled(databaseError: DatabaseError) {
                     Log.e("FirebaseError", "Error fetching data", databaseError.toException())
                     continuation.resumeWithException(databaseError.toException())

@@ -17,6 +17,7 @@ import com.example.healthtracker.databinding.ActivityMainBinding
 import com.example.healthtracker.ui.home.speeder.SpeederServiceBoolean
 import com.example.healthtracker.ui.home.walking.Alarm
 import com.example.healthtracker.ui.home.walking.AlarmItem
+import com.example.healthtracker.ui.home.walking.StepCounterService
 import com.example.healthtracker.ui.startStepCounterService
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.time.LocalDateTime
@@ -25,7 +26,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mainViewModel: MainViewModel
     private lateinit var binding: ActivityMainBinding
-    private val channelID = "friend_channel"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,37 +42,16 @@ class MainActivity : AppCompatActivity() {
         mainViewModel.settings.observe(this) {
             mainViewModel.updateLanguage(this)
         }
-        mainViewModel.observeDataChanges().observe(this) { dataChanged ->
-            if (dataChanged) {
-                showNotification()
-                mainViewModel.resetNotificationFlag()
-            }
-        }
+
         SpeederServiceBoolean._isMyServiceRunning.postValue(false)
-        startStepCounterService()
+        if (!StepCounterService.activeService){
+            startStepCounterService()
+        }
         val item = AlarmItem(LocalDateTime.now(), "wipe it")
         Alarm().schedule(item)
         supportActionBar?.hide()
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-    }
-
-    private fun showNotification() {
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channelId = channelID
-        val notificationId = 1
-
-        val channel =
-            NotificationChannel(channelId, "friends", NotificationManager.IMPORTANCE_DEFAULT)
-        notificationManager.createNotificationChannel(channel)
-
-        val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setContentTitle(getString(R.string.requests))
-            .setContentText(getString(R.string.new_friend)).setSmallIcon(R.drawable.friend_add)
-            .setAutoCancel(true)
-
-        notificationManager.notify(notificationId, notificationBuilder.build())
     }
 
     companion object {
@@ -89,4 +68,3 @@ class MainActivity : AppCompatActivity() {
     }
 
 }
-

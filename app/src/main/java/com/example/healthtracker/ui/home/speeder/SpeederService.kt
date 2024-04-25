@@ -103,6 +103,7 @@ class SpeederService : Service() {
         timer = startCountdownFromString(time, onTick = { timeRemaining ->
             _time.postValue(timeRemaining)
             updateNotification()
+            SpeederServiceBoolean._isMyServiceRunning.postValue(true)
         }, onFinish = {
             updateNotification()
             activityTime.postValue(parseDurationToLong(time))
@@ -247,7 +248,6 @@ class SpeederService : Service() {
         notificationManager.cancel(NOTIFICATION_ID)
         stopLocationUpdates()
         SpeederServiceBoolean._isMyServiceRunning.postValue(false)
-
         timer.cancel()
     }
 
@@ -331,17 +331,12 @@ class SpeederService : Service() {
     private fun startCountdownFromString(
         timeString: String, onTick: (String) -> Unit, onFinish: () -> Unit
     ): CountDownTimer {
-        val timeParts = timeString.split(":")
-        val hours = timeParts[0].toLong()
-        val minutes = timeParts[1].toLong()
-        val seconds = timeParts[2].toLong()
-        val totalTimeInMillis = ((hours * 3600) + (minutes * 60) + seconds) * 1000
+        val totalTimeInMillis = parseDurationToLong(timeString)
         return object : CountDownTimer(totalTimeInMillis, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 val formattedTimeLeft = formatDurationFromLong(millisUntilFinished)
                 onTick(formattedTimeLeft)
             }
-
             override fun onFinish() {
                 onFinish()
             }
@@ -352,4 +347,3 @@ class SpeederService : Service() {
         return ((MET * 3.5 * weight / 200) * minutes)
     }
 }
-

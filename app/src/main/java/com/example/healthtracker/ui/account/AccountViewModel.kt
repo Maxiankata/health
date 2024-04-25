@@ -32,13 +32,17 @@ class AccountViewModel(private val application: Application) : AndroidViewModel(
     val user: LiveData<UserMegaInfo?> get() = _user
     fun signOut() {
         viewModelScope.launch {
-            sync()
-            withContext(Dispatchers.IO) {
-                userDao.dropUser()
-                auth.signOut()
-                nullifyStepCounter()
-                stopStepCounterService()
-                stopSpeeder()
+            try {
+                sync()
+                withContext(Dispatchers.IO) {
+                    userDao.dropUser()
+                    auth.signOut()
+                    nullifyStepCounter()
+                    stopStepCounterService()
+                    stopSpeeder()
+                }
+            }catch (e:Exception){
+                Toast.makeText(application.applicationContext, R.string.unknown_error, Toast.LENGTH_SHORT).show()
             }
         }
     }

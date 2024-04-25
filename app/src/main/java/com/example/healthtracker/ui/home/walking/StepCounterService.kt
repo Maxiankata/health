@@ -27,6 +27,13 @@ import com.example.healthtracker.data.user.UserAutomaticInfo
 import com.example.healthtracker.data.user.UserMegaInfo
 import com.example.healthtracker.ui.formatDurationFromLong
 import com.example.healthtracker.ui.parseDurationToLong
+import com.example.healthtracker.ui.setCalendarTo8pm
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -35,6 +42,7 @@ import java.util.Calendar
 
 class StepCounterService : Service(), SensorEventListener {
     companion object {
+        var activeService = false
         val _steps = MutableLiveData<Int>()
         val steps: LiveData<Int> get() = _steps
         val _calories = MutableLiveData<Int>()
@@ -43,26 +51,24 @@ class StepCounterService : Service(), SensorEventListener {
         val _activeTime = MutableLiveData<Long>()
         val sleepDuration: LiveData<Long> get() = _sleepDuration
         val channelId = "step_counter_channel"
-
         var stepIntent: Intent = Intent(MyApplication.getContext(), StepCounterService::class.java)
+        val calendar = Calendar.getInstance()
     }
 
     private var lastSensorEventTime: Long = 0
     private var isSleeping = false
     private var sleepStartTime: Long = 0
     private var sleepStopTime: Long = 0
-    private val currentTimeMillis = System.currentTimeMillis()
-    private val calendar = Calendar.getInstance()
 
     private val idleThresholdMillis = 2 * 60 * 60 * 1000
 
     private var sensorManager: SensorManager? = null
+    private val friendChannelID = "friend_channel"
+    private val challengeChannelID = "challenge_channel"
 
     init {
-        calendar.timeInMillis = currentTimeMillis
-        calendar.set(Calendar.MINUTE, 42)
-        calendar.set(Calendar.SECOND, 0)
-        calendar.set(Calendar.HOUR_OF_DAY, 8)
+        activeService = true
+        setCalendarTo8pm()
     }
 
     private val userDao = MainActivity.getDatabaseInstance().dao()
@@ -72,8 +78,7 @@ class StepCounterService : Service(), SensorEventListener {
             userDao.getEntireUser().let {
                 callback(roomToUserMegaInfoAdapter.adapt(it))
                 Log.d(
-                    "emitted user",
-                    roomToUserMegaInfoAdapter.adapt(it).userAutomaticInfo.toString()
+                    "emitted user", roomToUserMegaInfoAdapter.adapt(it).userAutomaticInfo.toString()
                 )
             }
         }
@@ -82,18 +87,18 @@ class StepCounterService : Service(), SensorEventListener {
     fun getStartingMetrics() {
         getUser { user ->
             user?.let {
-                it.userAutomaticInfo?.let {it1->
-                    CoroutineScope(Dispatchers.Main).launch{
+                it.userAutomaticInfo?.let { it1 ->
+                    CoroutineScope(Dispatchers.Main).launch {
                         _activeTime.postValue(it1.activeTime!!)
                         _calories.value = it1.steps?.currentCalories!!
                         _steps.value = it1.steps.currentSteps!!
                     }
                 }
-                it.userPutInInfo?.let {it1->
+                it.userPutInInfo?.let { it1 ->
                     if (!it1.sleepDuration.isNullOrBlank()) {
                         val sleep = parseDurationToLong(it1.sleepDuration!!)
                         _sleepDuration.postValue(sleep)
-                    }else{
+                    } else {
                         _sleepDuration.postValue(0)
                     }
                 }
@@ -103,23 +108,21 @@ class StepCounterService : Service(), SensorEventListener {
 
     var handler: Handler? = null
     fun updateUserAutomaticInfo() {
+        if (!isSleeping){
+            checkForSleep()
+        }
         CoroutineScope(Dispatchers.IO).launch {
             val user = async { userDao.getEntireUser() }.await()
             user.userAutomaticInfo.let {
                 val renewedAutomaticInfo = UserAutomaticInfo(
-                    challengesPassed = it?.challengesPassed ?: 0,
-                    steps = it?.steps?.copy(
+                    challengesPassed = it?.challengesPassed ?: 0, steps = it?.steps?.copy(
                         currentSteps = _steps.value, currentCalories = _calories.value
-                    ),
-                    activeTime = it?.activeTime
+                    ), activeTime = it?.activeTime
                 )
                 userDao.updateUserAutomaticInfo(renewedAutomaticInfo)
-
-
             }
         }
     }
-
 
     override fun onCreate() {
         super.onCreate()
@@ -166,6 +169,7 @@ class StepCounterService : Service(), SensorEventListener {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startForeground(1, createNotification())
+        addListener()
         registerStepSensor()
         return START_STICKY
     }
@@ -186,7 +190,8 @@ class StepCounterService : Service(), SensorEventListener {
 
     private fun createNotification(): Notification {
         val notificationIntent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent =
+            PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
         val currentSteps = _steps.value ?: 0
         val builder =
             NotificationCompat.Builder(this, channelId).setSmallIcon(R.drawable.running_icon)
@@ -202,6 +207,7 @@ class StepCounterService : Service(), SensorEventListener {
             )
         }
     }
+
     private var isFirstCallback = true
 
     override fun onSensorChanged(event: SensorEvent) {
@@ -229,7 +235,6 @@ class StepCounterService : Service(), SensorEventListener {
 
     }
 
-
     private fun updateNotification() {
         val notification = createNotification()
         startForeground(1, notification)
@@ -237,6 +242,9 @@ class StepCounterService : Service(), SensorEventListener {
 
     override fun onDestroy() {
         super.onDestroy()
+        activeService = false
+        pathReference.removeEventListener(friendListener)
+        challengeReference.removeEventListener(challengeListener)
         this@StepCounterService.handler?.removeCallbacksAndMessages(null)
         this@StepCounterService.nullifySteps()
         sensorManager?.unregisterListener(this)
@@ -245,6 +253,87 @@ class StepCounterService : Service(), SensorEventListener {
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
+    }
+
+    private val pathReference =
+        Firebase.database.reference.child("user").child(Firebase.auth.currentUser!!.uid)
+            .child("userFriends")
+    private val challengeReference =
+        Firebase.database.reference.child("user").child(Firebase.auth.currentUser!!.uid)
+            .child("challenges")
+    var friendBurnerBoolean = false
+    var challengeBurnerBoolean = false
+    private val friendListener = object : ChildEventListener {
+        override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?) {
+             if (friendBurnerBoolean) {
+                showFriendNotification()
+            }
+            friendBurnerBoolean = true
+        }
+
+        override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {}
+
+        override fun onChildRemoved(dataSnapshot: DataSnapshot) {}
+
+        override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {}
+
+        override fun onCancelled(databaseError: DatabaseError) {}
+    }
+    private val challengeListener = object : ChildEventListener {
+        override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?) {
+            if (challengeBurnerBoolean) {
+                showChallengeNotification()
+            }
+            challengeBurnerBoolean = true
+        }
+
+        override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
+        }
+
+        override fun onChildRemoved(dataSnapshot: DataSnapshot) {
+        }
+
+        override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {
+        }
+
+        override fun onCancelled(databaseError: DatabaseError) {
+        }
+    }
+
+    private fun addListener() {
+        pathReference.addChildEventListener(friendListener)
+        challengeReference.addChildEventListener(challengeListener)
+    }
+
+    private fun showFriendNotification() {
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationId = 420
+        val channel =
+            NotificationChannel(friendChannelID, "friends", NotificationManager.IMPORTANCE_DEFAULT)
+        notificationManager.createNotificationChannel(channel)
+        val notificationBuilder = NotificationCompat.Builder(this, friendChannelID)
+            .setContentTitle(getString(R.string.requests))
+            .setContentText(getString(R.string.new_friend)).setSmallIcon(R.drawable.friend_add)
+            .setAutoCancel(true)
+        notificationManager.notify(notificationId, notificationBuilder.build())
+    }
+
+    private fun showChallengeNotification() {
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationId = 421
+        val channel = NotificationChannel(
+            challengeChannelID,
+            "challenge",
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+        notificationManager.createNotificationChannel(channel)
+        val notificationBuilder = NotificationCompat.Builder(this, challengeChannelID)
+            .setContentTitle(getString(R.string.challenge))
+            .setContentText(getString(R.string.new_challenge)).setSmallIcon(R.drawable.flag)
+            .setAutoCancel(true)
+        notificationManager.notify(notificationId, notificationBuilder.build())
     }
 
 }

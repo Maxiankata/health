@@ -65,27 +65,7 @@ class FriendsDialogFragment : DialogFragment() {
                     noFriendsText.visibility = VISIBLE
                 }
             }
-            textInputLayout.editText?.setOnEditorActionListener { _, actionId, event ->
-                if (actionId == EditorInfo.IME_ACTION_DONE || (event != null && event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    val query = textInputLayout.editText!!.text?.toString()
-                    textInputLayout.editText!!.clearFocus()
-                    if (!query.isNullOrBlank()) {
-                        FriendListViewModel.searchState.observe(viewLifecycleOwner) {
-                            lifecycleScope.launch {
-                                if (it) {
-                                    friendListViewModel.clearList()
-                                    friendListViewModel.fetchSearchedUsers(query)
-                                } else {
-                                    friendListViewModel.fetchUserFriends()
-                                    friendListViewModel.fetchSearchedFriends(query)
-                                }
-                            }
-                        }
-                    } else (Log.d("blank query", "luluu"))
-                    return@setOnEditorActionListener true
-                }
-                false
-            }
+
             textInputLayout.editText?.setOnFocusChangeListener { _, hasFocus ->
                 if (!hasFocus) textInputLayout.editText!!.text?.clear()
             }
@@ -103,28 +83,6 @@ class FriendsDialogFragment : DialogFragment() {
                 layoutManager = LinearLayoutManager(requireContext())
                 adapter = friendListAdapter
             }
-
-            textInputLayout.editText?.setOnEditorActionListener { _, actionId, event ->
-                if (actionId == EditorInfo.IME_ACTION_DONE || (event != null && event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    val query = textInputLayout.editText!!.text?.toString()
-                    textInputLayout.editText!!.clearFocus()
-                    if (!query.isNullOrBlank()) {
-                        FriendListViewModel.searchState.observe(viewLifecycleOwner) {
-                            lifecycleScope.launch {
-                                if (it) {
-                                    friendListViewModel.clearList()
-                                    friendListViewModel.fetchSearchedUsers(query)
-                                } else {
-                                    friendListViewModel.fetchUserFriends()
-                                    friendListViewModel.fetchSearchedFriends(query)
-                                }
-                            }
-                        }
-                    } else (Log.d("blank query", "luluu"))
-                    return@setOnEditorActionListener true
-                }
-                false
-            }
             FriendListViewModel.searchState.observe(viewLifecycleOwner) {
                 if (it) {
                     friendListViewModel.clearList()
@@ -135,6 +93,7 @@ class FriendsDialogFragment : DialogFragment() {
                             val query = textInputLayout.editText!!.text?.toString()
                             textInputLayout.editText!!.clearFocus()
                             if (!query.isNullOrBlank()) {
+                                friendListViewModel.clearList()
                                 friendListViewModel.fetchSearchedUsers(query)
 
                             } else (Log.d("blank query", "luluu"))
@@ -156,6 +115,7 @@ class FriendsDialogFragment : DialogFragment() {
                             val query = textInputLayout.editText!!.text?.toString()
                             textInputLayout.editText!!.clearFocus()
                             if (!query.isNullOrBlank()) {
+                                friendListViewModel.clearList()
                                 friendListViewModel.fetchUserFriends()
                                 friendListViewModel.fetchSearchedFriends(query)
 

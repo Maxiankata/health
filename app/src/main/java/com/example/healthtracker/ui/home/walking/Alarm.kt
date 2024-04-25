@@ -19,6 +19,7 @@ import com.example.healthtracker.ui.calendarToString
 import com.example.healthtracker.ui.getStepsValue
 import com.example.healthtracker.ui.isInternetAvailable
 import com.example.healthtracker.ui.nullifyStepCounter
+import com.example.healthtracker.ui.setCalendarTo8pm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -106,6 +107,8 @@ class AlarmReciever : BroadcastReceiver() {
                 authImpl.sync(syncer, syncer.userInfo.uid!!)
                 authImpl.clearChallenges()
             }
+            setCalendarTo8pm()
+            StepCounterService._sleepDuration.postValue(0)
             userDao.wipeUserAutomaticInfo()
             userDao.wipeUserPutInInfo()
             userDao.wipeChallenges()

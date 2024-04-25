@@ -37,25 +37,32 @@ class FriendListViewModel : ViewModel() {
     fun fetchSearchedUsers(string: String) {
         viewModelScope.launch {
             val searchedUsers = auth.fetchSearchedUsers(string)
+            Log.d("searched users", searchedUsers.toString())
             val filteredUsers = searchedUsers.filter { user ->
                 !friendsInfoList.any { friend -> friend.uid == user.uid }
             } as MutableList<UserInfo>
-            val currentUser = auth.getCurrentUser()?.userInfo
-            Log.d("current user", currentUser?.username.toString())
-            if (filteredUsers.contains(currentUser)) {
-                filteredUsers.remove(currentUser)
-                Log.d("removed current user", "")
-            }
             _usersList.postValue(filteredUsers)
+        }
+    }
+
+    fun testualFetchFriends(string: String) {
+        viewModelScope.launch {
+            val searchedUsers = auth.fetchSearchedFriends(string)
+            _usersList.postValue(searchedUsers)
         }
     }
 
     fun fetchSearchedFriends(string: String) {
         viewModelScope.launch {
-            val searchedUsers = auth.fetchSearchedFriends(string)
-            val filteredUsers = searchedUsers.filter { user ->
-                !friendsInfoList.any { friend -> friend.uid == user.uid }
-            } as MutableList<UserInfo>
+            Log.d("string search", string)
+            val userFriends = auth.fetchUserFriends()
+            val filteredUsers = mutableListOf<UserInfo>()
+            for (friend in userFriends) {
+                val user = auth.getUserInfo(friend.uid)
+                if (string.lowercase() == user?.username?.lowercase()) {
+                    filteredUsers.add(user)
+                }
+            }
             _usersList.postValue(filteredUsers)
         }
     }
@@ -72,8 +79,8 @@ class FriendListViewModel : ViewModel() {
             val timelyList = auth.fetchUserFriends() as MutableList<UserFriends>
             val friendlist = mutableListOf<UserFriends>()
             val userlist = mutableListOf<UserInfo>()
-            for (user in timelyList){
-                if(user.isFriend){
+            for (user in timelyList) {
+                if (user.isFriend) {
                     friendlist.add(user)
                     auth.getUserInfo(user.uid)?.let { userlist.add(it) }
                 }
