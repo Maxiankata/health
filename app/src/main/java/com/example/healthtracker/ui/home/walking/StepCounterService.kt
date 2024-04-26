@@ -32,6 +32,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.annotations.Nullable
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
@@ -52,6 +53,7 @@ class StepCounterService : Service(), SensorEventListener {
         val sleepDuration: LiveData<Long> get() = _sleepDuration
         val channelId = "step_counter_channel"
         var stepIntent: Intent = Intent(MyApplication.getContext(), StepCounterService::class.java)
+
         val calendar = Calendar.getInstance()
     }
 

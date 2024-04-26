@@ -18,6 +18,7 @@ import com.example.healthtracker.databinding.ChallengeBuilderDialogBinding
 import com.example.healthtracker.ui.account.friends.profile.ChallengeSpinnerAdapter
 import com.example.healthtracker.ui.durationToString
 import com.example.healthtracker.ui.home.speeder.ActivityEnum
+import com.example.healthtracker.ui.parseDurationToLong
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.format.DateTimeParseException
@@ -90,38 +91,46 @@ class ChallengeBuilderDialogFragment : DialogFragment() {
                         MyApplication.getContext(), R.string.empty_field, Toast.LENGTH_SHORT
                     ).show()
                 } else {
-                    Toast.makeText(MyApplication.getContext(), R.string.challenge_sent, Toast.LENGTH_SHORT)
-                        .show()
-                    val selectedItem = challengeTypeSpinner.selectedItem as SpinnerItem
-                    val challengeTypeId = selectedItem.itemId
-                    try {
-                        val activityType: ActivityEnum = when (challengeTypeId) {
-                            1 -> ActivityEnum.RUNNING
-                            2 -> ActivityEnum.CYCLING
-                            3 -> ActivityEnum.JOGGING
-                            4 -> ActivityEnum.WALKING
-                            else -> {
-                                ActivityEnum.WALKING
-                            }
-                        }
-                        val id = (Math.random())*100000
-                        val challenge = Challenge(
-                            challengeCompletion = false,
-                            challengeDuration = stringDuration,
-                            challengeType = activityType,
-                            assigner = assigner.first!!,
-                            image = assigner.second!!,
-                            id = id.toInt()
-                        )
-                        lifecycleScope.launch {
-                            challengeBuilderDialogViewModel.sendChallenge(userId, challenge)
-                        }
-                    } catch (e: DateTimeParseException) {
+                    if (parseDurationToLong(stringDuration)>7200000){
+                        Toast.makeText(MyApplication.getContext(), R.string.max_hours, Toast.LENGTH_SHORT).show()
+                    }else {
                         Toast.makeText(
                             MyApplication.getContext(),
-                            R.string.invalid_duration_format,
+                            R.string.challenge_sent,
                             Toast.LENGTH_SHORT
                         ).show()
+                        val selectedItem = challengeTypeSpinner.selectedItem as SpinnerItem
+                        val challengeTypeId = selectedItem.itemId
+                        try {
+                            val activityType: ActivityEnum = when (challengeTypeId) {
+                                1 -> ActivityEnum.RUNNING
+                                2 -> ActivityEnum.CYCLING
+                                3 -> ActivityEnum.JOGGING
+                                4 -> ActivityEnum.WALKING
+                                else -> {
+                                    ActivityEnum.WALKING
+                                }
+                            }
+                            val id = (Math.random()) * 100000
+                            val challenge = Challenge(
+                                challengeCompletion = false,
+                                challengeDuration = stringDuration,
+                                challengeType = activityType,
+                                assigner = assigner.first!!,
+                                image = assigner.second!!,
+                                id = id.toInt()
+                            )
+                            lifecycleScope.launch {
+                                challengeBuilderDialogViewModel.sendChallenge(userId, challenge)
+                            }
+
+                        } catch (e: DateTimeParseException) {
+                            Toast.makeText(
+                                MyApplication.getContext(),
+                                R.string.invalid_duration_format,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
             }

@@ -156,6 +156,7 @@
     <string name="accepted">Accepted</string>
     <string name="unknown_error">Unknown error, try again</string>
     <string name="new_challenge">A user has challenged you!</string>
+    <string name="max_hours">Please limit the challenge to 2 hours at max.</string>
     <string-array name="activities">
         <item>Walking</item>
         <item>Power Walking</item>

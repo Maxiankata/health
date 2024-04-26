@@ -301,9 +301,7 @@ fun stopStepCounterService() {
 
 fun startSpeeder(time: String, activity: ActivityEnum, challengeId: Int?) {
     val intent: Intent =
-        SpeederService.speedIntent.putExtra("time", time).putExtra("activity", activity.name)
-            .putExtra("challenge", challengeId.toString())
-
+        SpeederService.speedIntent.putExtra("time", time).putExtra("activity", activity.name).putExtra("challenge", challengeId.toString())
     MyApplication.getContext().startForegroundService(intent)
 }
 
